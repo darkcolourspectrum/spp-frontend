@@ -8,7 +8,6 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@/api': path.resolve(__dirname, './src/api'),
-      '@/store': path.resolve(__dirname, './src/store'),
       '@/modules': path.resolve(__dirname, './src/modules'),
       '@/pages': path.resolve(__dirname, './src/pages'),
       '@/shared': path.resolve(__dirname, './src/modules/shared'),
@@ -27,10 +26,26 @@ export default defineConfig({
     port: 3000,
     open: true,
     proxy: {
-      '/api': {
+      // Auth Service (порт 8000)
+      '/api/auth': {
         target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
+        rewrite: (path) => path.replace(/^\/api\/auth/, '/api/v1/auth')
+      },
+      // Profile Service (порт 8002)
+      '/api/profile': {
+        target: 'http://localhost:8002',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/profile/, '/api/v1/profiles')
+      },
+      // Schedule Service (порт 8001)
+      '/api/schedule': {
+        target: 'http://localhost:8001',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/schedule/, '/api/v1/schedule')
       }
     }
   }

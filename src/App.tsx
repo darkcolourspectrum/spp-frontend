@@ -1,35 +1,85 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+import { useEffect, useState } from 'react';
+import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
+import { store } from './store';
+import { setAccessToken, logout, checkAuthStatus } from './modules/auth/store';
+import AppRoutes from './routes';
+import './App.css';
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+function AppContent() {
+  const [isInitialized, setIsInitialized] = useState(false);
+  
+  useEffect(() => {
+    // Проверяем наличие активной сессии при запуске приложения
+    const initializeAuth = async () => {
+      try {
+        await store.dispatch(checkAuthStatus()).unwrap();
+      } catch (error) {
+        // Нет активной сессии - ничего не делаем
+        console.log('No active session');
+      } finally {
+        setIsInitialized(true);
+      }
+    };
+    
+    initializeAuth();
+    
+    // Слушатель для обновления токена (из axios interceptor)
+    const handleTokenRefresh = (event: Event) => {
+      const customEvent = event as CustomEvent<{ accessToken: string }>;
+      store.dispatch(setAccessToken(customEvent.detail.accessToken));
+    };
+
+    // Слушатель для выхода (из axios interceptor)
+    const handleLogout = () => {
+      store.dispatch(logout());
+    };
+
+    window.addEventListener('auth:token-refreshed', handleTokenRefresh);
+    window.addEventListener('auth:logout', handleLogout);
+
+    return () => {
+      window.removeEventListener('auth:token-refreshed', handleTokenRefresh);
+      window.removeEventListener('auth:logout', handleLogout);
+    };
+  }, []);
+  
+  // Показываем loader пока инициализируемся
+  if (!isInitialized) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '20px',
+        color: '#667eea',
+        fontWeight: 600
+      }}>
+        <div>
+          <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+            Schedule Schedule-Platform Plus
+          </div>
+          <div style={{ fontSize: '16px', fontWeight: 400 }}>
+            Загрузка приложения...
+          </div>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    );
+  }
+
+  return <AppRoutes />;
 }
 
-export default App
+function App() {
+  return (
+    <Provider store={store}>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </Provider>
+  );
+}
+
+export default App;
