@@ -22,9 +22,10 @@ import type {
 
 /**
  * Получение своего профиля
+ * Использует user_id из токена
  */
-export const getMyProfile = async (): Promise<UserProfile> => {
-  const response = await apiClient.get<UserProfile>(PROFILE_ENDPOINTS.MY_PROFILE);
+export const getMyProfile = async (userId: number): Promise<UserProfile> => {
+  const response = await apiClient.get<UserProfile>(PROFILE_ENDPOINTS.PROFILE_BY_ID(userId));
   return response.data;
 };
 
@@ -39,8 +40,8 @@ export const getProfileById = async (userId: number): Promise<UserProfile> => {
 /**
  * Обновление своего профиля
  */
-export const updateMyProfile = async (data: ProfileUpdateRequest): Promise<UserProfile> => {
-  const response = await apiClient.put<UserProfile>(PROFILE_ENDPOINTS.UPDATE_PROFILE, data);
+export const updateMyProfile = async (userId: number, data: ProfileUpdateRequest): Promise<UserProfile> => {
+  const response = await apiClient.put<UserProfile>(PROFILE_ENDPOINTS.PROFILE_BY_ID(userId), data);
   return response.data;
 };
 

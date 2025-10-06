@@ -15,12 +15,13 @@ interface ProfileViewProps {
 const ProfileView = ({ onEdit }: ProfileViewProps) => {
   const dispatch = useAppDispatch();
   const { profile, isLoading, error } = useAppSelector((state) => state.profile);
+  const { user } = useAppSelector((state) => state.auth);
   
   useEffect(() => {
-    if (!profile) {
-      dispatch(fetchMyProfile());
+    if (!profile && user?.id) {
+      dispatch(fetchMyProfile(user.id));
     }
-  }, [dispatch, profile]);
+  }, [dispatch, profile, user]);
   
   if (isLoading && !profile) {
     return (
@@ -36,9 +37,11 @@ const ProfileView = ({ onEdit }: ProfileViewProps) => {
       <div className="profile-view-error">
         <h3>Ошибка загрузки профиля</h3>
         <p>{error}</p>
-        <button onClick={() => dispatch(fetchMyProfile())}>
-          Попробовать снова
-        </button>
+        {user?.id && (
+          <button onClick={() => dispatch(fetchMyProfile(user.id))}>
+            Попробовать снова
+          </button>
+        )}
       </div>
     );
   }

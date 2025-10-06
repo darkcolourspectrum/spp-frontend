@@ -36,16 +36,16 @@ const getErrorMessage = (error: unknown): string => {
  */
 export const fetchMyProfile = createAsyncThunk(
   'profile/fetchMyProfile',
-  async (_, { dispatch, rejectWithValue }) => {
+  async (userId: number, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoading(true));
       
-      const profile = await profileApi.getMyProfile();
+      const profile = await profileApi.getMyProfile(userId);
       dispatch(setProfile(profile));
       
       return profile;
-      
-    } catch (error) {
+    }  
+    catch (error) {
       const errorMessage = getErrorMessage(error);
       dispatch(setError(errorMessage));
       return rejectWithValue(errorMessage);
@@ -60,15 +60,15 @@ export const fetchMyProfile = createAsyncThunk(
  */
 export const updateMyProfile = createAsyncThunk(
   'profile/updateMyProfile',
-  async (data: ProfileUpdateRequest, { dispatch, rejectWithValue }) => {
+  async ({ userId, data }: { userId: number; data: ProfileUpdateRequest }, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setUpdating(true));
-      
-      const updatedProfile = await profileApi.updateMyProfile(data);
+     
+      const updatedProfile = await profileApi.updateMyProfile(userId, data);
       dispatch(setProfile(updatedProfile));
-      
+     
       return updatedProfile;
-      
+     
     } catch (error) {
       const errorMessage = getErrorMessage(error);
       dispatch(setError(errorMessage));

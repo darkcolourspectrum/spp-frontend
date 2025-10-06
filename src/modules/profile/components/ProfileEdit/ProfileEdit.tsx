@@ -6,7 +6,6 @@ import { useState, useEffect, FormEvent } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { updateMyProfile } from '@/modules/profile/store';
 import type { ProfileUpdateRequest } from '@/api/profile/types';
-import { formatPhoneNumber } from '@/utils/helpers';
 import AvatarUpload from '../AvatarUpload';
 import './profileEdit.css';
 
@@ -91,6 +90,11 @@ const ProfileEdit = ({ onCancel, onSuccess }: ProfileEditProps) => {
       return;
     }
     
+    if (!profile?.user_id) {
+      setValidationErrors({ general: 'Не удалось определить пользователя' });
+      return;
+    }
+    
     try {
       const updateData: ProfileUpdateRequest = {
         first_name: formData.first_name.trim(),
@@ -99,7 +103,7 @@ const ProfileEdit = ({ onCancel, onSuccess }: ProfileEditProps) => {
         bio: formData.bio.trim() || undefined,
       };
       
-      await dispatch(updateMyProfile(updateData)).unwrap();
+      await dispatch(updateMyProfile({ userId: profile.user_id, data: updateData })).unwrap();
       
       setSuccessMessage('Профиль успешно обновлен!');
       
@@ -157,7 +161,7 @@ const ProfileEdit = ({ onCancel, onSuccess }: ProfileEditProps) => {
               )}
             </div>
             
-<div className="form-group">
+            <div className="form-group">
               <label htmlFor="last_name">Фамилия *</label>
               <input
                 id="last_name"
@@ -196,40 +200,46 @@ const ProfileEdit = ({ onCancel, onSuccess }: ProfileEditProps) => {
         </div>
         
         <div className="profile-edit-section">
-            <h3 className="section-label">О себе</h3>
-            
-            <div className="form-group">
-                <label htmlFor="bio">Биография</label>
-                <textarea
-                id="bio"
-                name="bio"
-                value={formData.bio}
-                onChange={handleChange}
-                disabled={isUpdating}
-                placeholder="Расскажите немного о себе..."
-                rows={4}
-                maxLength={500}
-                />
-                <div className="char-counter">
-                {formData.bio.length}/500 символов
-                </div>
-                {validationErrors.bio && (
-                <span className="field-error">{validationErrors.bio}</span>
-                )}
+          <h3 className="section-label">О себе</h3>
+          
+          <div className="form-group">
+            <label htmlFor="bio">Биография</label>
+            <textarea
+              id="bio"
+              name="bio"
+              value={formData.bio}
+              onChange={handleChange}
+              disabled={isUpdating}
+              placeholder="Расскажите немного о себе..."
+              rows={4}
+              maxLength={500}
+            />
+            <div className="char-counter">
+              {formData.bio.length}/500 символов
             </div>
+            {validationErrors.bio && (
+              <span className="field-error">{validationErrors.bio}</span>
+            )}
+          </div>
         </div>
         
         {/* Сообщения */}
         {successMessage && (
-        <div className="profile-edit-success">
+          <div className="profile-edit-success">
             {successMessage}
-        </div>
+          </div>
         )}
         
         {error && (
-        <div className="profile-edit-error">
+          <div className="profile-edit-error">
             {error}
-        </div>
+          </div>
+        )}
+        
+        {validationErrors.general && (
+          <div className="profile-edit-error">
+            {validationErrors.general}
+          </div>
         )}
         
         {/* Кнопки действий */}
