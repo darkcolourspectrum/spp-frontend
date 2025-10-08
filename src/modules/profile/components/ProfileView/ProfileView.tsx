@@ -1,7 +1,3 @@
-/**
- * ProfileView - компонент просмотра профиля
- */
-
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchMyProfile } from '@/modules/profile/store';
@@ -47,40 +43,54 @@ const ProfileView = ({ onEdit }: ProfileViewProps) => {
   }
   
   if (!profile) {
-    return null;
+    return (
+      <div className="profile-view-loading">
+        <p>Нет данных профиля</p>
+      </div>
+    );
   }
+  
+  const userInfo = (profile as any).user_info || {};
+  const firstName = userInfo.first_name || '';
+  const lastName = userInfo.last_name || '';
+  const email = userInfo.email || '';
+  const role = userInfo.role?.name || userInfo.role || 'student';
+  const isActive = userInfo.is_active ?? true;
+  const isVerified = userInfo.is_verified ?? false;
+  const createdAt = userInfo.created_at || (profile as any).created_at;
+  const lastLogin = userInfo.last_login;
+  
+  const displayName = (profile as any).display_name || `${firstName} ${lastName}`.trim() || 'Пользователь';
+  const bio = (profile as any).bio;
+  const avatarUrl = (profile as any).avatar_url;
+  const phone = (profile as any).phone;
+  
+  const userInitials = getUserInitials(firstName, lastName);
   
   return (
     <div className="profile-view">
-      {/* Header секция */}
       <div className="profile-header">
         <div className="profile-avatar-section">
-          {profile.avatar_url ? (
+          {avatarUrl ? (
             <img 
-              src={profile.avatar_url} 
-              alt={profile.full_name}
+              src={avatarUrl} 
+              alt={displayName}
               className="profile-avatar-large"
             />
           ) : (
             <div className="profile-avatar-large profile-avatar-placeholder">
-              {getUserInitials(profile.first_name, profile.last_name)}
+              {userInitials}
             </div>
           )}
         </div>
         
         <div className="profile-header-info">
-          <h1 className="profile-name">{profile.full_name}</h1>
+          <h1 className="profile-name">{displayName}</h1>
           <div className="profile-meta">
-            <span className="profile-role">{getRoleDisplayName(profile.role)}</span>
-            {profile.studio_name && (
-              <>
-                <span className="profile-separator">•</span>
-                <span className="profile-studio">{profile.studio_name}</span>
-              </>
-            )}
+            <span className="profile-role">{getRoleDisplayName(role)}</span>
           </div>
-          {profile.bio && (
-            <p className="profile-bio">{profile.bio}</p>
+          {bio && (
+            <p className="profile-bio">{bio}</p>
           )}
           {onEdit && (
             <button className="profile-edit-button" onClick={onEdit}>
@@ -90,22 +100,31 @@ const ProfileView = ({ onEdit }: ProfileViewProps) => {
         </div>
       </div>
       
-      {/* Информация */}
       <div className="profile-content">
         <div className="profile-section">
           <h2 className="section-title">Контактная информация</h2>
           <div className="profile-info-grid">
             <div className="info-item">
               <span className="info-label">Email</span>
-              <span className="info-value">{profile.email}</span>
+              <span className="info-value">{email || 'Не указан'}</span>
             </div>
             
-            {profile.phone && (
+            {phone && (
               <div className="info-item">
                 <span className="info-label">Телефон</span>
-                <span className="info-value">{profile.phone}</span>
+                <span className="info-value">{phone}</span>
               </div>
             )}
+            
+            <div className="info-item">
+              <span className="info-label">Имя</span>
+              <span className="info-value">{firstName || 'Не указано'}</span>
+            </div>
+            
+            <div className="info-item">
+              <span className="info-label">Фамилия</span>
+              <span className="info-value">{lastName || 'Не указана'}</span>
+            </div>
           </div>
         </div>
         
@@ -114,27 +133,27 @@ const ProfileView = ({ onEdit }: ProfileViewProps) => {
           <div className="profile-info-grid">
             <div className="info-item">
               <span className="info-label">Статус</span>
-              <span className={`info-value status-badge ${profile.is_active ? 'active' : 'inactive'}`}>
-                {profile.is_active ? 'Активен' : 'Неактивен'}
+              <span className={`info-value status-badge ${isActive ? 'active' : 'inactive'}`}>
+                {isActive ? 'Активен' : 'Неактивен'}
               </span>
             </div>
             
             <div className="info-item">
               <span className="info-label">Верификация</span>
-              <span className={`info-value status-badge ${profile.is_verified ? 'verified' : 'not-verified'}`}>
-                {profile.is_verified ? 'Верифицирован' : 'Не верифицирован'}
+              <span className={`info-value status-badge ${isVerified ? 'verified' : 'not-verified'}`}>
+                {isVerified ? 'Верифицирован' : 'Не верифицирован'}
               </span>
             </div>
             
             <div className="info-item">
               <span className="info-label">Дата регистрации</span>
-              <span className="info-value">{formatDate(profile.created_at)}</span>
+              <span className="info-value">{createdAt ? formatDate(createdAt) : 'Не указана'}</span>
             </div>
             
-            {profile.last_login && (
+            {lastLogin && (
               <div className="info-item">
                 <span className="info-label">Последний вход</span>
-                <span className="info-value">{formatDate(profile.last_login)}</span>
+                <span className="info-value">{formatDate(lastLogin)}</span>
               </div>
             )}
           </div>

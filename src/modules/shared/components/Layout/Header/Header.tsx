@@ -1,8 +1,3 @@
-/**
- * Header - главная шапка приложения
- * Навигация зависит от роли пользователя
- */
-
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/modules/auth/hooks';
@@ -17,7 +12,6 @@ const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
-  // Закрытие dropdown при клике вне его
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -33,10 +27,19 @@ const Header = () => {
     await logout();
   };
   
+  const getProfileRoute = () => {
+    if (isStudent()) {
+      return ROUTES.STUDENT.PROFILE;
+    }
+    if (isTeacher()) {
+      return ROUTES.TEACHER.PROFILE;
+    }
+    return ROUTES.PROFILE;
+  };
+  
   const getNavigationLinks = () => {
     if (isAdmin()) {
       return [
-        { label: 'Dashboard', path: ROUTES.ADMIN.DASHBOARD },
         { label: 'Пользователи', path: ROUTES.ADMIN.USERS },
         { label: 'Студии', path: ROUTES.ADMIN.STUDIOS },
         { label: 'Статистика', path: ROUTES.ADMIN.STATISTICS },
@@ -45,18 +48,14 @@ const Header = () => {
     
     if (isTeacher()) {
       return [
-        { label: 'Dashboard', path: ROUTES.TEACHER.SCHEDULE },
         { label: 'Расписание', path: ROUTES.TEACHER.SCHEDULE },
         { label: 'Студенты', path: ROUTES.TEACHER.STUDENTS },
-        { label: 'Мой профиль', path: ROUTES.TEACHER.PROFILE },
       ];
     }
     
     if (isStudent()) {
       return [
-        { label: 'Dashboard', path: ROUTES.STUDENT.SCHEDULE },
         { label: 'Расписание', path: ROUTES.STUDENT.SCHEDULE },
-        { label: 'Мой профиль', path: ROUTES.STUDENT.PROFILE },
       ];
     }
     
@@ -68,13 +67,11 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-container">
-        {/* Логотип */}
         <Link to={ROUTES.HOME} className="header-logo">
           <span className="logo-icon">🎵</span>
           <span className="logo-text">SPP</span>
         </Link>
         
-        {/* Навигация */}
         <nav className="header-nav">
           {navigationLinks.map((link) => (
             <Link
@@ -87,7 +84,6 @@ const Header = () => {
           ))}
         </nav>
         
-        {/* Профиль пользователя */}
         <div className="header-profile" ref={dropdownRef}>
           <button
             className="profile-button"
@@ -96,15 +92,11 @@ const Header = () => {
             <div className="profile-avatar">
               {getUserInitials(user?.first_name, user?.last_name)}
             </div>
-            <span className="profile-name">
-              {user?.first_name || 'Пользователь'}
-            </span>
             <span className={`dropdown-arrow ${dropdownOpen ? 'open' : ''}`}>
               ▼
             </span>
           </button>
           
-          {/* Dropdown меню */}
           {dropdownOpen && (
             <div className="profile-dropdown">
               <div className="dropdown-header">
@@ -124,7 +116,7 @@ const Header = () => {
               <div className="dropdown-divider" />
               
               <Link
-                to={ROUTES.PROFILE}
+                to={getProfileRoute()}
                 className="dropdown-item"
                 onClick={() => setDropdownOpen(false)}
               >

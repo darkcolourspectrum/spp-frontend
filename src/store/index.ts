@@ -5,12 +5,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { authReducer } from '@/modules/auth/store';
 import { profileReducer } from '@/modules/profile/store';
+import { adminReducer } from '@/modules/admin/store';
 
 // Создаем store
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     profile: profileReducer,
+    admin: adminReducer,
     // Здесь будут добавляться другие reducers:
     // schedule: scheduleReducer,
   },

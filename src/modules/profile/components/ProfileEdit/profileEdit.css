@@ -1,20 +1,20 @@
 .profile-edit {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  padding: 32px;
-  max-width: 800px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
 .profile-edit-header {
-  margin-bottom: 32px;
+  margin-bottom: 36px;
   padding-bottom: 24px;
   border-bottom: 2px solid #f0f0f0;
 }
 
 .profile-edit-header h2 {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   color: #333;
   margin: 0 0 8px 0;
@@ -24,29 +24,30 @@
   color: #888;
   font-size: 15px;
   margin: 0;
+  line-height: 1.5;
 }
 
 .profile-edit-section {
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 }
 
 .section-label {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   color: #333;
-  margin: 0 0 16px 0;
+  margin: 0 0 20px 0;
 }
 
 .profile-edit-form {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 24px;
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 20px;
 }
 
 .form-group {
@@ -56,26 +57,33 @@
 }
 
 .form-group label {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: #555;
 }
 
 .form-group input,
 .form-group textarea {
-  padding: 12px 16px;
+  padding: 14px 18px;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 16px;
   font-family: inherit;
   transition: all 0.2s ease;
+  background-color: #fff;
+  color: #333;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #999;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
   border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
 }
 
 .form-group input:disabled,
@@ -87,56 +95,61 @@
 
 .form-group textarea {
   resize: vertical;
-  min-height: 100px;
+  min-height: 120px;
+  line-height: 1.6;
 }
 
 .char-counter {
-  font-size: 12px;
+  font-size: 13px;
   color: #888;
   text-align: right;
+  margin-top: -4px;
 }
 
 .field-error {
   font-size: 13px;
   color: #dc3545;
-  margin-top: -4px;
+  margin-top: -2px;
+  line-height: 1.4;
 }
 
 .profile-edit-success {
-  padding: 12px 16px;
+  padding: 14px 18px;
   background: #d4edda;
   color: #155724;
   border-radius: 8px;
   border-left: 4px solid #28a745;
-  margin-bottom: 24px;
-  font-size: 14px;
+  margin-bottom: 28px;
+  font-size: 15px;
   font-weight: 500;
+  line-height: 1.5;
 }
 
 .profile-edit-error {
-  padding: 12px 16px;
+  padding: 14px 18px;
   background: #fee;
   color: #c33;
   border-radius: 8px;
   border-left: 4px solid #c33;
-  margin-bottom: 24px;
-  font-size: 14px;
+  margin-bottom: 28px;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 .profile-edit-actions {
   display: flex;
   gap: 16px;
   justify-content: flex-end;
-  margin-top: 32px;
-  padding-top: 24px;
+  margin-top: 36px;
+  padding-top: 28px;
   border-top: 2px solid #f0f0f0;
 }
 
 .profile-button {
-  padding: 12px 32px;
+  padding: 14px 32px;
   border: none;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -148,14 +161,17 @@
 }
 
 .profile-button-primary {
-  background: #667eea;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
 .profile-button-primary:hover:not(:disabled) {
-  background: #5568d3;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.profile-button-primary:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .profile-button-secondary {
@@ -165,14 +181,19 @@
 }
 
 .profile-button-secondary:hover:not(:disabled) {
-  background: #f5f5f5;
+  background: #f8f9fa;
   border-color: #ccc;
+  color: #333;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .profile-edit {
-    padding: 24px 16px;
+    padding: 28px 20px;
+  }
+  
+  .profile-edit-header h2 {
+    font-size: 24px;
   }
   
   .form-row {
