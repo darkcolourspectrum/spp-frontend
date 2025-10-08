@@ -12,6 +12,7 @@ import type {
   CreateStudioRequest,
   UpdateStudioRequest,
   AdminActionResponse,
+  SystemStats,
 } from './types';
 
 // Endpoints
@@ -21,18 +22,19 @@ const ADMIN_ENDPOINTS = {
   CHANGE_ROLE: '/api/auth/admin/change-user-role',
   ASSIGN_STUDIO: '/api/auth/admin/assign-studio',
   
-  STUDIOS: '/api/auth/studios',
-  STUDIO_BY_ID: (id: number) => `/api/auth/studios/${id}`,
-  STUDIO_ACTIVATE: (id: number) => `/api/auth/studios/${id}/activate`,
-  STUDIO_DEACTIVATE: (id: number) => `/api/auth/studios/${id}`,
-  STUDIO_TEACHERS: (id: number) => `/api/auth/studios/${id}/teachers`,
+  // Studios - идут через Auth Service, но НЕ через /auth prefix
+  STUDIOS: '/api/studios',
+  STUDIO_BY_ID: (id: number) => `/api/studios/${id}`,
+  STUDIO_ACTIVATE: (id: number) => `/api/studios/${id}/activate`,
+  STUDIO_DEACTIVATE: (id: number) => `/api/studios/${id}`,
+  STUDIO_TEACHERS: (id: number) => `/api/studios/${id}/teachers`,
+  
+  // Dashboard - идет через Profile Service, но НЕ через /profile prefix  
+  SYSTEM_STATS: '/api/dashboard/stats/system',
 };
 
 // ==================== USERS ====================
 
-/**
- * Получение списка всех пользователей
- */
 export const getAllUsers = async (params?: {
   limit?: number;
   offset?: number;
@@ -43,9 +45,6 @@ export const getAllUsers = async (params?: {
   return response.data;
 };
 
-/**
- * Назначение роли преподавателя
- */
 export const assignTeacherRole = async (
   data: AssignTeacherRequest
 ): Promise<AdminActionResponse> => {
@@ -56,9 +55,6 @@ export const assignTeacherRole = async (
   return response.data;
 };
 
-/**
- * Изменение роли пользователя
- */
 export const changeUserRole = async (
   data: ChangeRoleRequest
 ): Promise<AdminActionResponse> => {
@@ -69,9 +65,6 @@ export const changeUserRole = async (
   return response.data;
 };
 
-/**
- * Привязка пользователя к студии
- */
 export const assignUserToStudio = async (
   data: AssignStudioRequest
 ): Promise<AdminActionResponse> => {
@@ -84,33 +77,21 @@ export const assignUserToStudio = async (
 
 // ==================== STUDIOS ====================
 
-/**
- * Получение списка студий
- */
 export const getAllStudios = async (): Promise<Studio[]> => {
   const response = await apiClient.get<Studio[]>(ADMIN_ENDPOINTS.STUDIOS);
   return response.data;
 };
 
-/**
- * Получение студии по ID
- */
 export const getStudioById = async (id: number): Promise<Studio> => {
   const response = await apiClient.get<Studio>(ADMIN_ENDPOINTS.STUDIO_BY_ID(id));
   return response.data;
 };
 
-/**
- * Создание новой студии
- */
 export const createStudio = async (data: CreateStudioRequest): Promise<Studio> => {
   const response = await apiClient.post<Studio>(ADMIN_ENDPOINTS.STUDIOS, data);
   return response.data;
 };
 
-/**
- * Обновление студии
- */
 export const updateStudio = async (
   id: number,
   data: UpdateStudioRequest
@@ -119,9 +100,6 @@ export const updateStudio = async (
   return response.data;
 };
 
-/**
- * Активация студии
- */
 export const activateStudio = async (id: number): Promise<AdminActionResponse> => {
   const response = await apiClient.post<AdminActionResponse>(
     ADMIN_ENDPOINTS.STUDIO_ACTIVATE(id)
@@ -129,9 +107,6 @@ export const activateStudio = async (id: number): Promise<AdminActionResponse> =
   return response.data;
 };
 
-/**
- * Деактивация студии
- */
 export const deactivateStudio = async (id: number): Promise<AdminActionResponse> => {
   const response = await apiClient.delete<AdminActionResponse>(
     ADMIN_ENDPOINTS.STUDIO_DEACTIVATE(id)
@@ -139,13 +114,31 @@ export const deactivateStudio = async (id: number): Promise<AdminActionResponse>
   return response.data;
 };
 
-/**
- * Получение преподавателей студии
- */
 export const getStudioTeachers = async (id: number): Promise<AdminUser[]> => {
   const response = await apiClient.get<AdminUser[]>(ADMIN_ENDPOINTS.STUDIO_TEACHERS(id));
   return response.data;
 };
 
-// Экспортируем типы
-export type * from './types';
+// ==================== DASHBOARD ====================
+
+/**
+ * Получение системной статистики для дашборда
+ */
+export const getSystemStats = async (): Promise<SystemStats> => {
+  const response = await apiClient.get<SystemStats>(ADMIN_ENDPOINTS.SYSTEM_STATS);
+  return response.data;
+};
+
+// Экспортируем типы явно
+export type {
+  AdminUser,
+  Studio,
+  AssignTeacherRequest,
+  ChangeRoleRequest,
+  AssignStudioRequest,
+  CreateStudioRequest,
+  UpdateStudioRequest,
+  AdminActionResponse,
+  SystemStats,
+  DashboardStats,
+} from './types';

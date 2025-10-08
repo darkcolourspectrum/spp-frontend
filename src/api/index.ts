@@ -59,4 +59,6 @@ export type {
   CreateStudioRequest,
   UpdateStudioRequest,
   AdminActionResponse,
+  SystemStats,
+  DashboardStats,
 } from './admin/types';

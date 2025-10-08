@@ -46,7 +46,21 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api\/schedule/, '/api/v1/schedule')
-      }
+      },
+      // Studios endpoint (Auth Service, но без /auth prefix)
+      '/api/studios': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/studios/, '/api/v1/studios')
+      },
+      // Dashboard endpoint (Profile Service, но без /profile prefix)
+      '/api/dashboard': {
+        target: 'http://localhost:8002',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/dashboard/, '/api/v1/dashboard')
+      },
     }
   }
 })

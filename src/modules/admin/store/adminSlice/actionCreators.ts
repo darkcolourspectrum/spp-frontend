@@ -4,19 +4,22 @@
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
-import * as adminApi from '@/api/admin';
+import * as adminApi from '@/api/admin/index';
 import type {
   AssignTeacherRequest,
   ChangeRoleRequest,
   AssignStudioRequest,
   CreateStudioRequest,
   UpdateStudioRequest,
+  DashboardStats,
 } from '@/api/admin/types';
 import {
   setUsers,
   setStudios,
+  setDashboardStats,
   setLoadingUsers,
   setLoadingStudios,
+  setLoadingDashboard,
   setSubmitting,
   setError,
   setSuccessMessage,
@@ -75,6 +78,44 @@ export const fetchAllStudios = createAsyncThunk(
       return rejectWithValue(errorMessage);
     } finally {
       dispatch(setLoadingStudios(false));
+    }
+  }
+);
+
+/**
+ * Загрузка статистики для дашборда
+ */
+export const fetchDashboardStats = createAsyncThunk(
+  'admin/fetchDashboardStats',
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setLoadingDashboard(true));
+      
+      // Параллельная загрузка данных (как в auth модуле)
+      const [systemStats, studios] = await Promise.all([
+        adminApi.getSystemStats(),
+        adminApi.getAllStudios(),
+      ]);
+      
+      // Формируем статистику для UI
+      const dashboardStats: DashboardStats = {
+        totalUsers: systemStats.users.total_users,
+        totalStudios: studios.length,
+        activeTeachers: systemStats.users.total_teachers,
+        activeStudents: systemStats.users.total_students,
+        totalComments: systemStats.content.total_comments,
+        totalActivities: systemStats.content.total_activities,
+      };
+      
+      dispatch(setDashboardStats(dashboardStats));
+      
+      return dashboardStats;
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      dispatch(setError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setLoadingDashboard(false));
     }
   }
 );

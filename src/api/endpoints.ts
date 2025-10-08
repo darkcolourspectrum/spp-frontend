@@ -37,6 +37,9 @@ export const PROFILE_ENDPOINTS = {
   
   // Дашборд
   DASHBOARD: '/api/profile/dashboard',
+  ADMIN_DASHBOARD: (userId: number) => `/api/profile/dashboard/admin/${userId}`,
+  SYSTEM_STATS: '/api/profile/dashboard/stats/system',
+  
   
   // Комментарии
   COMMENTS: (userId: number) => `/api/profile/${userId}/comments`,

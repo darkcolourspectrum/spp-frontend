@@ -3,7 +3,7 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { AdminUser, Studio } from '@/api/admin/types';
+import type { AdminUser, Studio, DashboardStats } from '@/api/admin/types';
 
 // ==================== STATE TYPE ====================
 
@@ -11,6 +11,9 @@ export interface AdminState {
   // Списки
   users: AdminUser[];
   studios: Studio[];
+  
+  // Dashboard статистика
+  dashboardStats: DashboardStats | null;
   
   // Фильтры
   filters: {
@@ -22,6 +25,7 @@ export interface AdminState {
   // Статусы загрузки
   isLoadingUsers: boolean;
   isLoadingStudios: boolean;
+  isLoadingDashboard: boolean;
   isSubmitting: boolean;
   
   // Ошибки
@@ -39,6 +43,7 @@ export interface AdminState {
 const initialState: AdminState = {
   users: [],
   studios: [],
+  dashboardStats: null,
   filters: {
     roleFilter: '',
     studioFilter: '',
@@ -46,6 +51,7 @@ const initialState: AdminState = {
   },
   isLoadingUsers: false,
   isLoadingStudios: false,
+  isLoadingDashboard: false,
   isSubmitting: false,
   error: null,
   successMessage: null,
@@ -68,6 +74,13 @@ const adminSlice = createSlice({
     // Установка студий
     setStudios: (state, action: PayloadAction<Studio[]>) => {
       state.studios = action.payload;
+      state.error = null;
+    },
+    
+    // Установка статистики дашборда
+    setDashboardStats: (state, action: PayloadAction<DashboardStats>) => {
+      state.dashboardStats = action.payload;
+      state.lastUpdated = new Date().toISOString();
       state.error = null;
     },
     
@@ -114,6 +127,13 @@ const adminSlice = createSlice({
       }
     },
     
+    setLoadingDashboard: (state, action: PayloadAction<boolean>) => {
+      state.isLoadingDashboard = action.payload;
+      if (action.payload) {
+        state.error = null;
+      }
+    },
+    
     setSubmitting: (state, action: PayloadAction<boolean>) => {
       state.isSubmitting = action.payload;
       if (action.payload) {
@@ -127,6 +147,7 @@ const adminSlice = createSlice({
       state.error = action.payload;
       state.isLoadingUsers = false;
       state.isLoadingStudios = false;
+      state.isLoadingDashboard = false;
       state.isSubmitting = false;
     },
     
@@ -149,6 +170,7 @@ const adminSlice = createSlice({
     clearAdminData: (state) => {
       state.users = [];
       state.studios = [];
+      state.dashboardStats = null;
       state.filters = initialState.filters;
       state.error = null;
       state.successMessage = null;
@@ -162,6 +184,7 @@ const adminSlice = createSlice({
 export const {
   setUsers,
   setStudios,
+  setDashboardStats,
   updateUser,
   setRoleFilter,
   setStudioFilter,
@@ -169,6 +192,7 @@ export const {
   resetFilters,
   setLoadingUsers,
   setLoadingStudios,
+  setLoadingDashboard,
   setSubmitting,
   setError,
   clearError,

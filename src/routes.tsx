@@ -12,10 +12,13 @@ import Login from './modules/auth/components/Login';
 import Register from './modules/auth/components/Register';
 import ProtectedRoute from './modules/auth/components/ProtectedRoute';
 
-// Pages
+// Admin Pages - РЕАЛЬНЫЕ КОМПОНЕНТЫ
+import { AdminDashboardPage, AdminUsersPage } from './pages/admin';
+
+// Other Pages
 import StudentProfilePage from './pages/StudentProfilePage';
 
-// Временные placeholder компоненты
+// Временные placeholder компоненты (оставшиеся)
 const Dashboard = () => (
   <div style={{ padding: '40px', textAlign: 'center' }}>
     <h1>Dashboard</h1>
@@ -23,31 +26,17 @@ const Dashboard = () => (
   </div>
 );
 
-const AdminDashboard = () => (
-  <div style={{ padding: '40px', textAlign: 'center' }}>
-    <h1>Админ Панель</h1>
-    <p>Управление системой</p>
-  </div>
-);
-
-const AdminUsers = () => (
-  <div style={{ padding: '40px', textAlign: 'center' }}>
-    <h1>Управление пользователями</h1>
-    <p>Список всех пользователей системы</p>
-  </div>
-);
-
 const AdminStudios = () => (
   <div style={{ padding: '40px', textAlign: 'center' }}>
     <h1>Управление студиями</h1>
-    <p>Список всех студий</p>
+    <p>Список всех студий (в разработке)</p>
   </div>
 );
 
 const AdminStatistics = () => (
   <div style={{ padding: '40px', textAlign: 'center' }}>
     <h1>Статистика</h1>
-    <p>Аналитика и отчеты</p>
+    <p>Аналитика и отчеты (в разработке)</p>
   </div>
 );
 
@@ -131,8 +120,8 @@ const AppRoutes = () => {
         
         {/* ==================== АДМИН МАРШРУТЫ ==================== */}
         <Route element={<ProtectedRoute requiredRoles={['admin']}><Outlet /></ProtectedRoute>}>
-          <Route path={ROUTES.ADMIN.DASHBOARD} element={<AdminDashboard />} />
-          <Route path={ROUTES.ADMIN.USERS} element={<AdminUsers />} />
+          <Route path={ROUTES.ADMIN.DASHBOARD} element={<AdminDashboardPage />} />
+          <Route path={ROUTES.ADMIN.USERS} element={<AdminUsersPage />} />
           <Route path={ROUTES.ADMIN.STUDIOS} element={<AdminStudios />} />
           <Route path={ROUTES.ADMIN.STATISTICS} element={<AdminStatistics />} />
         </Route>

@@ -1,60 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/modules/auth/hooks/useAuth';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { fetchDashboardStats } from '@/modules/admin/store/adminSlice/actionCreators';
 import './adminDashboardPage.css';
 
-interface DashboardStats {
-  totalUsers: number;
-  totalStudios: number;
-  activeTeachers: number;
-  activeStudents: number;
-  totalLessons: number;
-  pendingApprovals: number;
-}
-
 const AdminDashboardPage = () => {
+  const dispatch = useAppDispatch();
   const { user } = useAuth();
-  const [stats, setStats] = useState<DashboardStats>({
-    totalUsers: 0,
-    totalStudios: 0,
-    activeTeachers: 0,
-    activeStudents: 0,
-    totalLessons: 0,
-    pendingApprovals: 0,
-  });
-  const [isLoading, setIsLoading] = useState(true);
+  
+  // Получаем данные из Redux store
+  const { dashboardStats, isLoadingDashboard, error } = useAppSelector((state) => state.admin);
 
   useEffect(() => {
-    const loadDashboardData = async () => {
-      try {
-        setIsLoading(true);
-        // TODO: Здесь будет реальный запрос к API
-        // const data = await getDashboardStats();
-        // setStats(data);
-        
-        // Пока моковые данные для демонстрации
-        setTimeout(() => {
-          setStats({
-            totalUsers: 127,
-            totalStudios: 5,
-            activeTeachers: 12,
-            activeStudents: 98,
-            totalLessons: 456,
-            pendingApprovals: 3,
-          });
-          setIsLoading(false);
-        }, 800);
-      } catch (error) {
-        console.error('Ошибка загрузки данных дашборда:', error);
-        setIsLoading(false);
-      }
-    };
+    // При монтировании компонента загружаем статистику
+    dispatch(fetchDashboardStats());
+  }, [dispatch]);
 
-    loadDashboardData();
-  }, []);
-
-  if (isLoading) {
+  if (isLoadingDashboard && !dashboardStats) {
     return (
       <div className="admin-dashboard-page">
         <div className="loading-state">
@@ -64,6 +28,33 @@ const AdminDashboardPage = () => {
       </div>
     );
   }
+
+  if (error && !dashboardStats) {
+    return (
+      <div className="admin-dashboard-page">
+        <div className="error-state">
+          <h2>Ошибка загрузки</h2>
+          <p>{error}</p>
+          <button 
+            onClick={() => dispatch(fetchDashboardStats())} 
+            className="retry-button"
+          >
+            Попробовать снова
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Используем данные из store или показываем нули
+  const stats = dashboardStats || {
+    totalUsers: 0,
+    totalStudios: 0,
+    activeTeachers: 0,
+    activeStudents: 0,
+    totalComments: 0,
+    totalActivities: 0,
+  };
 
   return (
     <div className="admin-dashboard-page">
@@ -96,7 +87,7 @@ const AdminDashboardPage = () => {
         <div className="stat-card">
           <div className="stat-icon teachers">👨‍🏫</div>
           <div className="stat-content">
-            <h3>Активные преподаватели</h3>
+            <h3>Преподаватели</h3>
             <p className="stat-value">{stats.activeTeachers}</p>
           </div>
         </div>
@@ -104,24 +95,24 @@ const AdminDashboardPage = () => {
         <div className="stat-card">
           <div className="stat-icon students">🎓</div>
           <div className="stat-content">
-            <h3>Активные студенты</h3>
+            <h3>Студенты</h3>
             <p className="stat-value">{stats.activeStudents}</p>
           </div>
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon lessons">📚</div>
+          <div className="stat-icon lessons">💬</div>
           <div className="stat-content">
-            <h3>Всего уроков</h3>
-            <p className="stat-value">{stats.totalLessons}</p>
+            <h3>Комментариев</h3>
+            <p className="stat-value">{stats.totalComments}</p>
           </div>
         </div>
 
         <div className="stat-card highlight">
-          <div className="stat-icon approvals">⏳</div>
+          <div className="stat-icon approvals">📊</div>
           <div className="stat-content">
-            <h3>Ожидают одобрения</h3>
-            <p className="stat-value">{stats.pendingApprovals}</p>
+            <h3>Активностей</h3>
+            <p className="stat-value">{stats.totalActivities}</p>
           </div>
         </div>
       </div>
@@ -159,24 +150,24 @@ const AdminDashboardPage = () => {
         <h2>Последняя активность</h2>
         <div className="activity-list">
           <div className="activity-item">
-            <div className="activity-icon">✅</div>
+            <div className="activity-icon">📊</div>
             <div className="activity-content">
-              <p><strong>Новый пользователь</strong> зарегистрировался</p>
-              <span className="activity-time">5 минут назад</span>
+              <p><strong>Система готова</strong> к работе</p>
+              <span className="activity-time">Все сервисы запущены</span>
             </div>
           </div>
           <div className="activity-item">
-            <div className="activity-icon">📝</div>
+            <div className="activity-icon">👥</div>
             <div className="activity-content">
-              <p><strong>Урок создан</strong> преподавателем Иваном Петровым</p>
-              <span className="activity-time">15 минут назад</span>
+              <p><strong>Пользователей:</strong> {stats.totalUsers}</p>
+              <span className="activity-time">Студентов: {stats.activeStudents}, Преподавателей: {stats.activeTeachers}</span>
             </div>
           </div>
           <div className="activity-item">
-            <div className="activity-icon">🎓</div>
+            <div className="activity-icon">🏢</div>
             <div className="activity-content">
-              <p><strong>Студент записался</strong> на урок</p>
-              <span className="activity-time">1 час назад</span>
+              <p><strong>Студий:</strong> {stats.totalStudios}</p>
+              <span className="activity-time">Активных студий в системе</span>
             </div>
           </div>
         </div>

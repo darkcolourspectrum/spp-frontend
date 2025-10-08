@@ -40,6 +40,7 @@ const Header = () => {
   const getNavigationLinks = () => {
     if (isAdmin()) {
       return [
+        { label: 'Dashboard', path: ROUTES.ADMIN.DASHBOARD },
         { label: 'Пользователи', path: ROUTES.ADMIN.USERS },
         { label: 'Студии', path: ROUTES.ADMIN.STUDIOS },
         { label: 'Статистика', path: ROUTES.ADMIN.STATISTICS },

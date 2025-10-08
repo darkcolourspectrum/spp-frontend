@@ -2,7 +2,8 @@
  * Типы для Admin API
  */
 
-// Расширенная информация о пользователе для админки
+// ==================== USERS ====================
+
 export interface AdminUser {
   id: number;
   email: string;
@@ -23,7 +24,8 @@ export interface AdminUser {
   privacy_policy_accepted_at: string | null;
 }
 
-// Информация о студии
+// ==================== STUDIOS ====================
+
 export interface Studio {
   id: number;
   name: string;
@@ -37,25 +39,23 @@ export interface Studio {
   created_at: string;
 }
 
-// Запрос на назначение преподавателя
+// ==================== REQUESTS ====================
+
 export interface AssignTeacherRequest {
   user_id: number;
   studio_id: number;
 }
 
-// Запрос на изменение роли
 export interface ChangeRoleRequest {
   user_id: number;
   role: 'admin' | 'teacher' | 'student' | 'guest';
 }
 
-// Запрос на привязку к студии
 export interface AssignStudioRequest {
   user_id: number;
   studio_id: number;
 }
 
-// Создание студии
 export interface CreateStudioRequest {
   name: string;
   description?: string;
@@ -64,7 +64,6 @@ export interface CreateStudioRequest {
   email?: string;
 }
 
-// Обновление студии
 export interface UpdateStudioRequest {
   name?: string;
   description?: string;
@@ -74,7 +73,8 @@ export interface UpdateStudioRequest {
   is_active?: boolean;
 }
 
-// Ответ с сообщением
+// ==================== RESPONSES ====================
+
 export interface AdminActionResponse {
   message: string;
   user?: {
@@ -89,4 +89,34 @@ export interface AdminActionResponse {
     name: string;
     is_active: boolean;
   };
+}
+
+// ==================== DASHBOARD ====================
+
+// Системная статистика (ответ от бэкенда)
+export interface SystemStats {
+  users: {
+    total_students: number;
+    total_teachers: number;
+    total_users: number;
+  };
+  profiles: {
+    total_profiles: number;
+    public_profiles: number;
+    private_profiles: number;
+  };
+  content: {
+    total_comments: number;
+    total_activities: number;
+  };
+}
+
+// Статистика для UI (то что храним в Redux)
+export interface DashboardStats {
+  totalUsers: number;
+  totalStudios: number;
+  activeTeachers: number;
+  activeStudents: number;
+  totalComments: number;
+  totalActivities: number;
 }
