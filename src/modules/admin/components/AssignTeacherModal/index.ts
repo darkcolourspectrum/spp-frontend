@@ -1,0 +1,1 @@
+export { AssignTeacherModal } from './AssignTeacherModal';

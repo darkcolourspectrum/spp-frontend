@@ -146,3 +146,6 @@ export const getStudioTeachers = async (id: number): Promise<AdminUser[]> => {
   const response = await apiClient.get<AdminUser[]>(ADMIN_ENDPOINTS.STUDIO_TEACHERS(id));
   return response.data;
 };
+
+// Экспортируем типы
+export type * from './types';
