@@ -8,7 +8,7 @@ import { AUTH_ENDPOINTS } from './endpoints';
 
 // Создаем основной axios instance
 export const apiClient = axios.create({
-  baseURL: '/',
+  baseURL: 'http://localhost:8080',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',

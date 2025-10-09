@@ -30,7 +30,7 @@ const ADMIN_ENDPOINTS = {
   STUDIO_TEACHERS: (id: number) => `/api/studios/${id}/teachers`,
   
   // Dashboard - идет через Profile Service, но НЕ через /profile prefix  
-  SYSTEM_STATS: '/api/dashboard/stats/system',
+  SYSTEM_STATS: '/api/profile/dashboard/stats/system',
 };
 
 // ==================== USERS ====================

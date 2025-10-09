@@ -32,8 +32,8 @@ export const PROFILE_ENDPOINTS = {
   UPDATE_PROFILE: '/api/profile/me',
   
   // Аватары
-  UPLOAD_AVATAR: '/api/profile/me/avatar',
-  DELETE_AVATAR: '/api/profile/me/avatar',
+  UPLOAD_AVATAR: (userId: number) => `/api/profile/avatars/${userId}`,
+  DELETE_AVATAR: (userId: number) => `/api/profile/me/avatar/${userId}`,
   
   // Дашборд
   DASHBOARD: '/api/profile/dashboard',

@@ -91,16 +91,13 @@ export const fetchDashboardStats = createAsyncThunk(
     try {
       dispatch(setLoadingDashboard(true));
       
-      // Параллельная загрузка данных (как в auth модуле)
-      const [systemStats, studios] = await Promise.all([
-        adminApi.getSystemStats(),
-        adminApi.getAllStudios(),
-      ]);
+      // Загружаем только системную статистику
+      const systemStats = await adminApi.getSystemStats();
       
       // Формируем статистику для UI
       const dashboardStats: DashboardStats = {
         totalUsers: systemStats.users.total_users,
-        totalStudios: studios.length,
+        totalStudios: 0, // Пока не загружаем студии для дашборда
         activeTeachers: systemStats.users.total_teachers,
         activeStudents: systemStats.users.total_students,
         totalComments: systemStats.content.total_comments,
