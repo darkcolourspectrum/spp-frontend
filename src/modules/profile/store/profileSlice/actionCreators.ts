@@ -84,12 +84,12 @@ export const updateMyProfile = createAsyncThunk(
  */
 export const uploadAvatarFile = createAsyncThunk(
   'profile/uploadAvatar',
-  async (file: File, { dispatch, rejectWithValue }) => {
+  async ({ userId, file }: { userId: number; file: File }, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setUploadingAvatar(true));
       
-      const response = await profileApi.uploadAvatar(file);
-      dispatch(setAvatar(response.avatar_url));
+      const response = await profileApi.uploadAvatar(userId, file);
+      dispatch(setAvatar(response.url));
       
       return response;
       
@@ -108,11 +108,11 @@ export const uploadAvatarFile = createAsyncThunk(
  */
 export const deleteAvatarFile = createAsyncThunk(
   'profile/deleteAvatar',
-  async (_, { dispatch, rejectWithValue }) => {
+  async (userId: number, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setUploadingAvatar(true));
       
-      await profileApi.deleteAvatar();
+      await profileApi.deleteAvatar(userId);
       dispatch(removeAvatar());
       
       return true;

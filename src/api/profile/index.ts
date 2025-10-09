@@ -22,7 +22,6 @@ import type {
 
 /**
  * Получение своего профиля
- * Использует user_id из токена
  */
 export const getMyProfile = async (userId: number): Promise<UserProfile> => {
   const response = await apiClient.get<UserProfile>(PROFILE_ENDPOINTS.PROFILE_BY_ID(userId));
@@ -50,12 +49,12 @@ export const updateMyProfile = async (userId: number, data: ProfileUpdateRequest
 /**
  * Загрузка аватара
  */
-export const uploadAvatar = async (file: File): Promise<AvatarUploadResponse> => {
+export const uploadAvatar = async (userId: number, file: File): Promise<AvatarUploadResponse> => {
   const formData = new FormData();
   formData.append('file', file);
   
   const response = await apiClient.post<AvatarUploadResponse>(
-    PROFILE_ENDPOINTS.UPLOAD_AVATAR,
+    PROFILE_ENDPOINTS.UPLOAD_AVATAR(userId),
     formData,
     {
       headers: {
@@ -70,8 +69,10 @@ export const uploadAvatar = async (file: File): Promise<AvatarUploadResponse> =>
 /**
  * Удаление аватара
  */
-export const deleteAvatar = async (): Promise<AvatarDeleteResponse> => {
-  const response = await apiClient.delete<AvatarDeleteResponse>(PROFILE_ENDPOINTS.DELETE_AVATAR);
+export const deleteAvatar = async (userId: number): Promise<AvatarDeleteResponse> => {
+  const response = await apiClient.delete<AvatarDeleteResponse>(
+    PROFILE_ENDPOINTS.DELETE_AVATAR(userId)
+  );
   return response.data;
 };
 
@@ -90,22 +91,16 @@ export const getDashboard = async (): Promise<DashboardData> => {
 /**
  * Получение комментариев профиля
  */
-export const getProfileComments = async (userId: number): Promise<Comment[]> => {
+export const getComments = async (userId: number): Promise<Comment[]> => {
   const response = await apiClient.get<Comment[]>(PROFILE_ENDPOINTS.COMMENTS(userId));
   return response.data;
 };
 
 /**
- * Добавление комментария к профилю (только для teacher/admin)
+ * Добавление комментария
  */
-export const addComment = async (
-  userId: number,
-  data: CommentCreateRequest
-): Promise<Comment> => {
-  const response = await apiClient.post<Comment>(
-    PROFILE_ENDPOINTS.ADD_COMMENT(userId),
-    data
-  );
+export const addComment = async (userId: number, data: CommentCreateRequest): Promise<Comment> => {
+  const response = await apiClient.post<Comment>(PROFILE_ENDPOINTS.ADD_COMMENT(userId), data);
   return response.data;
 };
 
@@ -127,14 +122,17 @@ export const updateComment = async (
 /**
  * Удаление комментария
  */
-export const deleteComment = async (userId: number, commentId: number): Promise<void> => {
-  await apiClient.delete(PROFILE_ENDPOINTS.DELETE_COMMENT(userId, commentId));
+export const deleteComment = async (userId: number, commentId: number): Promise<{ message: string }> => {
+  const response = await apiClient.delete<{ message: string }>(
+    PROFILE_ENDPOINTS.DELETE_COMMENT(userId, commentId)
+  );
+  return response.data;
 };
 
-// ==================== ACTIVITY ====================
+// ==================== ACTIVITIES ====================
 
 /**
- * Получение истории активности
+ * Получение активности пользователя
  */
 export const getActivities = async (
   userId: number,

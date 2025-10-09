@@ -33,8 +33,11 @@ export interface ProfileUpdateRequest {
 // ==================== AVATAR TYPES ====================
 
 export interface AvatarUploadResponse {
-  avatar_url: string;
-  message: string;
+  success: boolean;
+  filename?: string;
+  url?: string;
+  size?: number;
+  error?: string;
 }
 
 export interface AvatarDeleteResponse {
