@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/modules/auth/hooks';
+import { useAppSelector } from '@/store/hooks';
 import { ROUTES } from '@/constants/routes';
 import { getUserInitials } from '@/utils/helpers';
 import './header.css';
 
 const Header = () => {
   const { user, logout, isAdmin, isTeacher, isStudent } = useAuth();
+  const { profile } = useAppSelector((state) => state.profile);
   const navigate = useNavigate();
   
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -65,6 +67,15 @@ const Header = () => {
   
   const navigationLinks = getNavigationLinks();
   
+  // Получаем информацию о пользователе
+  const userInfo = (profile as any)?.user_info || {};
+  const avatarUrl = (profile as any)?.avatar_url;
+  const displayName = `${userInfo.first_name || user?.first_name || ''} ${userInfo.last_name || user?.last_name || ''}`.trim();
+  const userInitials = getUserInitials(
+    userInfo.first_name || user?.first_name,
+    userInfo.last_name || user?.last_name
+  );
+  
   return (
     <header className="header">
       <div className="header-container">
@@ -91,8 +102,26 @@ const Header = () => {
             onClick={() => setDropdownOpen(!dropdownOpen)}
           >
             <div className="profile-avatar">
-              {getUserInitials(user?.first_name, user?.last_name)}
+              {avatarUrl ? (
+                <img 
+                  src={avatarUrl} 
+                  alt={displayName}
+                  className="profile-avatar-image"
+                  onError={(e) => {
+                    // При ошибке загрузки показываем инициалы
+                    e.currentTarget.style.display = 'none';
+                    const parent = e.currentTarget.parentElement;
+                    if (parent) {
+                      parent.classList.add('show-initials');
+                    }
+                  }}
+                />
+              ) : null}
+              <span className={`profile-avatar-initials ${!avatarUrl ? 'visible' : ''}`}>
+                {userInitials}
+              </span>
             </div>
+            <span className="profile-name">{displayName || 'Пользователь'}</span>
             <span className={`dropdown-arrow ${dropdownOpen ? 'open' : ''}`}>
               ▼
             </span>
@@ -103,11 +132,27 @@ const Header = () => {
               <div className="dropdown-header">
                 <div className="dropdown-user-info">
                   <div className="dropdown-avatar">
-                    {getUserInitials(user?.first_name, user?.last_name)}
+                    {avatarUrl ? (
+                      <img 
+                        src={avatarUrl} 
+                        alt={displayName}
+                        className="dropdown-avatar-image"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const parent = e.currentTarget.parentElement;
+                          if (parent) {
+                            parent.classList.add('show-initials');
+                          }
+                        }}
+                      />
+                    ) : null}
+                    <span className={`dropdown-avatar-initials ${!avatarUrl ? 'visible' : ''}`}>
+                      {userInitials}
+                    </span>
                   </div>
                   <div className="dropdown-details">
                     <div className="dropdown-name">
-                      {user?.first_name} {user?.last_name}
+                      {displayName || 'Пользователь'}
                     </div>
                     <div className="dropdown-email">{user?.email}</div>
                   </div>
