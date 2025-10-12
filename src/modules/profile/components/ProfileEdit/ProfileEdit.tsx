@@ -17,7 +17,8 @@ interface ProfileEditProps {
 const ProfileEdit = ({ onCancel, onSuccess }: ProfileEditProps) => {
   const dispatch = useAppDispatch();
   const { profile, isUpdating, error } = useAppSelector((state) => state.profile);
-  
+  const { user } = useAppSelector((state) => state.auth);
+
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -90,7 +91,10 @@ const ProfileEdit = ({ onCancel, onSuccess }: ProfileEditProps) => {
       return;
     }
     
-    if (!profile?.user_id) {
+    // Получаем userId из разных мест
+    const userId = (profile as any)?.user_info?.id || user?.id;
+    
+    if (!userId) {
       setValidationErrors({ general: 'Не удалось определить пользователя' });
       return;
     }
@@ -103,7 +107,10 @@ const ProfileEdit = ({ onCancel, onSuccess }: ProfileEditProps) => {
         bio: formData.bio.trim() || undefined,
       };
       
-      await dispatch(updateMyProfile({ userId: profile.user_id, data: updateData })).unwrap();
+      console.log('Update data:', updateData);
+      console.log('User ID:', userId);
+
+      await dispatch(updateMyProfile({ userId, data: updateData })).unwrap();
       
       setSuccessMessage('Профиль успешно обновлен!');
       

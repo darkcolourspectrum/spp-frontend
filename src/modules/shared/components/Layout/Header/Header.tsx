@@ -121,7 +121,6 @@ const Header = () => {
                 {userInitials}
               </span>
             </div>
-            <span className="profile-name">{displayName || 'Пользователь'}</span>
             <span className={`dropdown-arrow ${dropdownOpen ? 'open' : ''}`}>
               ▼
             </span>
