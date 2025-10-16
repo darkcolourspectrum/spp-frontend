@@ -60,7 +60,8 @@ const ProfileView = ({ onEdit }: ProfileViewProps) => {
   const createdAt = userInfo.created_at || (profile as any).created_at;
   const lastLogin = userInfo.last_login;
   
-  const displayName = (profile as any).display_name || `${firstName} ${lastName}`.trim() || 'Пользователь';
+  const fullName = `${firstName} ${lastName}`.trim();
+  const displayName = fullName || (profile as any).display_name || 'Пользователь';
   const bio = (profile as any).bio;
   const avatarUrl = (profile as any).avatar_url;
   const phone = (profile as any).phone;

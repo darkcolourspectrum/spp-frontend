@@ -107,8 +107,6 @@ const ProfileEdit = ({ onCancel, onSuccess }: ProfileEditProps) => {
         bio: formData.bio.trim() || undefined,
       };
       
-      console.log('Update data:', updateData);
-      console.log('User ID:', userId);
 
       await dispatch(updateMyProfile({ userId, data: updateData })).unwrap();
       
