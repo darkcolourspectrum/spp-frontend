@@ -22,7 +22,6 @@ const ProfileEdit = ({ onCancel, onSuccess }: ProfileEditProps) => {
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
-    phone: '',
     bio: '',
   });
   
@@ -35,7 +34,6 @@ const ProfileEdit = ({ onCancel, onSuccess }: ProfileEditProps) => {
       setFormData({
         first_name: profile.first_name || '',
         last_name: profile.last_name || '',
-        phone: profile.phone || '',
         bio: profile.bio || '',
       });
     }
@@ -44,19 +42,13 @@ const ProfileEdit = ({ onCancel, onSuccess }: ProfileEditProps) => {
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
     
-    if (formData.first_name.trim().length < 2) {
+    // Валидируем только если поля заполнены
+    if (formData.first_name.trim() && formData.first_name.trim().length < 2) {
       errors.first_name = 'Имя должно содержать минимум 2 символа';
     }
     
-    if (formData.last_name.trim().length < 2) {
+    if (formData.last_name.trim() && formData.last_name.trim().length < 2) {
       errors.last_name = 'Фамилия должна содержать минимум 2 символа';
-    }
-    
-    if (formData.phone && formData.phone.length > 0) {
-      const phoneRegex = /^\+?[0-9\s\-\(\)]{10,20}$/;
-      if (!phoneRegex.test(formData.phone)) {
-        errors.phone = 'Некорректный номер телефона';
-      }
     }
     
     if (formData.bio && formData.bio.length > 500) {
@@ -101,13 +93,11 @@ const ProfileEdit = ({ onCancel, onSuccess }: ProfileEditProps) => {
     
     try {
       const updateData: ProfileUpdateRequest = {
-        first_name: formData.first_name.trim(),
-        last_name: formData.last_name.trim(),
-        phone: formData.phone.trim() || undefined,
+        first_name: formData.first_name.trim() || undefined,
+        last_name: formData.last_name.trim() || undefined,
         bio: formData.bio.trim() || undefined,
       };
       
-
       await dispatch(updateMyProfile({ userId, data: updateData })).unwrap();
       
       setSuccessMessage('Профиль успешно обновлен!');
@@ -151,7 +141,7 @@ const ProfileEdit = ({ onCancel, onSuccess }: ProfileEditProps) => {
           
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="first_name">Имя *</label>
+              <label htmlFor="first_name">Имя</label>
               <input
                 id="first_name"
                 name="first_name"
@@ -167,7 +157,7 @@ const ProfileEdit = ({ onCancel, onSuccess }: ProfileEditProps) => {
             </div>
             
             <div className="form-group">
-              <label htmlFor="last_name">Фамилия *</label>
+              <label htmlFor="last_name">Фамилия</label>
               <input
                 id="last_name"
                 name="last_name"
@@ -181,26 +171,6 @@ const ProfileEdit = ({ onCancel, onSuccess }: ProfileEditProps) => {
                 <span className="field-error">{validationErrors.last_name}</span>
               )}
             </div>
-          </div>
-        </div>
-        
-        <div className="profile-edit-section">
-          <h3 className="section-label">Контактная информация</h3>
-          
-          <div className="form-group">
-            <label htmlFor="phone">Телефон</label>
-            <input
-              id="phone"
-              name="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={handleChange}
-              disabled={isUpdating}
-              placeholder="+7 (900) 123-45-67"
-            />
-            {validationErrors.phone && (
-              <span className="field-error">{validationErrors.phone}</span>
-            )}
           </div>
         </div>
         

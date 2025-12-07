@@ -102,32 +102,12 @@ const ProfileView = ({ onEdit }: ProfileViewProps) => {
       </div>
       
       <div className="profile-content">
-        <div className="profile-section">
-          <h2 className="section-title">Контактная информация</h2>
-          <div className="profile-info-grid">
-            <div className="info-item">
-              <span className="info-label">Email</span>
-              <span className="info-value">{email || 'Не указан'}</span>
+          {bio && (
+            <div className="profile-section">
+              <h2 className="section-title">О себе</h2>
+              <p className="profile-bio-content">{bio}</p>
             </div>
-            
-            {phone && (
-              <div className="info-item">
-                <span className="info-label">Телефон</span>
-                <span className="info-value">{phone}</span>
-              </div>
-            )}
-            
-            <div className="info-item">
-              <span className="info-label">Имя</span>
-              <span className="info-value">{firstName || 'Не указано'}</span>
-            </div>
-            
-            <div className="info-item">
-              <span className="info-label">Фамилия</span>
-              <span className="info-value">{lastName || 'Не указана'}</span>
-            </div>
-          </div>
-        </div>
+          )}
         
         <div className="profile-section">
           <h2 className="section-title">Информация об аккаунте</h2>
