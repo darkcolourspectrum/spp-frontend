@@ -4,7 +4,6 @@ import { useAdmin } from '@/modules/admin/hooks/useAdmin';
 import { fetchAllUsers, fetchAllStudios } from '@/modules/admin/store';
 import { UsersFilters } from '@/modules/admin/components/UsersFilters';
 import { UsersList } from '@/modules/admin/components/UsersList';
-import { AssignTeacherModal } from '@/modules/admin/components/AssignTeacherModal';
 import { ChangeRoleModal } from '@/modules/admin/components/ChangeRoleModal';
 import type { AdminUser } from '@/api/admin/types';
 import './adminUsersPage.css';
@@ -22,7 +21,6 @@ const AdminUsersPage = () => {
     handleClearSuccess,
   } = useAdmin();
   
-  const [showAssignTeacherModal, setShowAssignTeacherModal] = useState(false);
   const [showChangeRoleModal, setShowChangeRoleModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   
@@ -36,18 +34,12 @@ const AdminUsersPage = () => {
     dispatch(fetchAllStudios());
   };
   
-  const handleAssignTeacher = (user: AdminUser) => {
-    setSelectedUser(user);
-    setShowAssignTeacherModal(true);
-  };
-  
   const handleChangeRole = (user: AdminUser) => {
     setSelectedUser(user);
     setShowChangeRoleModal(true);
   };
   
-  const closeModals = () => {
-    setShowAssignTeacherModal(false);
+  const closeModal = () => {
     setShowChangeRoleModal(false);
     setSelectedUser(null);
   };
@@ -94,22 +86,13 @@ const AdminUsersPage = () => {
       <UsersList
         users={filteredUsers}
         totalUsers={users.length}
-        onAssignTeacher={handleAssignTeacher}
         onChangeRole={handleChangeRole}
       />
-      
-      {showAssignTeacherModal && selectedUser && (
-        <AssignTeacherModal
-          user={selectedUser}
-          studios={studios}
-          onClose={closeModals}
-        />
-      )}
       
       {showChangeRoleModal && selectedUser && (
         <ChangeRoleModal
           user={selectedUser}
-          onClose={closeModals}
+          onClose={closeModal}
         />
       )}
     </div>

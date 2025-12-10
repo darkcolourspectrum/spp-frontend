@@ -34,25 +34,17 @@ export interface Studio {
   phone: string | null;
   email: string | null;
   is_active: boolean;
-  teachers_count: number;
-  students_count: number;
   created_at: string;
+  updated_at: string;
 }
 
 // ==================== REQUESTS ====================
 
-export interface AssignTeacherRequest {
-  user_id: number;
-  studio_id: number;
-}
-
-export interface ChangeRoleRequest {
-  user_id: number;
+export interface UpdateRoleRequest {
   role: 'admin' | 'teacher' | 'student' | 'guest';
 }
 
 export interface AssignStudioRequest {
-  user_id: number;
   studio_id: number;
 }
 
@@ -77,37 +69,26 @@ export interface UpdateStudioRequest {
 
 export interface AdminActionResponse {
   message: string;
-  user?: {
-    id: number;
-    email: string;
-    full_name: string;
-    role: string;
-    studio_name: string | null;
-  };
-  studio?: {
-    id: number;
-    name: string;
-    is_active: boolean;
-  };
+  user?: AdminUser;
+  studio?: Studio;
 }
 
 // ==================== DASHBOARD ====================
 
-// Системная статистика (ответ от бэкенда)
 export interface SystemStats {
   users: {
-    total_students: number;
-    total_teachers: number;
-    total_users: number;
+    total: number;
+    active: number;
+    students: number;
+    teachers: number;
   };
-  profiles: {
-    total_profiles: number;
-    public_profiles: number;
-    private_profiles: number;
+  studios: {
+    total: number;
+    active: number;
   };
-  content: {
-    total_comments: number;
-    total_activities: number;
+  classrooms: {
+    total: number;
+    active: number;
   };
 }
 
@@ -117,6 +98,17 @@ export interface DashboardStats {
   totalStudios: number;
   activeTeachers: number;
   activeStudents: number;
-  totalComments: number;
-  totalActivities: number;
+  totalClassrooms: number;
+  activeClassrooms: number;
+}
+
+// УСТАРЕВШИЕ ТИПЫ (для совместимости, будут удалены)
+export interface AssignTeacherRequest {
+  user_id: number;
+  studio_id: number;
+}
+
+export interface ChangeRoleRequest {
+  user_id: number;
+  role: 'admin' | 'teacher' | 'student' | 'guest';
 }

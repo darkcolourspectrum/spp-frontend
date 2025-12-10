@@ -5,11 +5,10 @@ import './usersList.css';
 interface UsersListProps {
   users: AdminUser[];
   totalUsers: number;
-  onAssignTeacher: (user: AdminUser) => void;
   onChangeRole: (user: AdminUser) => void;
 }
 
-export const UsersList = ({ users, onAssignTeacher, onChangeRole }: UsersListProps) => {
+export const UsersList = ({ users, onChangeRole }: UsersListProps) => {
   return (
     <div className="users-list">
       <table className="users-table">
@@ -62,18 +61,9 @@ export const UsersList = ({ users, onAssignTeacher, onChangeRole }: UsersListPro
                 <td>{formatDate(user.created_at)}</td>
                 <td>
                   <div className="actions-cell">
-                    {user.role !== 'teacher' && (
-                      <button
-                        onClick={() => onAssignTeacher(user)}
-                        className="action-button primary"
-                        title="Назначить преподавателем"
-                      >
-                        👨‍🏫
-                      </button>
-                    )}
                     <button
                       onClick={() => onChangeRole(user)}
-                      className="action-button secondary"
+                      className="action-button primary"
                       title="Изменить роль"
                     >
                       🔄

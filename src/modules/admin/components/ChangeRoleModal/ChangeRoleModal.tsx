@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAppDispatch } from '@/store/hooks';
 import { useAdmin } from '@/modules/admin/hooks/useAdmin';
-import { changeRole } from '@/modules/admin/store';
+import { changeUserRole } from '@/modules/admin/store';
 import type { AdminUser } from '@/api/admin/types';
 import './changeRoleModal.css';
 
@@ -18,9 +18,9 @@ export const ChangeRoleModal = ({ user, onClose }: ChangeRoleModalProps) => {
   const handleSubmit = async () => {
     if (!selectedRole) return;
     
-    await dispatch(changeRole({
-      user_id: user.id,
-      role: selectedRole as any,
+    await dispatch(changeUserRole({
+      userId: user.id,
+      role: selectedRole,
     }));
     
     setTimeout(onClose, 1500);

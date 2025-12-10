@@ -5,14 +5,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import * as adminApi from '@/api/admin/index';
-import type {
-  AssignTeacherRequest,
-  ChangeRoleRequest,
-  AssignStudioRequest,
-  CreateStudioRequest,
-  UpdateStudioRequest,
-  DashboardStats,
-} from '@/api/admin/types';
+import type { CreateStudioRequest, UpdateStudioRequest, DashboardStats } from '@/api/admin/types';
 import {
   setUsers,
   setStudios,
@@ -34,20 +27,23 @@ const getErrorMessage = (error: unknown): string => {
   return 'Произошла неизвестная ошибка';
 };
 
-// ==================== ASYNC THUNKS ====================
+// ==================== USER MANAGEMENT ====================
 
 /**
  * Загрузка всех пользователей
  */
 export const fetchAllUsers = createAsyncThunk(
   'admin/fetchAllUsers',
-  async (params: { limit?: number; offset?: number; role?: string; studio_id?: number } | undefined, { dispatch, rejectWithValue }) => {
+  async (
+    params: { limit?: number; offset?: number; role?: string; studio_id?: number } | undefined,
+    { dispatch, rejectWithValue }
+  ) => {
     try {
       dispatch(setLoadingUsers(true));
-      
+
       const users = await adminApi.getAllUsers(params);
       dispatch(setUsers(users));
-      
+
       return users;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -60,104 +56,20 @@ export const fetchAllUsers = createAsyncThunk(
 );
 
 /**
- * Загрузка всех студий
- */
-export const fetchAllStudios = createAsyncThunk(
-  'admin/fetchAllStudios',
-  async (_, { dispatch, rejectWithValue }) => {
-    try {
-      dispatch(setLoadingStudios(true));
-      
-      const studios = await adminApi.getAllStudios();
-      dispatch(setStudios(studios));
-      
-      return studios;
-    } catch (error) {
-      const errorMessage = getErrorMessage(error);
-      dispatch(setError(errorMessage));
-      return rejectWithValue(errorMessage);
-    } finally {
-      dispatch(setLoadingStudios(false));
-    }
-  }
-);
-
-/**
- * Загрузка статистики для дашборда
- */
-export const fetchDashboardStats = createAsyncThunk(
-  'admin/fetchDashboardStats',
-  async (_, { dispatch, rejectWithValue }) => {
-    try {
-      dispatch(setLoadingDashboard(true));
-      
-      // Загружаем только системную статистику
-      const systemStats = await adminApi.getSystemStats();
-      
-      // Формируем статистику для UI
-      const dashboardStats: DashboardStats = {
-        totalUsers: systemStats.users.total_users,
-        totalStudios: 0, // Пока не загружаем студии для дашборда
-        activeTeachers: systemStats.users.total_teachers,
-        activeStudents: systemStats.users.total_students,
-        totalComments: systemStats.content.total_comments,
-        totalActivities: systemStats.content.total_activities,
-      };
-      
-      dispatch(setDashboardStats(dashboardStats));
-      
-      return dashboardStats;
-    } catch (error) {
-      const errorMessage = getErrorMessage(error);
-      dispatch(setError(errorMessage));
-      return rejectWithValue(errorMessage);
-    } finally {
-      dispatch(setLoadingDashboard(false));
-    }
-  }
-);
-
-/**
- * Назначение роли преподавателя
- */
-export const assignTeacher = createAsyncThunk(
-  'admin/assignTeacher',
-  async (data: AssignTeacherRequest, { dispatch, rejectWithValue }) => {
-    try {
-      dispatch(setSubmitting(true));
-      
-      const response = await adminApi.assignTeacherRole(data);
-      dispatch(setSuccessMessage(response.message));
-      
-      // Перезагружаем пользователей после успешного назначения
-      await dispatch(fetchAllUsers());
-      
-      return response;
-    } catch (error) {
-      const errorMessage = getErrorMessage(error);
-      dispatch(setError(errorMessage));
-      return rejectWithValue(errorMessage);
-    } finally {
-      dispatch(setSubmitting(false));
-    }
-  }
-);
-
-/**
  * Изменение роли пользователя
  */
-export const changeRole = createAsyncThunk(
-  'admin/changeRole',
-  async (data: ChangeRoleRequest, { dispatch, rejectWithValue }) => {
+export const changeUserRole = createAsyncThunk(
+  'admin/changeUserRole',
+  async (data: { userId: number; role: string }, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setSubmitting(true));
-      
-      const response = await adminApi.changeUserRole(data);
+
+      const response = await adminApi.updateUserRole(data.userId, data.role);
       dispatch(setSuccessMessage(response.message));
-      
+
       // Перезагружаем пользователей
       await dispatch(fetchAllUsers());
-      
+
       return response;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -172,18 +84,18 @@ export const changeRole = createAsyncThunk(
 /**
  * Привязка пользователя к студии
  */
-export const assignStudio = createAsyncThunk(
-  'admin/assignStudio',
-  async (data: AssignStudioRequest, { dispatch, rejectWithValue }) => {
+export const assignUserToStudio = createAsyncThunk(
+  'admin/assignUserToStudio',
+  async (data: { userId: number; studioId: number }, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setSubmitting(true));
-      
-      const response = await adminApi.assignUserToStudio(data);
+
+      const response = await adminApi.assignUserToStudio(data.userId, data.studioId);
       dispatch(setSuccessMessage(response.message));
-      
+
       // Перезагружаем пользователей
       await dispatch(fetchAllUsers());
-      
+
       return response;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -196,6 +108,83 @@ export const assignStudio = createAsyncThunk(
 );
 
 /**
+ * Активация пользователя
+ */
+export const activateUser = createAsyncThunk(
+  'admin/activateUser',
+  async (userId: number, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setSubmitting(true));
+
+      const response = await adminApi.activateUser(userId);
+      dispatch(setSuccessMessage(response.message));
+
+      // Перезагружаем пользователей
+      await dispatch(fetchAllUsers());
+
+      return response;
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      dispatch(setError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setSubmitting(false));
+    }
+  }
+);
+
+/**
+ * Деактивация пользователя
+ */
+export const deactivateUser = createAsyncThunk(
+  'admin/deactivateUser',
+  async (userId: number, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setSubmitting(true));
+
+      const response = await adminApi.deactivateUser(userId);
+      dispatch(setSuccessMessage(response.message));
+
+      // Перезагружаем пользователей
+      await dispatch(fetchAllUsers());
+
+      return response;
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      dispatch(setError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setSubmitting(false));
+    }
+  }
+);
+
+// ==================== STUDIOS ====================
+
+/**
+ * Загрузка всех студий
+ */
+export const fetchAllStudios = createAsyncThunk(
+  'admin/fetchAllStudios',
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setLoadingStudios(true));
+
+      const studios = await adminApi.getAllStudios();
+      dispatch(setStudios(studios));
+
+      return studios;
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      dispatch(setError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setLoadingStudios(false));
+    }
+  }
+);
+
+/**
  * Создание новой студии
  */
 export const createNewStudio = createAsyncThunk(
@@ -203,13 +192,13 @@ export const createNewStudio = createAsyncThunk(
   async (data: CreateStudioRequest, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setSubmitting(true));
-      
+
       const studio = await adminApi.createStudio(data);
       dispatch(setSuccessMessage(`Студия "${studio.name}" успешно создана`));
-      
+
       // Перезагружаем студии
       await dispatch(fetchAllStudios());
-      
+
       return studio;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -226,16 +215,19 @@ export const createNewStudio = createAsyncThunk(
  */
 export const updateExistingStudio = createAsyncThunk(
   'admin/updateStudio',
-  async ({ id, data }: { id: number; data: UpdateStudioRequest }, { dispatch, rejectWithValue }) => {
+  async (
+    { id, data }: { id: number; data: UpdateStudioRequest },
+    { dispatch, rejectWithValue }
+  ) => {
     try {
       dispatch(setSubmitting(true));
-      
+
       const studio = await adminApi.updateStudio(id, data);
       dispatch(setSuccessMessage(`Студия "${studio.name}" успешно обновлена`));
-      
+
       // Перезагружаем студии
       await dispatch(fetchAllStudios());
-      
+
       return studio;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -248,21 +240,21 @@ export const updateExistingStudio = createAsyncThunk(
 );
 
 /**
- * Активация студии
+ * Удаление студии
  */
-export const activateExistingStudio = createAsyncThunk(
-  'admin/activateStudio',
+export const deleteExistingStudio = createAsyncThunk(
+  'admin/deleteStudio',
   async (id: number, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setSubmitting(true));
-      
-      const response = await adminApi.activateStudio(id);
-      dispatch(setSuccessMessage(response.message));
-      
+
+      await adminApi.deleteStudio(id);
+      dispatch(setSuccessMessage('Студия успешно удалена'));
+
       // Перезагружаем студии
       await dispatch(fetchAllStudios());
-      
-      return response;
+
+      return id;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
       dispatch(setError(errorMessage));
@@ -273,28 +265,38 @@ export const activateExistingStudio = createAsyncThunk(
   }
 );
 
+// ==================== DASHBOARD ====================
+
 /**
- * Деактивация студии
+ * Загрузка статистики для дашборда
  */
-export const deactivateExistingStudio = createAsyncThunk(
-  'admin/deactivateStudio',
-  async (id: number, { dispatch, rejectWithValue }) => {
+export const fetchDashboardStats = createAsyncThunk(
+  'admin/fetchDashboardStats',
+  async (_, { dispatch, rejectWithValue }) => {
     try {
-      dispatch(setSubmitting(true));
-      
-      const response = await adminApi.deactivateStudio(id);
-      dispatch(setSuccessMessage(response.message));
-      
-      // Перезагружаем студии
-      await dispatch(fetchAllStudios());
-      
-      return response;
+      dispatch(setLoadingDashboard(true));
+
+      const systemStats = await adminApi.getSystemStats();
+
+      // Формируем статистику для UI
+      const dashboardStats: DashboardStats = {
+        totalUsers: systemStats.users.total,
+        totalStudios: systemStats.studios.total,
+        activeTeachers: systemStats.users.teachers,
+        activeStudents: systemStats.users.students,
+        totalClassrooms: systemStats.classrooms.total,
+        activeClassrooms: systemStats.classrooms.active,
+      };
+
+      dispatch(setDashboardStats(dashboardStats));
+
+      return dashboardStats;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
       dispatch(setError(errorMessage));
       return rejectWithValue(errorMessage);
     } finally {
-      dispatch(setSubmitting(false));
+      dispatch(setLoadingDashboard(false));
     }
   }
 );
