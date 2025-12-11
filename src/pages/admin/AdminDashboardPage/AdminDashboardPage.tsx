@@ -113,7 +113,7 @@ const AdminDashboardPage = () => {
           </div>
           <div className="stat-content">
             <div className="stat-value">{dashboardStats?.totalStudios || 0}</div>
-            <div className="stat-label">Студий (скоро)</div>
+            <div className="stat-label">Студий</div>
           </div>
         </div>
       </div>

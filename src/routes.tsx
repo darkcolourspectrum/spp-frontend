@@ -13,7 +13,7 @@ import Register from './modules/auth/components/Register';
 import ProtectedRoute from './modules/auth/components/ProtectedRoute';
 
 // Admin Pages - РЕАЛЬНЫЕ КОМПОНЕНТЫ
-import { AdminDashboardPage, AdminUsersPage } from './pages/admin';
+import { AdminDashboardPage, AdminUsersPage, AdminStudiosPage } from './pages/admin';
 
 // Other Pages
 import StudentProfilePage from './pages/StudentProfilePage';
@@ -23,13 +23,6 @@ const Dashboard = () => (
   <div style={{ padding: '40px', textAlign: 'center' }}>
     <h1>Dashboard</h1>
     <p>Добро пожаловать в систему!</p>
-  </div>
-);
-
-const AdminStudios = () => (
-  <div style={{ padding: '40px', textAlign: 'center' }}>
-    <h1>Управление студиями</h1>
-    <p>Список всех студий (в разработке)</p>
   </div>
 );
 
@@ -122,7 +115,7 @@ const AppRoutes = () => {
         <Route element={<ProtectedRoute requiredRoles={['admin']}><Outlet /></ProtectedRoute>}>
           <Route path={ROUTES.ADMIN.DASHBOARD} element={<AdminDashboardPage />} />
           <Route path={ROUTES.ADMIN.USERS} element={<AdminUsersPage />} />
-          <Route path={ROUTES.ADMIN.STUDIOS} element={<AdminStudios />} />
+          <Route path={ROUTES.ADMIN.STUDIOS} element={<AdminStudiosPage />} />
           <Route path={ROUTES.ADMIN.STATISTICS} element={<AdminStatistics />} />
         </Route>
         

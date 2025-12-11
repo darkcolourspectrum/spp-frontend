@@ -36,6 +36,16 @@
   background: #f8f9fa;
 }
 
+/* Подсветка текущего пользователя */
+.current-user-row {
+  background: #e7f3ff !important;
+  border-left: 3px solid #667eea;
+}
+
+.current-user-row:hover {
+  background: #d6e9ff !important;
+}
+
 .user-cell {
   display: flex;
   align-items: center;
@@ -56,8 +66,36 @@
   flex-shrink: 0;
 }
 
+.user-name-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .user-name {
   font-weight: 500;
+}
+
+.current-user-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #667eea;
+  color: white;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.studio-cell {
+  min-width: 120px;
+}
+
+.no-studio {
+  color: #999;
+  font-style: italic;
+  font-size: 13px;
 }
 
 .role-badge {
@@ -98,6 +136,13 @@
   border-radius: 6px;
   font-size: 16px;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none !important;
 }
 
 .action-button.primary {
@@ -105,8 +150,9 @@
   color: #0066cc;
 }
 
-.action-button.primary:hover {
+.action-button.primary:hover:not(:disabled) {
   background: #cce5ff;
+  transform: translateY(-1px);
 }
 
 .action-button.secondary {
@@ -114,8 +160,29 @@
   color: #555;
 }
 
-.action-button.secondary:hover {
+.action-button.secondary:hover:not(:disabled) {
   background: #e0e0e0;
+  transform: translateY(-1px);
+}
+
+.action-button.danger {
+  background: #ffe7e7;
+  color: #cc0000;
+}
+
+.action-button.danger:hover:not(:disabled) {
+  background: #ffcccc;
+  transform: translateY(-1px);
+}
+
+.action-button.success {
+  background: #e7f9f0;
+  color: #28a745;
+}
+
+.action-button.success:hover:not(:disabled) {
+  background: #d4edda;
+  transform: translateY(-1px);
 }
 
 .empty-state {
@@ -131,6 +198,6 @@
   }
   
   .users-table {
-    min-width: 1000px;
+    min-width: 1100px;
   }
 }
