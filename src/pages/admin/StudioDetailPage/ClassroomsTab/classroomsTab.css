@@ -1,0 +1,161 @@
+/* Classrooms Tab */
+.classrooms-tab {
+  padding: 20px 0;
+}
+
+.classrooms-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.classrooms-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+/* Empty State */
+.no-classrooms {
+  text-align: center;
+  padding: 60px 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.no-classrooms p {
+  color: #666;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+/* Classrooms List */
+.classrooms-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+/* Classroom Card */
+.classroom-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  transition: box-shadow 0.3s;
+}
+
+.classroom-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.classroom-info {
+  flex: 1;
+}
+
+.classroom-card h3 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.classroom-capacity {
+  color: #667eea;
+  font-weight: 500;
+  margin: 5px 0;
+}
+
+.classroom-description {
+  color: #666;
+  font-size: 14px;
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+.classroom-status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+.classroom-status.active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.classroom-status.inactive {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Actions */
+.classroom-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.action-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.action-button:hover {
+  background: #f0f0f0;
+}
+
+.action-button.edit:hover {
+  background: #e3f2fd;
+}
+
+.action-button.delete:hover {
+  background: #ffebee;
+}
+
+/* Loading */
+.classrooms-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 15px;
+}
+
+.classrooms-loading p {
+  color: #666;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .classrooms-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+  
+  .classrooms-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .classroom-card {
+    flex-direction: column;
+  }
+  
+  .classroom-actions {
+    margin-top: 15px;
+    justify-content: flex-end;
+  }
+}

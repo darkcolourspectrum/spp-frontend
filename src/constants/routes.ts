@@ -19,6 +19,7 @@ export const ROUTES = {
     DASHBOARD: '/admin/dashboard',
     USERS: '/admin/users',
     STUDIOS: '/admin/studios',
+    STUDIO_DETAIL: '/admin/studios/:studioId',  // ← НОВЫЙ МАРШРУТ
     STATISTICS: '/admin/statistics',
   },
   
@@ -61,4 +62,11 @@ export const getDefaultRouteForRole = (role: string): string => {
     default:
       return ROUTES.DASHBOARD;
   }
+};
+
+/**
+ * Хелпер для генерации пути к детальной странице студии
+ */
+export const getStudioDetailRoute = (studioId: number): string => {
+  return `/admin/studios/${studioId}`;
 };

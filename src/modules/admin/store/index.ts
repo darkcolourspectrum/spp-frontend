@@ -9,14 +9,20 @@ export { default as adminReducer } from './adminSlice/adminReducer';
 export {
   setUsers,
   setStudios,
+  setClassrooms,
+  addClassroom,
+  updateClassroom,
+  removeClassroom,
   setDashboardStats,
   updateUser,
+  updateStudio,
   setRoleFilter,
   setStudioFilter,
   setSearchQuery,
   resetFilters,
   setLoadingUsers,
   setLoadingStudios,
+  setLoadingClassrooms,
   setLoadingDashboard,
   setSubmitting,
   setError,
@@ -25,10 +31,11 @@ export {
   clearSuccessMessage,
 } from './adminSlice/adminReducer';
 
-// Action Creators (Thunks) - ОБНОВЛЁННЫЕ НАЗВАНИЯ
+// Action Creators (Thunks)
 export {
   fetchAllUsers,
   fetchAllStudios,
+  fetchStudioClassrooms,
   changeUserRole,
   assignUserToStudio,
   activateUser,
@@ -36,6 +43,9 @@ export {
   createNewStudio,
   updateExistingStudio,
   deleteExistingStudio,
+  createNewClassroom,
+  updateExistingClassroom,
+  deleteExistingClassroom,
   fetchDashboardStats,
 } from './adminSlice/actionCreators';
 

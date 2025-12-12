@@ -3,7 +3,7 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { AdminUser, Studio, DashboardStats } from '@/api/admin/types';
+import type { AdminUser, Studio, DashboardStats, Classroom } from '@/api/admin/types';
 
 // ==================== STATE TYPE ====================
 
@@ -11,6 +11,7 @@ export interface AdminState {
   // Списки
   users: AdminUser[];
   studios: Studio[];
+  classrooms: Classroom[];  // ← ДОБАВЛЕНО
   
   // Dashboard статистика
   dashboardStats: DashboardStats | null;
@@ -25,6 +26,7 @@ export interface AdminState {
   // Статусы загрузки
   isLoadingUsers: boolean;
   isLoadingStudios: boolean;
+  isLoadingClassrooms: boolean;  // ← ДОБАВЛЕНО
   isLoadingDashboard: boolean;
   isSubmitting: boolean;
   
@@ -43,6 +45,7 @@ export interface AdminState {
 const initialState: AdminState = {
   users: [],
   studios: [],
+  classrooms: [],  // ← ДОБАВЛЕНО
   dashboardStats: null,
   filters: {
     roleFilter: '',
@@ -51,6 +54,7 @@ const initialState: AdminState = {
   },
   isLoadingUsers: false,
   isLoadingStudios: false,
+  isLoadingClassrooms: false,  // ← ДОБАВЛЕНО
   isLoadingDashboard: false,
   isSubmitting: false,
   error: null,
@@ -77,6 +81,30 @@ const adminSlice = createSlice({
       state.error = null;
     },
     
+    // Установка кабинетов
+    setClassrooms: (state, action: PayloadAction<Classroom[]>) => {
+      state.classrooms = action.payload;
+      state.error = null;
+    },
+    
+    // Добавление кабинета
+    addClassroom: (state, action: PayloadAction<Classroom>) => {
+      state.classrooms.push(action.payload);
+    },
+    
+    // Обновление кабинета
+    updateClassroom: (state, action: PayloadAction<Classroom>) => {
+      const index = state.classrooms.findIndex(c => c.id === action.payload.id);
+      if (index !== -1) {
+        state.classrooms[index] = action.payload;
+      }
+    },
+    
+    // Удаление кабинета
+    removeClassroom: (state, action: PayloadAction<number>) => {
+      state.classrooms = state.classrooms.filter(c => c.id !== action.payload);
+    },
+    
     // Установка статистики дашборда
     setDashboardStats: (state, action: PayloadAction<DashboardStats>) => {
       state.dashboardStats = action.payload;
@@ -89,6 +117,14 @@ const adminSlice = createSlice({
       const index = state.users.findIndex(u => u.id === action.payload.id);
       if (index !== -1) {
         state.users[index] = action.payload;
+      }
+    },
+    
+    // Обновление студии
+    updateStudio: (state, action: PayloadAction<Studio>) => {
+      const index = state.studios.findIndex(s => s.id === action.payload.id);
+      if (index !== -1) {
+        state.studios[index] = action.payload;
       }
     },
     
@@ -127,6 +163,13 @@ const adminSlice = createSlice({
       }
     },
     
+    setLoadingClassrooms: (state, action: PayloadAction<boolean>) => {
+      state.isLoadingClassrooms = action.payload;
+      if (action.payload) {
+        state.error = null;
+      }
+    },
+    
     setLoadingDashboard: (state, action: PayloadAction<boolean>) => {
       state.isLoadingDashboard = action.payload;
       if (action.payload) {
@@ -147,6 +190,7 @@ const adminSlice = createSlice({
       state.error = action.payload;
       state.isLoadingUsers = false;
       state.isLoadingStudios = false;
+      state.isLoadingClassrooms = false;
       state.isLoadingDashboard = false;
       state.isSubmitting = false;
     },
@@ -170,6 +214,7 @@ const adminSlice = createSlice({
     clearAdminData: (state) => {
       state.users = [];
       state.studios = [];
+      state.classrooms = [];
       state.dashboardStats = null;
       state.filters = initialState.filters;
       state.error = null;
@@ -184,14 +229,20 @@ const adminSlice = createSlice({
 export const {
   setUsers,
   setStudios,
+  setClassrooms,
+  addClassroom,
+  updateClassroom,
+  removeClassroom,
   setDashboardStats,
   updateUser,
+  updateStudio,
   setRoleFilter,
   setStudioFilter,
   setSearchQuery,
   resetFilters,
   setLoadingUsers,
   setLoadingStudios,
+  setLoadingClassrooms,
   setLoadingDashboard,
   setSubmitting,
   setError,

@@ -6,15 +6,16 @@ import apiClient from '../instance';
 import type {
   AdminUser,
   Studio,
-  // UpdateRoleRequest,
-  // AssignStudioRequest,
+  Classroom,
+  ClassroomCreate,
+  ClassroomUpdate,
   CreateStudioRequest,
   UpdateStudioRequest,
   AdminActionResponse,
   SystemStats,
 } from './types';
 
-// Endpoints - всё через Admin Service
+// Endpoints
 const ADMIN_ENDPOINTS = {
   // User Management
   USERS: '/api/admin/user-management',
@@ -27,6 +28,10 @@ const ADMIN_ENDPOINTS = {
   STUDIOS: '/api/admin/studios',
   STUDIO_BY_ID: (id: number) => `/api/admin/studios/${id}`,
   
+  // Classrooms
+  STUDIO_CLASSROOMS: (studioId: number) => `/api/admin/studios/${studioId}/classrooms`,
+  CLASSROOM_BY_ID: (id: number) => `/api/admin/classrooms/${id}`,
+  
   // Dashboard
   DASHBOARD: '/api/admin/dashboard',
   SYSTEM_STATS: '/api/admin/dashboard/system-stats',
@@ -34,9 +39,6 @@ const ADMIN_ENDPOINTS = {
 
 // ==================== USERS ====================
 
-/**
- * Получить всех пользователей с фильтрами
- */
 export const getAllUsers = async (params?: {
   limit?: number;
   offset?: number;
@@ -48,9 +50,6 @@ export const getAllUsers = async (params?: {
   return response.data;
 };
 
-/**
- * Изменить роль пользователя
- */
 export const updateUserRole = async (
   userId: number,
   role: string
@@ -62,9 +61,6 @@ export const updateUserRole = async (
   return response.data;
 };
 
-/**
- * Привязать пользователя к студии
- */
 export const assignUserToStudio = async (
   userId: number,
   studioId: number
@@ -76,9 +72,6 @@ export const assignUserToStudio = async (
   return response.data;
 };
 
-/**
- * Активировать пользователя
- */
 export const activateUser = async (userId: number): Promise<AdminActionResponse> => {
   const response = await apiClient.post<AdminActionResponse>(
     ADMIN_ENDPOINTS.ACTIVATE_USER(userId)
@@ -86,9 +79,6 @@ export const activateUser = async (userId: number): Promise<AdminActionResponse>
   return response.data;
 };
 
-/**
- * Деактивировать пользователя
- */
 export const deactivateUser = async (userId: number): Promise<AdminActionResponse> => {
   const response = await apiClient.post<AdminActionResponse>(
     ADMIN_ENDPOINTS.DEACTIVATE_USER(userId)
@@ -98,33 +88,21 @@ export const deactivateUser = async (userId: number): Promise<AdminActionRespons
 
 // ==================== STUDIOS ====================
 
-/**
- * Получить все студии
- */
 export const getAllStudios = async (): Promise<Studio[]> => {
   const response = await apiClient.get<Studio[]>(ADMIN_ENDPOINTS.STUDIOS);
   return response.data;
 };
 
-/**
- * Получить студию по ID
- */
 export const getStudioById = async (id: number): Promise<Studio> => {
   const response = await apiClient.get<Studio>(ADMIN_ENDPOINTS.STUDIO_BY_ID(id));
   return response.data;
 };
 
-/**
- * Создать новую студию
- */
 export const createStudio = async (data: CreateStudioRequest): Promise<Studio> => {
   const response = await apiClient.post<Studio>(ADMIN_ENDPOINTS.STUDIOS, data);
   return response.data;
 };
 
-/**
- * Обновить студию
- */
 export const updateStudio = async (
   id: number,
   data: UpdateStudioRequest
@@ -133,26 +111,52 @@ export const updateStudio = async (
   return response.data;
 };
 
-/**
- * Удалить студию
- */
 export const deleteStudio = async (id: number): Promise<void> => {
   await apiClient.delete(ADMIN_ENDPOINTS.STUDIO_BY_ID(id));
 };
 
+// ==================== CLASSROOMS ====================
+
+export const getStudioClassrooms = async (studioId: number): Promise<Classroom[]> => {
+  const response = await apiClient.get<Classroom[]>(
+    ADMIN_ENDPOINTS.STUDIO_CLASSROOMS(studioId)
+  );
+  return response.data;
+};
+
+export const createClassroom = async (
+  studioId: number,
+  data: ClassroomCreate
+): Promise<Classroom> => {
+  const response = await apiClient.post<Classroom>(
+    ADMIN_ENDPOINTS.STUDIO_CLASSROOMS(studioId),
+    data
+  );
+  return response.data;
+};
+
+export const updateClassroom = async (
+  classroomId: number,
+  data: ClassroomUpdate
+): Promise<Classroom> => {
+  const response = await apiClient.put<Classroom>(
+    ADMIN_ENDPOINTS.CLASSROOM_BY_ID(classroomId),
+    data
+  );
+  return response.data;
+};
+
+export const deleteClassroom = async (classroomId: number): Promise<void> => {
+  await apiClient.delete(ADMIN_ENDPOINTS.CLASSROOM_BY_ID(classroomId));
+};
+
 // ==================== DASHBOARD ====================
 
-/**
- * Получить системную статистику для дашборда
- */
 export const getSystemStats = async (): Promise<SystemStats> => {
   const response = await apiClient.get<SystemStats>(ADMIN_ENDPOINTS.SYSTEM_STATS);
   return response.data;
 };
 
-/**
- * Получить полный дашборд администратора
- */
 export const getAdminDashboard = async (): Promise<any> => {
   const response = await apiClient.get(ADMIN_ENDPOINTS.DASHBOARD);
   return response.data;
@@ -162,8 +166,9 @@ export const getAdminDashboard = async (): Promise<any> => {
 export type {
   AdminUser,
   Studio,
-  UpdateRoleRequest,
-  AssignStudioRequest,
+  Classroom,
+  ClassroomCreate,
+  ClassroomUpdate,
   CreateStudioRequest,
   UpdateStudioRequest,
   AdminActionResponse,

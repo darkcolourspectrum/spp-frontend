@@ -1,49 +1,51 @@
 /**
- * Admin Action Creators - async thunks для админ-панели
+ * Admin Action Creators (Thunks)
  */
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { AxiosError } from 'axios';
-import * as adminApi from '@/api/admin/index';
-import type { CreateStudioRequest, UpdateStudioRequest, DashboardStats } from '@/api/admin/types';
+import * as adminApi from '@/api/admin';
+import type {
+  CreateStudioRequest,
+  UpdateStudioRequest,
+  ClassroomCreate,
+  ClassroomUpdate,
+} from '@/api/admin/types';
 import {
   setUsers,
   setStudios,
+  setClassrooms,
+  addClassroom,
+  updateClassroom as updateClassroomAction,
+  removeClassroom,
   setDashboardStats,
+  updateUser,
+  updateStudio as updateStudioAction,
   setLoadingUsers,
   setLoadingStudios,
+  setLoadingClassrooms,
   setLoadingDashboard,
   setSubmitting,
   setError,
   setSuccessMessage,
 } from './adminReducer';
 
-// ==================== HELPER FUNCTIONS ====================
-
-const getErrorMessage = (error: unknown): string => {
-  if (error instanceof AxiosError) {
-    return error.response?.data?.detail || error.message || 'Произошла ошибка';
+// Хелпер для обработки ошибок
+const getErrorMessage = (error: any): string => {
+  if (error.response?.data?.detail) {
+    return error.response.data.detail;
   }
-  return 'Произошла неизвестная ошибка';
+  return error.message || 'Произошла ошибка';
 };
 
-// ==================== USER MANAGEMENT ====================
+// ==================== USERS ====================
 
-/**
- * Загрузка всех пользователей
- */
 export const fetchAllUsers = createAsyncThunk(
-  'admin/fetchAllUsers',
-  async (
-    params: { limit?: number; offset?: number; role?: string; studio_id?: number } | undefined,
-    { dispatch, rejectWithValue }
-  ) => {
+  'admin/fetchUsers',
+  async (_, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoadingUsers(true));
-
-      const users = await adminApi.getAllUsers(params);
+      const users = await adminApi.getAllUsers();
       dispatch(setUsers(users));
-
       return users;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -55,21 +57,21 @@ export const fetchAllUsers = createAsyncThunk(
   }
 );
 
-/**
- * Изменение роли пользователя
- */
 export const changeUserRole = createAsyncThunk(
-  'admin/changeUserRole',
-  async (data: { userId: number; role: string }, { dispatch, rejectWithValue }) => {
+  'admin/changeRole',
+  async (
+    { userId, role }: { userId: number; role: string },
+    { dispatch, rejectWithValue }
+  ) => {
     try {
       dispatch(setSubmitting(true));
-
-      const response = await adminApi.updateUserRole(data.userId, data.role);
-      dispatch(setSuccessMessage(response.message));
-
-      // Перезагружаем пользователей
-      await dispatch(fetchAllUsers());
-
+      const response = await adminApi.updateUserRole(userId, role);
+      
+      if (response.user) {
+        dispatch(updateUser(response.user));
+        dispatch(setSuccessMessage(response.message || 'Роль успешно изменена'));
+      }
+      
       return response;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -81,21 +83,21 @@ export const changeUserRole = createAsyncThunk(
   }
 );
 
-/**
- * Привязка пользователя к студии
- */
 export const assignUserToStudio = createAsyncThunk(
-  'admin/assignUserToStudio',
-  async (data: { userId: number; studioId: number }, { dispatch, rejectWithValue }) => {
+  'admin/assignStudio',
+  async (
+    { userId, studioId }: { userId: number; studioId: number },
+    { dispatch, rejectWithValue }
+  ) => {
     try {
       dispatch(setSubmitting(true));
-
-      const response = await adminApi.assignUserToStudio(data.userId, data.studioId);
-      dispatch(setSuccessMessage(response.message));
-
-      // Перезагружаем пользователей
-      await dispatch(fetchAllUsers());
-
+      const response = await adminApi.assignUserToStudio(userId, studioId);
+      
+      if (response.user) {
+        dispatch(updateUser(response.user));
+        dispatch(setSuccessMessage(response.message || 'Студия успешно назначена'));
+      }
+      
       return response;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -107,21 +109,18 @@ export const assignUserToStudio = createAsyncThunk(
   }
 );
 
-/**
- * Активация пользователя
- */
 export const activateUser = createAsyncThunk(
   'admin/activateUser',
   async (userId: number, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setSubmitting(true));
-
       const response = await adminApi.activateUser(userId);
-      dispatch(setSuccessMessage(response.message));
-
-      // Перезагружаем пользователей
-      await dispatch(fetchAllUsers());
-
+      
+      if (response.user) {
+        dispatch(updateUser(response.user));
+        dispatch(setSuccessMessage(response.message || 'Пользователь активирован'));
+      }
+      
       return response;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -133,21 +132,18 @@ export const activateUser = createAsyncThunk(
   }
 );
 
-/**
- * Деактивация пользователя
- */
 export const deactivateUser = createAsyncThunk(
   'admin/deactivateUser',
   async (userId: number, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setSubmitting(true));
-
       const response = await adminApi.deactivateUser(userId);
-      dispatch(setSuccessMessage(response.message));
-
-      // Перезагружаем пользователей
-      await dispatch(fetchAllUsers());
-
+      
+      if (response.user) {
+        dispatch(updateUser(response.user));
+        dispatch(setSuccessMessage(response.message || 'Пользователь деактивирован'));
+      }
+      
       return response;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -161,18 +157,13 @@ export const deactivateUser = createAsyncThunk(
 
 // ==================== STUDIOS ====================
 
-/**
- * Загрузка всех студий
- */
 export const fetchAllStudios = createAsyncThunk(
-  'admin/fetchAllStudios',
+  'admin/fetchStudios',
   async (_, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoadingStudios(true));
-
       const studios = await adminApi.getAllStudios();
       dispatch(setStudios(studios));
-
       return studios;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -184,21 +175,14 @@ export const fetchAllStudios = createAsyncThunk(
   }
 );
 
-/**
- * Создание новой студии
- */
 export const createNewStudio = createAsyncThunk(
   'admin/createStudio',
   async (data: CreateStudioRequest, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setSubmitting(true));
-
       const studio = await adminApi.createStudio(data);
       dispatch(setSuccessMessage(`Студия "${studio.name}" успешно создана`));
-
-      // Перезагружаем студии
       await dispatch(fetchAllStudios());
-
       return studio;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -210,9 +194,6 @@ export const createNewStudio = createAsyncThunk(
   }
 );
 
-/**
- * Обновление студии
- */
 export const updateExistingStudio = createAsyncThunk(
   'admin/updateStudio',
   async (
@@ -221,13 +202,9 @@ export const updateExistingStudio = createAsyncThunk(
   ) => {
     try {
       dispatch(setSubmitting(true));
-
       const studio = await adminApi.updateStudio(id, data);
+      dispatch(updateStudioAction(studio));
       dispatch(setSuccessMessage(`Студия "${studio.name}" успешно обновлена`));
-
-      // Перезагружаем студии
-      await dispatch(fetchAllStudios());
-
       return studio;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -239,22 +216,98 @@ export const updateExistingStudio = createAsyncThunk(
   }
 );
 
-/**
- * Удаление студии
- */
 export const deleteExistingStudio = createAsyncThunk(
   'admin/deleteStudio',
   async (id: number, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setSubmitting(true));
-
       await adminApi.deleteStudio(id);
       dispatch(setSuccessMessage('Студия успешно удалена'));
-
-      // Перезагружаем студии
       await dispatch(fetchAllStudios());
-
       return id;
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      dispatch(setError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setSubmitting(false));
+    }
+  }
+);
+
+// ==================== CLASSROOMS ====================
+
+export const fetchStudioClassrooms = createAsyncThunk(
+  'admin/fetchClassrooms',
+  async (studioId: number, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setLoadingClassrooms(true));
+      const classrooms = await adminApi.getStudioClassrooms(studioId);
+      dispatch(setClassrooms(classrooms));
+      return classrooms;
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      dispatch(setError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setLoadingClassrooms(false));
+    }
+  }
+);
+
+export const createNewClassroom = createAsyncThunk(
+  'admin/createClassroom',
+  async (
+    { studioId, data }: { studioId: number; data: ClassroomCreate },
+    { dispatch, rejectWithValue }
+  ) => {
+    try {
+      dispatch(setSubmitting(true));
+      const classroom = await adminApi.createClassroom(studioId, data);
+      dispatch(addClassroom(classroom));
+      dispatch(setSuccessMessage(`Кабинет "${classroom.name}" успешно создан`));
+      return classroom;
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      dispatch(setError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setSubmitting(false));
+    }
+  }
+);
+
+export const updateExistingClassroom = createAsyncThunk(
+  'admin/updateClassroom',
+  async (
+    { classroomId, data }: { classroomId: number; data: ClassroomUpdate },
+    { dispatch, rejectWithValue }
+  ) => {
+    try {
+      dispatch(setSubmitting(true));
+      const classroom = await adminApi.updateClassroom(classroomId, data);
+      dispatch(updateClassroomAction(classroom));
+      dispatch(setSuccessMessage(`Кабинет "${classroom.name}" успешно обновлен`));
+      return classroom;
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      dispatch(setError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setSubmitting(false));
+    }
+  }
+);
+
+export const deleteExistingClassroom = createAsyncThunk(
+  'admin/deleteClassroom',
+  async (classroomId: number, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setSubmitting(true));
+      await adminApi.deleteClassroom(classroomId);
+      dispatch(removeClassroom(classroomId));
+      dispatch(setSuccessMessage('Кабинет успешно удален'));
+      return classroomId;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
       dispatch(setError(errorMessage));
@@ -267,29 +320,23 @@ export const deleteExistingStudio = createAsyncThunk(
 
 // ==================== DASHBOARD ====================
 
-/**
- * Загрузка статистики для дашборда
- */
 export const fetchDashboardStats = createAsyncThunk(
   'admin/fetchDashboardStats',
   async (_, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoadingDashboard(true));
-
-      const systemStats = await adminApi.getSystemStats();
-
-      // Формируем статистику для UI
-      const dashboardStats: DashboardStats = {
-        totalUsers: systemStats.users.total,
-        totalStudios: systemStats.studios.total,
-        activeTeachers: systemStats.users.teachers,
-        activeStudents: systemStats.users.students,
-        totalClassrooms: systemStats.classrooms.total,
-        activeClassrooms: systemStats.classrooms.active,
+      const stats = await adminApi.getSystemStats();
+      
+      const dashboardStats = {
+        totalUsers: stats.users.total,
+        totalStudios: stats.studios.total,
+        activeTeachers: stats.users.teachers,
+        activeStudents: stats.users.students,
+        totalClassrooms: stats.classrooms.total,
+        activeClassrooms: stats.classrooms.active,
       };
-
+      
       dispatch(setDashboardStats(dashboardStats));
-
       return dashboardStats;
     } catch (error) {
       const errorMessage = getErrorMessage(error);

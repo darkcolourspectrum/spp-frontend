@@ -12,13 +12,13 @@ import Login from './modules/auth/components/Login';
 import Register from './modules/auth/components/Register';
 import ProtectedRoute from './modules/auth/components/ProtectedRoute';
 
-// Admin Pages - РЕАЛЬНЫЕ КОМПОНЕНТЫ
-import { AdminDashboardPage, AdminUsersPage, AdminStudiosPage } from './pages/admin';
+// Admin Pages
+import { AdminDashboardPage, AdminUsersPage, AdminStudiosPage, StudioDetailPage } from './pages/admin';
 
 // Other Pages
 import StudentProfilePage from './pages/StudentProfilePage';
 
-// Временные placeholder компоненты (оставшиеся)
+// Временные placeholder компоненты
 const Dashboard = () => (
   <div style={{ padding: '40px', textAlign: 'center' }}>
     <h1>Dashboard</h1>
@@ -75,7 +75,6 @@ const ProfilePage = () => (
 const AppRoutes = () => {
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   
-  // Определяем редирект для главной страницы
   const getDefaultRedirect = () => {
     if (!isAuthenticated || !user) {
       return ROUTES.LOGIN;
@@ -86,7 +85,6 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* ==================== ПУБЛИЧНЫЕ МАРШРУТЫ ==================== */}
-      {/* Используем PublicLayout - БЕЗ Header/Footer */}
       <Route element={<PublicLayout><Outlet /></PublicLayout>}>
         <Route 
           path={ROUTES.LOGIN} 
@@ -99,7 +97,6 @@ const AppRoutes = () => {
       </Route>
       
       {/* ==================== ЗАЩИЩЕННЫЕ МАРШРУТЫ ==================== */}
-      {/* Используем PrivateLayout - С Header/Footer */}
       <Route element={
         <PrivateLayout>
           <ProtectedRoute>
@@ -116,6 +113,7 @@ const AppRoutes = () => {
           <Route path={ROUTES.ADMIN.DASHBOARD} element={<AdminDashboardPage />} />
           <Route path={ROUTES.ADMIN.USERS} element={<AdminUsersPage />} />
           <Route path={ROUTES.ADMIN.STUDIOS} element={<AdminStudiosPage />} />
+          <Route path={ROUTES.ADMIN.STUDIO_DETAIL} element={<StudioDetailPage />} />
           <Route path={ROUTES.ADMIN.STATISTICS} element={<AdminStatistics />} />
         </Route>
         
@@ -134,7 +132,6 @@ const AppRoutes = () => {
       </Route>
       
       {/* ==================== СПЕЦИАЛЬНЫЕ МАРШРУТЫ ==================== */}
-      {/* Главная страница - редирект */}
       <Route 
         path={ROUTES.HOME} 
         element={<Navigate to={getDefaultRedirect()} replace />} 

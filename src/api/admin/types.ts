@@ -38,6 +38,32 @@ export interface Studio {
   updated_at: string;
 }
 
+// ==================== CLASSROOMS ====================
+
+export interface Classroom {
+  id: number;
+  name: string;
+  capacity: number;
+  description: string | null;
+  studio_id: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string | null;
+}
+
+export interface ClassroomCreate {
+  name: string;
+  capacity: number;
+  description?: string;
+}
+
+export interface ClassroomUpdate {
+  name?: string;
+  capacity?: number;
+  description?: string;
+  is_active?: boolean;
+}
+
 // ==================== REQUESTS ====================
 
 export interface UpdateRoleRequest {
@@ -92,7 +118,6 @@ export interface SystemStats {
   };
 }
 
-// Статистика для UI (то что храним в Redux)
 export interface DashboardStats {
   totalUsers: number;
   totalStudios: number;
@@ -102,7 +127,7 @@ export interface DashboardStats {
   activeClassrooms: number;
 }
 
-// УСТАРЕВШИЕ ТИПЫ (для совместимости, будут удалены)
+// УСТАРЕВШИЕ ТИПЫ (для совместимости)
 export interface AssignTeacherRequest {
   user_id: number;
   studio_id: number;
