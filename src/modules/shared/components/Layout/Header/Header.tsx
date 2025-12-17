@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/modules/auth/hooks';
-import { useAppSelector } from '@/store/hooks';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { fetchMyProfile } from '@/modules/profile/store';
 import { ROUTES } from '@/constants/routes';
 import { getUserInitials } from '@/utils/helpers';
 import './header.css';
 
 const Header = () => {
+  const dispatch = useAppDispatch();
   const { user, logout, isAdmin, isTeacher, isStudent } = useAuth();
   const { profile } = useAppSelector((state) => state.profile);
   const navigate = useNavigate();
@@ -66,6 +68,13 @@ const Header = () => {
   };
   
   const navigationLinks = getNavigationLinks();
+  
+  // Загружаем профиль при монтировании компонента
+  useEffect(() => {
+    if (!profile && user?.id) {
+      dispatch(fetchMyProfile(user.id));
+    }
+  }, [dispatch, profile, user]);
   
   // Получаем информацию о пользователе
   const userInfo = (profile as any)?.user_info || {};

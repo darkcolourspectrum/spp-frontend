@@ -22,6 +22,7 @@ export interface AdminUser {
   created_at: string;
   privacy_policy_accepted: boolean;
   privacy_policy_accepted_at: string | null;
+  avatar_url: string | null;  // ← ДОБАВЛЕНО
 }
 
 // ==================== STUDIOS ====================
