@@ -15,8 +15,11 @@ import ProtectedRoute from './modules/auth/components/ProtectedRoute';
 // Admin Pages
 import { AdminDashboardPage, AdminUsersPage, AdminStudiosPage, StudioDetailPage } from './pages/admin';
 
-// Other Pages
-import StudentProfilePage from './pages/StudentProfilePage';
+// Teacher Pages
+import TeacherStudiosPage from './pages/teacher/TeacherStudiosPage';
+
+// Profile Page (универсальная для всех ролей)
+import UserProfilePage from './pages/UserProfilePage';
 
 // Временные placeholder компоненты
 const Dashboard = () => (
@@ -47,28 +50,10 @@ const TeacherStudents = () => (
   </div>
 );
 
-const TeacherProfile = () => (
-  <div style={{ padding: '40px', textAlign: 'center' }}>
-    <h1>Профиль преподавателя</h1>
-    <p>Ваш профиль</p>
-  </div>
-);
-
 const StudentSchedule = () => (
   <div style={{ padding: '40px', textAlign: 'center' }}>
     <h1>Расписание студента</h1>
     <p>Запись на уроки</p>
-  </div>
-);
-
-const StudentProfile = () => (
-  <StudentProfilePage />
-);
-
-const ProfilePage = () => (
-  <div style={{ padding: '40px', textAlign: 'center' }}>
-    <h1>Мой профиль</h1>
-    <p>Общий профиль пользователя</p>
   </div>
 );
 
@@ -106,7 +91,7 @@ const AppRoutes = () => {
       }>
         {/* Общие защищенные маршруты */}
         <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
-        <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+        <Route path={ROUTES.PROFILE} element={<UserProfilePage />} />
         
         {/* ==================== АДМИН МАРШРУТЫ ==================== */}
         <Route element={<ProtectedRoute requiredRoles={['admin']}><Outlet /></ProtectedRoute>}>
@@ -119,15 +104,16 @@ const AppRoutes = () => {
         
         {/* ==================== ПРЕПОДАВАТЕЛЬ МАРШРУТЫ ==================== */}
         <Route element={<ProtectedRoute requiredRoles={['teacher', 'admin']}><Outlet /></ProtectedRoute>}>
+          <Route path={ROUTES.TEACHER.STUDIOS} element={<TeacherStudiosPage />} />
           <Route path={ROUTES.TEACHER.SCHEDULE} element={<TeacherSchedule />} />
           <Route path={ROUTES.TEACHER.STUDENTS} element={<TeacherStudents />} />
-          <Route path={ROUTES.TEACHER.PROFILE} element={<TeacherProfile />} />
+          <Route path={ROUTES.TEACHER.PROFILE} element={<UserProfilePage />} />
         </Route>
         
         {/* ==================== СТУДЕНТ МАРШРУТЫ ==================== */}
         <Route element={<ProtectedRoute requiredRoles={['student', 'admin']}><Outlet /></ProtectedRoute>}>
           <Route path={ROUTES.STUDENT.SCHEDULE} element={<StudentSchedule />} />
-          <Route path={ROUTES.STUDENT.PROFILE} element={<StudentProfile />} />
+          <Route path={ROUTES.STUDENT.PROFILE} element={<UserProfilePage />} />
         </Route>
       </Route>
       

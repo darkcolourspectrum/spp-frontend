@@ -6,6 +6,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { authReducer } from '@/modules/auth/store';
 import { profileReducer } from '@/modules/profile/store';
 import { adminReducer } from '@/modules/admin/store';
+import { scheduleReducer } from '@/modules/schedule/store';
 
 // Создаем store
 export const store = configureStore({
@@ -13,8 +14,7 @@ export const store = configureStore({
     auth: authReducer,
     profile: profileReducer,
     admin: adminReducer,
-    // Здесь будут добавляться другие reducers:
-    // schedule: scheduleReducer,
+    schedule: scheduleReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

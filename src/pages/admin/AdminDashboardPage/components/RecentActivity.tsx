@@ -58,7 +58,7 @@ const RecentActivity = ({ users, studios }: RecentActivityProps) => {
           
           {recentStudios.map((studio) => (
             <div key={`studio-${studio.id}`} className="activity-item">
-              <div className="activity-icon studio-icon">🏫</div>
+              <div className="activity-icon studio-icon"></div>
               <div className="activity-content">
                 <p>
                   Студия <strong>{studio.name}</strong> создана

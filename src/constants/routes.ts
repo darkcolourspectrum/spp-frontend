@@ -19,12 +19,13 @@ export const ROUTES = {
     DASHBOARD: '/admin/dashboard',
     USERS: '/admin/users',
     STUDIOS: '/admin/studios',
-    STUDIO_DETAIL: '/admin/studios/:studioId',  // ← НОВЫЙ МАРШРУТ
+    STUDIO_DETAIL: '/admin/studios/:studioId',
     STATISTICS: '/admin/statistics',
   },
   
   // Преподаватель маршруты
   TEACHER: {
+    STUDIOS: '/teacher/studios',  // ← НОВЫЙ МАРШРУТ
     SCHEDULE: '/teacher/schedule',
     LESSONS: '/teacher/lessons',
     STUDENTS: '/teacher/students',
@@ -54,7 +55,7 @@ export const getDefaultRouteForRole = (role: string): string => {
     case 'admin':
       return ROUTES.ADMIN.DASHBOARD;
     case 'teacher':
-      return ROUTES.TEACHER.SCHEDULE;
+      return ROUTES.TEACHER.STUDIOS;  // ← ИЗМЕНЕНО: теперь по умолчанию студии
     case 'student':
       return ROUTES.STUDENT.SCHEDULE;
     case 'guest':

@@ -1,27 +1,35 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { useAuth } from '@/modules/auth/hooks/useAuth';
+import { useAppDispatch } from '@/store/hooks';
 import { fetchStudioClassrooms } from '@/modules/admin/store';
 import { getStudioById } from '@/api/admin';
 import type { Studio } from '@/api/admin/types';
 import StudioTabs from './StudioTabs';
 import ClassroomsTab from './ClassroomsTab/ClassroomsTab';
+import ScheduleTab from './ScheduleTab/ScheduleTab';
 import SettingsTab from './SettingsTab/SettingsTab';
 import './studioDetailPage.css';
 
-type TabType = 'classrooms' | 'settings';
+type TabType = 'classrooms' | 'schedule' | 'settings';
 
 const StudioDetailPage = () => {
   const { studioId } = useParams<{ studioId: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { user, isAdmin, isTeacher } = useAuth();
   
   const [studio, setStudio] = useState<Studio | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   const activeTab = (searchParams.get('tab') as TabType) || 'classrooms';
+  
+  // Определяем доступные табы в зависимости от роли
+  const availableTabs: TabType[] = isAdmin()
+    ? ['classrooms', 'schedule', 'settings']
+    : ['classrooms', 'schedule']; // Для преподавателя
   
   useEffect(() => {
     const loadStudio = async () => {
@@ -34,6 +42,12 @@ const StudioDetailPage = () => {
         setIsLoading(true);
         const studioData = await getStudioById(parseInt(studioId));
         setStudio(studioData);
+        
+        // Проверяем доступ преподавателя к студии
+        if (isTeacher() && user?.studio_id !== studioData.id) {
+          setError('У вас нет доступа к этой студии');
+          return;
+        }
         
         // Загружаем кабинеты если активен таб с кабинетами
         if (activeTab === 'classrooms') {
@@ -48,9 +62,14 @@ const StudioDetailPage = () => {
     };
     
     loadStudio();
-  }, [studioId, dispatch, navigate, activeTab]);
+  }, [studioId, dispatch, navigate, activeTab, isTeacher, user]);
   
   const handleTabChange = (tab: TabType) => {
+    // Проверяем доступность таба
+    if (!availableTabs.includes(tab)) {
+      return;
+    }
+    
     setSearchParams({ tab });
     
     // Загружаем кабинеты при переключении на таб кабинетов
@@ -60,7 +79,12 @@ const StudioDetailPage = () => {
   };
   
   const handleBack = () => {
-    navigate('/admin/studios');
+    if (isAdmin()) {
+      navigate('/admin/studios');
+    } else {
+      // Для преподавателя - вернуться на свою страницу
+      navigate('/teacher/studios');
+    }
   };
   
   if (isLoading) {
@@ -96,12 +120,29 @@ const StudioDetailPage = () => {
       </div>
       
       {/* Tabs */}
-      <StudioTabs activeTab={activeTab} onTabChange={handleTabChange} />
+      <StudioTabs 
+        activeTab={activeTab} 
+        availableTabs={availableTabs}
+        onTabChange={handleTabChange} 
+      />
       
       {/* Tab Content */}
       <div className="studio-tab-content">
-        {activeTab === 'classrooms' && <ClassroomsTab studio={studio} />}
-        {activeTab === 'settings' && <SettingsTab studio={studio} />}
+        {activeTab === 'classrooms' && (
+          <ClassroomsTab 
+            studio={studio} 
+            isReadOnly={!isAdmin()} 
+          />
+        )}
+        {activeTab === 'schedule' && (
+          <ScheduleTab 
+            studio={studio} 
+            isReadOnly={!isAdmin()} 
+          />
+        )}
+        {activeTab === 'settings' && isAdmin() && (
+          <SettingsTab studio={studio} />
+        )}
       </div>
     </div>
   );

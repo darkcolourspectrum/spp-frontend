@@ -36,7 +36,6 @@ const SystemAlerts = ({ users, studios, stats }: SystemAlertsProps) => {
   if (usersWithoutStudio.length > 0) {
     alerts.push({
       type: 'info',
-      icon: 'ℹ️',
       message: `${usersWithoutStudio.length} ${usersWithoutStudio.length === 1 ? 'пользователь' : 'пользователей'} без студии`,
       action: 'Назначить студии',
     });
@@ -47,7 +46,6 @@ const SystemAlerts = ({ users, studios, stats }: SystemAlertsProps) => {
   if (inactiveUsers.length > 0) {
     alerts.push({
       type: 'warning',
-      icon: '⚠️',
       message: `${inactiveUsers.length} ${inactiveUsers.length === 1 ? 'неактивный пользователь' : 'неактивных пользователей'}`,
       action: 'Проверить пользователей',
     });
@@ -57,7 +55,6 @@ const SystemAlerts = ({ users, studios, stats }: SystemAlertsProps) => {
   if (alerts.length === 0) {
     alerts.push({
       type: 'success',
-      icon: '✅',
       message: 'Система работает нормально',
       action: null,
     });

@@ -8,9 +8,10 @@ import './classroomsTab.css';
 
 interface ClassroomsTabProps {
   studio: Studio;
+  isReadOnly?: boolean; // Для преподавателей
 }
 
-const ClassroomsTab = ({ studio }: ClassroomsTabProps) => {
+const ClassroomsTab = ({ studio, isReadOnly = false }: ClassroomsTabProps) => {
   const { classrooms, isLoadingClassrooms } = useAppSelector((state) => state.admin);
   
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -42,17 +43,21 @@ const ClassroomsTab = ({ studio }: ClassroomsTabProps) => {
     <div className="classrooms-tab">
       <div className="classrooms-header">
         <h2>Кабинеты студии</h2>
-        <button onClick={handleCreate} className="btn-primary">
-          + Добавить кабинет
-        </button>
+        {!isReadOnly && (
+          <button onClick={handleCreate} className="btn-primary">
+            + Добавить кабинет
+          </button>
+        )}
       </div>
       
       {classrooms.length === 0 ? (
         <div className="no-classrooms">
           <p>В этой студии пока нет кабинетов</p>
-          <button onClick={handleCreate} className="btn-primary">
-            Создать первый кабинет
-          </button>
+          {!isReadOnly && (
+            <button onClick={handleCreate} className="btn-primary">
+              Создать первый кабинет
+            </button>
+          )}
         </div>
       ) : (
         <div className="classrooms-list">
@@ -70,47 +75,53 @@ const ClassroomsTab = ({ studio }: ClassroomsTabProps) => {
                   {classroom.is_active ? 'Активен' : 'Неактивен'}
                 </span>
               </div>
-              <div className="classroom-actions">
-                <button
-                  onClick={() => handleEdit(classroom)}
-                  className="action-button edit"
-                  title="Редактировать"
-                >
-                  ✏️
-                </button>
-                <button
-                  onClick={() => handleDelete(classroom)}
-                  className="action-button delete"
-                  title="Удалить"
-                >
-                  🗑️
-                </button>
-              </div>
+              {!isReadOnly && (
+                <div className="classroom-actions">
+                  <button
+                    onClick={() => handleEdit(classroom)}
+                    className="action-button edit"
+                    title="Редактировать"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={() => handleDelete(classroom)}
+                    className="action-button delete"
+                    title="Удалить"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
       )}
       
-      {/* Modals */}
-      {showCreateModal && (
-        <CreateClassroomModal
-          studioId={studio.id}
-          onClose={() => setShowCreateModal(false)}
-        />
-      )}
-      
-      {editingClassroom && (
-        <EditClassroomModal
-          classroom={editingClassroom}
-          onClose={() => setEditingClassroom(null)}
-        />
-      )}
-      
-      {deletingClassroom && (
-        <DeleteClassroomModal
-          classroom={deletingClassroom}
-          onClose={() => setDeletingClassroom(null)}
-        />
+      {/* Modals - только для админов */}
+      {!isReadOnly && (
+        <>
+          {showCreateModal && (
+            <CreateClassroomModal
+              studioId={studio.id}
+              onClose={() => setShowCreateModal(false)}
+            />
+          )}
+          
+          {editingClassroom && (
+            <EditClassroomModal
+              classroom={editingClassroom}
+              onClose={() => setEditingClassroom(null)}
+            />
+          )}
+          
+          {deletingClassroom && (
+            <DeleteClassroomModal
+              classroom={deletingClassroom}
+              onClose={() => setDeletingClassroom(null)}
+            />
+          )}
+        </>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/modules/auth/hooks';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { fetchMyProfile } from '@/modules/profile/store';
@@ -11,7 +11,6 @@ const Header = () => {
   const dispatch = useAppDispatch();
   const { user, logout, isAdmin, isTeacher, isStudent } = useAuth();
   const { profile } = useAppSelector((state) => state.profile);
-  const navigate = useNavigate();
   
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -53,6 +52,7 @@ const Header = () => {
     
     if (isTeacher()) {
       return [
+        { label: 'Моя студия', path: ROUTES.TEACHER.STUDIOS },
         { label: 'Расписание', path: ROUTES.TEACHER.SCHEDULE },
         { label: 'Студенты', path: ROUTES.TEACHER.STUDENTS },
       ];
@@ -89,7 +89,7 @@ const Header = () => {
     <header className="header">
       <div className="header-container">
         <Link to={ROUTES.HOME} className="header-logo">
-          <span className="logo-icon">🎵</span>
+          <span className="logo-icon"></span>
           <span className="logo-text">SPP</span>
         </Link>
         

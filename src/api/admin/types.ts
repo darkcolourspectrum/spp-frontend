@@ -22,7 +22,7 @@ export interface AdminUser {
   created_at: string;
   privacy_policy_accepted: boolean;
   privacy_policy_accepted_at: string | null;
-  avatar_url: string | null;  // ← ДОБАВЛЕНО
+  avatar_url: string | null;
 }
 
 // ==================== STUDIOS ====================
@@ -35,6 +35,8 @@ export interface Studio {
   phone: string | null;
   email: string | null;
   is_active: boolean;
+  teachers_count?: number;  // Опциональное - может не быть в некоторых ответах
+  students_count?: number;  // Опциональное - может не быть в некоторых ответах
   created_at: string;
   updated_at: string;
 }

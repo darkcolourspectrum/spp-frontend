@@ -10,9 +10,9 @@ const Footer = () => {
         <div className="footer-content">
           {/* Левая часть - copyright */}
           <div className="footer-left">
-            <span className="footer-logo">🎵 SPP</span>
+            <span className="footer-logo">SPP</span>
             <span className="footer-copyright">
-              © {currentYear} Schedule Platform Plus. Все права защищены.
+              © {currentYear} Schedule Platform Plus.
             </span>
           </div>
           

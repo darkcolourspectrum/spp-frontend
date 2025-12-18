@@ -1,12 +1,13 @@
 /**
- * Страница профиля студента
+ * Универсальная страница профиля пользователя
+ * Используется для всех ролей: admin, teacher, student
  */
 
 import { useState } from 'react';
 import { ProfileView, ProfileEdit } from '@/modules/profile/components';
-import './studentProfilePage.css';
+import './userProfilePage.css';
 
-const StudentProfilePage = () => {
+const UserProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   
   const handleEditClick = () => {
@@ -22,7 +23,7 @@ const StudentProfilePage = () => {
   };
   
   return (
-    <div className="student-profile-page">
+    <div className="user-profile-page">
       {isEditing ? (
         <ProfileEdit 
           onCancel={handleCancelEdit}
@@ -35,4 +36,4 @@ const StudentProfilePage = () => {
   );
 };
 
-export default StudentProfilePage;
+export default UserProfilePage;

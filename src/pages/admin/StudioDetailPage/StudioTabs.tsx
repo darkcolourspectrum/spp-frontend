@@ -1,23 +1,29 @@
+type TabType = 'classrooms' | 'schedule' | 'settings';
+
 interface StudioTabsProps {
-  activeTab: 'classrooms' | 'settings';
-  onTabChange: (tab: 'classrooms' | 'settings') => void;
+  activeTab: TabType;
+  availableTabs: TabType[];
+  onTabChange: (tab: TabType) => void;
 }
 
-const StudioTabs = ({ activeTab, onTabChange }: StudioTabsProps) => {
+const TAB_LABELS: Record<TabType, string> = {
+  classrooms: 'Кабинеты',
+  schedule: 'Расписание',
+  settings: 'Настройки',
+};
+
+const StudioTabs = ({ activeTab, availableTabs, onTabChange }: StudioTabsProps) => {
   return (
     <div className="studio-tabs">
-      <button
-        className={`tab-button ${activeTab === 'classrooms' ? 'active' : ''}`}
-        onClick={() => onTabChange('classrooms')}
-      >
-        Кабинеты
-      </button>
-      <button
-        className={`tab-button ${activeTab === 'settings' ? 'active' : ''}`}
-        onClick={() => onTabChange('settings')}
-      >
-        Настройки
-      </button>
+      {availableTabs.map((tab) => (
+        <button
+          key={tab}
+          className={`tab-button ${activeTab === tab ? 'active' : ''}`}
+          onClick={() => onTabChange(tab)}
+        >
+          {TAB_LABELS[tab]}
+        </button>
+      ))}
     </div>
   );
 };

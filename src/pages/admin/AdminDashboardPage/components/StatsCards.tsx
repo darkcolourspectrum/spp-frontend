@@ -9,7 +9,7 @@ const StatsCards = ({ stats }: StatsCardsProps) => {
     {
       title: 'Всего пользователей',
       value: stats?.totalUsers || 0,
-      icon: '👥',
+      icon: '',
       color: 'blue',
       details: [
         { label: 'Студенты', value: stats?.activeStudents || 0 },
@@ -19,7 +19,7 @@ const StatsCards = ({ stats }: StatsCardsProps) => {
     {
       title: 'Студии',
       value: stats?.totalStudios || 0,
-      icon: '🏫',
+      icon: '',
       color: 'purple',
       details: [
         { label: 'Всего кабинетов', value: stats?.totalClassrooms || 0 },
@@ -29,7 +29,7 @@ const StatsCards = ({ stats }: StatsCardsProps) => {
     {
       title: 'Кабинеты',
       value: stats?.totalClassrooms || 0,
-      icon: '🚪',
+      icon: '',
       color: 'green',
       details: [
         { label: 'Активных', value: stats?.activeClassrooms || 0 },
@@ -39,7 +39,7 @@ const StatsCards = ({ stats }: StatsCardsProps) => {
     {
       title: 'Учителя',
       value: stats?.activeTeachers || 0,
-      icon: '👨‍🏫',
+      icon: '',
       color: 'orange',
       details: [
         { label: 'Всего пользователей', value: stats?.totalUsers || 0 },
@@ -51,7 +51,7 @@ const StatsCards = ({ stats }: StatsCardsProps) => {
     <div className="stats-grid">
       {cards.map((card, index) => (
         <div key={index} className={`stat-card ${card.color}`}>
-          <div className="stat-icon">{card.icon}</div>
+          {/* <div className="stat-icon">{card.icon}</div> */}
           <div className="stat-content">
             <div className="stat-value">{card.value}</div>
             <div className="stat-label">{card.title}</div>

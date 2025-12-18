@@ -1,0 +1,273 @@
+/* Schedule Calendar */
+.schedule-calendar {
+  padding: 0;
+}
+
+/* Calendar Navigation */
+.calendar-navigation {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.nav-button {
+  padding: 10px 20px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.3s;
+}
+
+.nav-button:hover {
+  background: #f8f9fa;
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.nav-button.today {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.nav-button.today:hover {
+  background: #5568d3;
+}
+
+/* Date Range Info */
+.date-range-info {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 30px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+/* Loading */
+.schedule-calendar-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 15px;
+}
+
+/* No Lessons */
+.no-lessons {
+  text-align: center;
+  padding: 60px 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.no-lessons-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.no-lessons h3 {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.no-lessons p {
+  color: #666;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Calendar Days */
+.calendar-days {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Calendar Day */
+.calendar-day {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Day Header */
+.day-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.day-number {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.day-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.day-weekday {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.day-month {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.day-count {
+  margin-left: auto;
+  font-size: 14px;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+}
+
+/* Day Lessons */
+.day-lessons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px;
+}
+
+/* Lesson Card */
+.lesson-card {
+  padding: 16px;
+  background: #f8f9fa;
+  border-left: 4px solid #667eea;
+  border-radius: 6px;
+  transition: all 0.3s;
+}
+
+.lesson-card:hover {
+  background: #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.lesson-card.status-completed {
+  border-left-color: #4caf50;
+  background: #e8f5e9;
+}
+
+.lesson-card.status-cancelled {
+  border-left-color: #f44336;
+  background: #ffebee;
+  opacity: 0.7;
+}
+
+.lesson-card.status-missed {
+  border-left-color: #ff9800;
+  background: #fff3e0;
+}
+
+.lesson-time {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.lesson-teacher,
+.lesson-classroom,
+.lesson-students {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.lesson-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.lesson-status .status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.lesson-status .status-badge.scheduled {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.lesson-status .status-badge.completed {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.lesson-status .status-badge.cancelled {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.lesson-status .status-badge.missed {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.recurring-badge {
+  padding: 4px 8px;
+  background: #fff3e0;
+  border-radius: 12px;
+  font-size: 12px;
+  cursor: help;
+}
+
+.lesson-notes {
+  margin-top: 8px;
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .calendar-navigation {
+    flex-direction: column;
+  }
+  
+  .nav-button {
+    width: 100%;
+  }
+  
+  .day-header {
+    padding: 12px 16px;
+  }
+  
+  .day-number {
+    font-size: 28px;
+  }
+  
+  .day-lessons {
+    padding: 12px 16px;
+  }
+  
+  .lesson-card {
+    padding: 12px;
+  }
+}

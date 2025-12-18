@@ -96,7 +96,7 @@ const AdminStudiosPage = () => {
               </div>
               
               {studio.address && (
-                <p className="studio-address">📍 {studio.address}</p>
+                <p className="studio-address"> {studio.address}</p>
               )}
               
               {studio.description && (
