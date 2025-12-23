@@ -174,7 +174,7 @@ const Header = () => {
                 className="dropdown-item"
                 onClick={() => setDropdownOpen(false)}
               >
-                <span className="dropdown-item-icon">👤</span>
+                <span className="dropdown-item-icon"></span>
                 Мой профиль
               </Link>
               
@@ -184,7 +184,7 @@ const Header = () => {
                 className="dropdown-item dropdown-item-logout"
                 onClick={handleLogout}
               >
-                <span className="dropdown-item-icon">🚪</span>
+                <span className="dropdown-item-icon"></span>
                 Выйти
               </button>
             </div>

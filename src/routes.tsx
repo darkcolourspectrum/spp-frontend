@@ -32,7 +32,7 @@ const Dashboard = () => (
 const AdminStatistics = () => (
   <div style={{ padding: '40px', textAlign: 'center' }}>
     <h1>Статистика</h1>
-    <p>Аналитика и отчеты (в разработке)</p>
+    <p>Аналитика и отчеты</p>
   </div>
 );
 
