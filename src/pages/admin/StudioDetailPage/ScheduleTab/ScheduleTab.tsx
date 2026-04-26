@@ -11,6 +11,7 @@ import type { Studio } from '@/api/admin/types';
 import PatternsList from './PatternsList';
 import ScheduleCalendar from './ScheduleCalendar';
 import CreatePatternModal from './CreatePatternModal';
+import CreateLessonModal from './CreateLessonModal';
 import './scheduleTab.css';
 
 interface ScheduleTabProps {
@@ -36,6 +37,7 @@ const ScheduleTab = ({ studio, isReadOnly = false }: ScheduleTabProps) => {
   } = useSchedule();
   
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCreateLessonModal, setShowCreateLessonModal] = useState(false);
   const [activeView, setActiveView] = useState<'patterns' | 'calendar'>('patterns');
   
   useEffect(() => {
@@ -84,9 +86,14 @@ const ScheduleTab = ({ studio, isReadOnly = false }: ScheduleTabProps) => {
             🔄 Обновить
           </button>
           {!isReadOnly && (
-            <button onClick={handleCreatePattern} className="btn-primary">
-              + Создать шаблон
-            </button>
+            <>
+              <button onClick={() => setShowCreateLessonModal(true)} className="btn-primary">
+                + Разовое занятие
+              </button>
+              <button onClick={handleCreatePattern} className="btn-primary">
+                + Создать шаблон
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -148,6 +155,12 @@ const ScheduleTab = ({ studio, isReadOnly = false }: ScheduleTabProps) => {
           studioId={studio.id}
           teacherId={user?.id}
           onClose={() => setShowCreateModal(false)}
+        />
+      )} {showCreateLessonModal && (
+        <CreateLessonModal
+          studioId={studio.id}
+          teacherId={user?.id}
+          onClose={() => setShowCreateLessonModal(false)}
         />
       )}
     </div>

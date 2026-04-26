@@ -23,8 +23,24 @@ import {
  */
 const getErrorMessage = (error: unknown): string => {
   if (error instanceof AxiosError) {
-    const apiError = error.response?.data as ApiError;
-    return apiError?.detail || error.message || 'Произошла ошибка';
+    const detail = error.response?.data?.detail;
+    
+    // Pydantic 422 — detail это массив объектов
+    if (Array.isArray(detail)) {
+      return detail
+        .map((err: any) => {
+          const field = Array.isArray(err.loc) ? err.loc[err.loc.length - 1] : '';
+          return field ? `${field}: ${err.msg}` : err.msg;
+        })
+        .join('; ');
+    }
+    
+    // Обычная ошибка — detail это строка
+    if (typeof detail === 'string') {
+      return detail;
+    }
+    
+    return error.message || 'Произошла ошибка';
   }
   return 'Произошла неизвестная ошибка';
 };

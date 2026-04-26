@@ -98,10 +98,14 @@ const AppRoutes = () => {
           <Route path={ROUTES.ADMIN.DASHBOARD} element={<AdminDashboardPage />} />
           <Route path={ROUTES.ADMIN.USERS} element={<AdminUsersPage />} />
           <Route path={ROUTES.ADMIN.STUDIOS} element={<AdminStudiosPage />} />
-          <Route path={ROUTES.ADMIN.STUDIO_DETAIL} element={<StudioDetailPage />} />
           <Route path={ROUTES.ADMIN.STATISTICS} element={<AdminStatistics />} />
         </Route>
         
+        {/* Просмотр студии доступен и админу, и преподавателю */}
+        <Route element={<ProtectedRoute requiredRoles={['admin', 'teacher']}><Outlet /></ProtectedRoute>}>
+          <Route path={ROUTES.ADMIN.STUDIO_DETAIL} element={<StudioDetailPage />} />
+        </Route>
+
         {/* ==================== ПРЕПОДАВАТЕЛЬ МАРШРУТЫ ==================== */}
         <Route element={<ProtectedRoute requiredRoles={['teacher', 'admin']}><Outlet /></ProtectedRoute>}>
           <Route path={ROUTES.TEACHER.STUDIOS} element={<TeacherStudiosPage />} />

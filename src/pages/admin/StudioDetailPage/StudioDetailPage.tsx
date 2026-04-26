@@ -43,8 +43,8 @@ const StudioDetailPage = () => {
         const studioData = await getStudioById(parseInt(studioId));
         setStudio(studioData);
         
-        // Проверяем доступ преподавателя к студии
-        if (isTeacher() && user?.studio_id !== studioData.id) {
+        // Проверяем доступ преподавателя к студии (админ имеет доступ ко всем)
+        if (!isAdmin() && user?.studio_id !== studioData.id) {
           setError('У вас нет доступа к этой студии');
           return;
         }
@@ -137,7 +137,7 @@ const StudioDetailPage = () => {
         {activeTab === 'schedule' && (
           <ScheduleTab 
             studio={studio} 
-            isReadOnly={!isAdmin()} 
+            isReadOnly={false} 
           />
         )}
         {activeTab === 'settings' && isAdmin() && (

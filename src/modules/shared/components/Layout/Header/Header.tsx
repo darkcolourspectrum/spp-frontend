@@ -5,6 +5,7 @@ import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { fetchMyProfile } from '@/modules/profile/store';
 import { ROUTES } from '@/constants/routes';
 import { getUserInitials } from '@/utils/helpers';
+import NotificationBell from '@/modules/notifications/components/NotificationBell/NotificationBell';
 import './header.css';
 
 const Header = () => {
@@ -105,6 +106,8 @@ const Header = () => {
           ))}
         </nav>
         
+        <NotificationBell />
+
         <div className="header-profile" ref={dropdownRef}>
           <button
             className="profile-button"
