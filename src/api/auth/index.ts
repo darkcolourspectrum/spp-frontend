@@ -99,3 +99,14 @@ export const getStudioById = async (id: number): Promise<Studio> => {
   const response = await apiClient.get<Studio>(AUTH_ENDPOINTS.STUDIO_BY_ID(id));
   return response.data;
 };
+
+/**
+ * Обновление базовых данных пользователя в Auth Service
+ * (first_name, last_name, phone)
+ */
+export const updateMyAuthProfile = async (
+  data: { first_name?: string; last_name?: string; phone?: string }
+): Promise<unknown> => {
+  const response = await apiClient.put(AUTH_ENDPOINTS.USER_PROFILE, data);
+  return response.data;
+};

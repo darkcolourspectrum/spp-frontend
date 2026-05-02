@@ -15,6 +15,7 @@ export const AUTH_ENDPOINTS = {
   // Управление пользователями
   USERS: '/api/auth/users',
   USER_BY_ID: (id: number) => `/api/auth/users/${id}`,
+  USER_PROFILE: '/api/auth/users/profile',
   
   // Роли
   ROLES: '/api/auth/roles',

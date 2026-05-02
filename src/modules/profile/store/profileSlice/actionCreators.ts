@@ -16,6 +16,7 @@ import {
   setAvatar,
   removeAvatar,
 } from './profileReducer';
+import * as authApi from '@/api/auth';
 
 // ==================== HELPER FUNCTIONS ====================
 
@@ -63,12 +64,45 @@ export const updateMyProfile = createAsyncThunk(
   async ({ userId, data }: { userId: number; data: ProfileUpdateRequest }, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setUpdating(true));
-     
-      const updatedProfile = await profileApi.updateMyProfile(userId, data);
-      dispatch(setProfile(updatedProfile));
-     
-      return updatedProfile;
-     
+
+      // Разделяем поля по владельцу:
+      // - first_name/last_name/phone -> Auth Service
+      // - bio/display_name/avatar и пр. -> Profile Service
+      const authData: { first_name?: string; last_name?: string; phone?: string } = {};
+      const profileData: ProfileUpdateRequest = {};
+
+      if (data.first_name !== undefined) authData.first_name = data.first_name;
+      if (data.last_name !== undefined) authData.last_name = data.last_name;
+      if ((data as any).phone !== undefined) authData.phone = (data as any).phone;
+
+      // Всё остальное идёт в Profile
+      Object.keys(data).forEach((key) => {
+        if (key !== 'first_name' && key !== 'last_name' && key !== 'phone') {
+          (profileData as any)[key] = (data as any)[key];
+        }
+      });
+
+      // Запросы параллельно. Если Auth-часть пуста, делаем только Profile, и наоборот.
+      const promises: Promise<unknown>[] = [];
+
+      if (Object.keys(authData).length > 0) {
+        promises.push(authApi.updateMyAuthProfile(authData));
+      }
+
+      if (Object.keys(profileData).length > 0) {
+        promises.push(profileApi.updateMyProfile(userId, profileData));
+      }
+
+      await Promise.all(promises);
+
+      // Перечитываем профиль с бэка, чтобы взять свежие first_name/last_name
+      // (они придут из Profile users_cache через event ~1-2 сек, и для надёжности
+      // здесь ещё подождём немного)
+      await new Promise((r) => setTimeout(r, 800));
+      const fresh = await profileApi.getMyProfile(userId);
+      dispatch(setProfile(fresh));
+
+      return fresh;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
       dispatch(setError(errorMessage));
