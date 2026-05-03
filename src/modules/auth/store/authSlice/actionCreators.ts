@@ -85,6 +85,10 @@ export const login = createAsyncThunk(
     try {
       dispatch(setLoading(true));
       
+      // Очищаем профиль предыдущего пользователя если был
+      const { clearProfile } = await import('@/modules/profile/store');
+      dispatch(clearProfile());
+
       const response = await authApi.loginUser(credentials);
       
       // Сохраняем токен и пользователя в store
@@ -123,14 +127,20 @@ export const logoutUser = createAsyncThunk(
       // Вызываем API для инвалидации токенов на сервере
       await authApi.logoutUser();
       
-      // Очищаем состояние
+      // Очищаем состояние auth и profile - чтобы при следующем
+      // логине не показывались данные предыдущего пользователя
       dispatch(logout());
+      const { clearProfile } = await import('@/modules/profile/store');
+      dispatch(clearProfile());
       
       return true;
       
     } catch (error) {
-      // Даже если API запрос failed, всё равно очищаем состояние
+      // Очищаем состояние auth и profile - чтобы при следующем
+      // логине не показывались данные предыдущего пользователя
       dispatch(logout());
+      const { clearProfile } = await import('@/modules/profile/store');
+      dispatch(clearProfile());
       
       const errorMessage = getErrorMessage(error);
       return rejectWithValue(errorMessage);
@@ -156,7 +166,11 @@ export const refreshToken = createAsyncThunk(
       
     } catch (error) {
       // Если refresh не удался - выходим
+      // Очищаем состояние auth и profile - чтобы при следующем
+      // логине не показывались данные предыдущего пользователя
       dispatch(logout());
+      const { clearProfile } = await import('@/modules/profile/store');
+      dispatch(clearProfile());
       
       const errorMessage = getErrorMessage(error);
       return rejectWithValue(errorMessage);
@@ -239,7 +253,11 @@ export const checkAuthStatus = createAsyncThunk(
       
     } catch (error) {
       // Нет активной сессии
+      // Очищаем состояние auth и profile - чтобы при следующем
+      // логине не показывались данные предыдущего пользователя
       dispatch(logout());
+      const { clearProfile } = await import('@/modules/profile/store');
+      dispatch(clearProfile());
       return rejectWithValue('No active session');
     }
   }

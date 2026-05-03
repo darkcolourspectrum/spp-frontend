@@ -95,14 +95,16 @@ export const updateMyProfile = createAsyncThunk(
 
       await Promise.all(promises);
 
-      // Перечитываем профиль с бэка, чтобы взять свежие first_name/last_name
-      // (они придут из Profile users_cache через event ~1-2 сек, и для надёжности
-      // здесь ещё подождём немного)
-      await new Promise((r) => setTimeout(r, 800));
+      // Read-your-writes: запрашиваем свежий профиль из Profile Service.
+      // Profile при is_own_profile=True ходит в Auth по HTTP напрямую
+      // (см. ProfileService.get_profile_by_user_id) - так что first_name/last_name
+      // приходят гарантированно свежие, без ожидания event-driven синхронизации.
+      // Никаких setTimeout не нужно - это не гонка с RabbitMQ, а прямой HTTP.
       const fresh = await profileApi.getMyProfile(userId);
       dispatch(setProfile(fresh));
 
       return fresh;
+      
     } catch (error) {
       const errorMessage = getErrorMessage(error);
       dispatch(setError(errorMessage));

@@ -1,273 +1,326 @@
-/* Schedule Calendar */
+/* ==================== Calendar root ==================== */
+
 .schedule-calendar {
-  padding: 0;
-}
-
-/* Calendar Navigation */
-.calendar-navigation {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-  justify-content: center;
-}
-
-.nav-button {
-  padding: 10px 20px;
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  color: #333;
-  transition: all 0.3s;
-}
-
-.nav-button:hover {
-  background: #f8f9fa;
-  border-color: #667eea;
-  color: #667eea;
-}
-
-.nav-button.today {
-  background: #667eea;
-  color: white;
-  border-color: #667eea;
-}
-
-.nav-button.today:hover {
-  background: #5568d3;
-}
-
-/* Date Range Info */
-.date-range-info {
-  text-align: center;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 30px;
-  padding: 12px;
-  background: #f8f9fa;
-  border-radius: 8px;
-}
-
-/* Loading */
-.schedule-calendar-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  gap: 15px;
-}
-
-/* No Lessons */
-.no-lessons {
-  text-align: center;
-  padding: 60px 20px;
-  background: #f8f9fa;
-  border-radius: 8px;
-}
-
-.no-lessons-icon {
-  font-size: 64px;
-  margin-bottom: 20px;
-}
-
-.no-lessons h3 {
-  margin: 0 0 10px 0;
-  color: #333;
-}
-
-.no-lessons p {
-  color: #666;
-  font-size: 16px;
-  margin: 0;
-}
-
-/* Calendar Days */
-.calendar-days {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* Calendar Day */
-.calendar-day {
+  position: relative;
   background: white;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   overflow: hidden;
 }
 
-/* Day Header */
-.day-header {
+/* ==================== Toolbar ==================== */
+
+.calendar-toolbar {
   display: flex;
   align-items: center;
-  gap: 15px;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fafafa;
 }
 
-.day-number {
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.day-info {
+.toolbar-nav {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 6px;
 }
 
-.day-weekday {
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.day-month {
-  font-size: 12px;
-  opacity: 0.9;
-}
-
-.day-count {
-  margin-left: auto;
+.nav-btn {
+  background: white;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  padding: 6px 12px;
   font-size: 14px;
-  padding: 4px 12px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
 }
 
-/* Day Lessons */
-.day-lessons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px 20px;
-}
-
-/* Lesson Card */
-.lesson-card {
-  padding: 16px;
-  background: #f8f9fa;
-  border-left: 4px solid #667eea;
-  border-radius: 6px;
-  transition: all 0.3s;
-}
-
-.lesson-card:hover {
+.nav-btn:hover {
   background: #f0f0f0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.lesson-card.status-completed {
-  border-left-color: #4caf50;
-  background: #e8f5e9;
-}
-
-.lesson-card.status-cancelled {
-  border-left-color: #f44336;
-  background: #ffebee;
-  opacity: 0.7;
-}
-
-.lesson-card.status-missed {
-  border-left-color: #ff9800;
-  background: #fff3e0;
-}
-
-.lesson-time {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-.lesson-teacher,
-.lesson-classroom,
-.lesson-students {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 4px;
-}
-
-.lesson-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.lesson-status .status-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
+.today-btn {
   font-weight: 500;
 }
 
-.lesson-status .status-badge.scheduled {
+.toolbar-range {
+  font-weight: 500;
+  color: #444;
+  text-transform: capitalize;
+}
+
+/* ==================== Header (weekday row) ==================== */
+
+.calendar-header {
+  display: grid;
+  grid-template-columns: 60px repeat(6, 1fr);
+  border-bottom: 1px solid #e0e0e0;
+  background: white;
+}
+
+.header-time-col {
+  border-right: 1px solid #e0e0e0;
+}
+
+.header-day {
+  padding: 10px 0;
+  text-align: center;
+  border-right: 1px solid #e0e0e0;
+}
+
+.header-day:last-child {
+  border-right: none;
+}
+
+.header-day-label {
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.header-day-number {
+  font-size: 20px;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.header-day.is-today .header-day-number {
+  color: white;
+  background: #2196f3;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==================== Grid body ==================== */
+
+.calendar-body {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  position: relative;
+}
+
+/* Колонка времени слева */
+.time-column {
+  position: relative;
+  border-right: 1px solid #e0e0e0;
+}
+
+.time-mark {
+  position: absolute;
+  left: 0;
+  right: 0;
+  font-size: 11px;
+  color: #888;
+  text-align: right;
+  padding-right: 6px;
+  transform: translateY(-50%);
+  background: white;
+}
+
+/* Контейнер с 6 колонками дней */
+.days-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+/* Линии сетки (горизонтальные) */
+.grid-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.grid-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+.grid-line.hour {
+  border-top-color: #e0e0e0;
+}
+
+.grid-line.half-hour {
+  border-top-style: dashed;
+  border-top-color: #f5f5f5;
+}
+
+/* Колонка дня */
+.day-column {
+  position: relative;
+  border-right: 1px solid #e0e0e0;
+}
+
+.day-column:last-child {
+  border-right: none;
+}
+
+.day-column.is-today {
+  background: rgba(33, 150, 243, 0.04);
+}
+
+/* ==================== Lesson block ==================== */
+
+.lesson-block {
+  position: absolute;
   background: #e3f2fd;
-  color: #1976d2;
+  border-left: 3px solid #2196f3;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 12px;
+  overflow: hidden;
+  box-sizing: border-box;
+  cursor: default;
+  transition: box-shadow 0.15s;
 }
 
-.lesson-status .status-badge.completed {
+.lesson-block:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  z-index: 5;
+}
+
+.lesson-block.status-cancelled {
+  background: #ffebee;
+  border-left-color: #f44336;
+  opacity: 0.7;
+  text-decoration: line-through;
+}
+
+.lesson-block.status-completed {
   background: #e8f5e9;
-  color: #2e7d32;
+  border-left-color: #4caf50;
 }
 
-.lesson-status .status-badge.cancelled {
+.lesson-block.status-missed {
+  background: #fff3e0;
+  border-left-color: #ff9800;
+}
+
+.lesson-block-time {
+  font-weight: 500;
+  color: #333;
+  font-size: 11px;
+}
+
+.lesson-block-title {
+  margin-top: 2px;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lesson-block-meta {
+  margin-top: 1px;
+  color: #888;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==================== Lesson actions ==================== */
+
+.lesson-block-actions {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 3;
+}
+
+.lesson-block:hover {
+  z-index: 5;
+}
+
+.lesson-block:hover .lesson-block-actions {
+  opacity: 1;
+}
+
+.lesson-action-btn {
+  background: white;
+  border: 1px solid #d0d0d0;
+  border-radius: 3px;
+  width: 22px;
+  height: 22px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #555;
+}
+
+.lesson-action-btn.cancel:hover {
   background: #ffebee;
   color: #c62828;
+  border-color: #f44336;
 }
 
-.lesson-status .status-badge.missed {
-  background: #fff3e0;
-  color: #ef6c00;
+.lesson-action-btn.reschedule:hover {
+  background: #e3f2fd;
+  color: #1976d2;
+  border-color: #2196f3;
 }
 
-.recurring-badge {
-  padding: 4px 8px;
-  background: #fff3e0;
-  border-radius: 12px;
-  font-size: 12px;
-  cursor: help;
+/* ==================== Loading ==================== */
+
+.calendar-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #555;
+  z-index: 10;
 }
 
-.lesson-notes {
-  margin-top: 8px;
-  padding: 8px;
-  background: white;
-  border-radius: 4px;
-  font-size: 13px;
-  color: #666;
-  font-style: italic;
+/* ==================== Now line ==================== */
+
+.now-line {
+  position: absolute;
+  height: 0;
+  border-top: 2px solid #f44336;
+  z-index: 4;
+  pointer-events: none;
 }
 
-/* Mobile */
+.now-line-dot {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 8px;
+  height: 8px;
+  background: #f44336;
+  border-radius: 50%;
+}
+
+/* ==================== Mobile placeholder ==================== */
+
 @media (max-width: 768px) {
-  .calendar-navigation {
-    flex-direction: column;
+  .calendar-header,
+  .calendar-body {
+    font-size: 11px;
   }
-  
-  .nav-button {
-    width: 100%;
+  .lesson-block {
+    font-size: 10px;
+    padding: 2px 4px;
   }
-  
-  .day-header {
-    padding: 12px 16px;
-  }
-  
-  .day-number {
-    font-size: 28px;
-  }
-  
-  .day-lessons {
-    padding: 12px 16px;
-  }
-  
-  .lesson-card {
-    padding: 12px;
+  .lesson-block-actions {
+    opacity: 1;
   }
 }

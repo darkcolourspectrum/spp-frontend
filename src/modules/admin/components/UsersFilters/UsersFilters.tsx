@@ -55,7 +55,7 @@ export const UsersFilters = ({ studios, onRefresh }: UsersFiltersProps) => {
             className="filter-select"
           >
             <option value="">Все студии</option>
-            <option value="none">Без студии</option>
+            <option value="no_studio">Без студии</option>
             {studios.filter(s => s.is_active).map((studio) => (
               <option key={studio.id} value={studio.id}>
                 {studio.name}

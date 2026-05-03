@@ -89,7 +89,7 @@ export interface LessonCreate {
   classroom_id?: number | null;
   lesson_date: string;
   start_time: string;
-  end_time: string;
+  duration_minutes: number;
   student_ids?: number[];
   notes?: string;
 }
@@ -98,9 +98,12 @@ export interface LessonUpdate {
   classroom_id?: number | null;
   lesson_date?: string;
   start_time?: string;
-  end_time?: string;
-  status?: 'scheduled' | 'completed' | 'cancelled' | 'missed';
+  duration_minutes?: number;
   notes?: string;
+}
+
+export interface LessonCancelRequest {
+  reason?: string;
 }
 
 // ==================== SCHEDULE ====================

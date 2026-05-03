@@ -16,14 +16,6 @@ interface CreateLessonModalProps {
   onClose: () => void;
 }
 
-const calcEndTime = (startTime: string, durationMin: number): string => {
-  const [h, m] = startTime.split(':').map(Number);
-  const totalMin = h * 60 + m + durationMin;
-  const eh = Math.floor(totalMin / 60) % 24;
-  const em = totalMin % 60;
-  return `${String(eh).padStart(2, '0')}:${String(em).padStart(2, '0')}`;
-};
-
 const CreateLessonModal = ({ studioId, teacherId, onClose }: CreateLessonModalProps) => {
   const dispatch = useAppDispatch();
   const { addLesson, isSubmitting } = useSchedule();
@@ -82,7 +74,7 @@ const CreateLessonModal = ({ studioId, teacherId, onClose }: CreateLessonModalPr
       classroom_id: formData.classroom_id,
       lesson_date: formData.lesson_date,
       start_time: formData.start_time,
-      end_time: calcEndTime(formData.start_time, formData.duration_minutes),
+      duration_minutes: formData.duration_minutes,
       student_ids: formData.student_ids,
       notes: formData.notes || undefined,
     };
@@ -153,7 +145,7 @@ const CreateLessonModal = ({ studioId, teacherId, onClose }: CreateLessonModalPr
                 type="number"
                 min={30}
                 max={180}
-                step={15}
+                step={10}
                 value={formData.duration_minutes}
                 onChange={(e) =>
                   setFormData({ ...formData, duration_minutes: Number(e.target.value) })
