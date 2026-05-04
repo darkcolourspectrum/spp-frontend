@@ -6,29 +6,33 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/modules/auth/hooks/useAuth';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchAllStudios } from '@/modules/admin/store';
-import { getStudioDetailRoute } from '@/constants/routes';
+import { useSchedule } from '@/modules/schedule/hooks/useSchedule';
+import { getTeacherStudioDetailRoute } from '@/constants/routes';
 import './teacherStudiosPage.css';
 
 const TeacherStudiosPage = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { studios, isLoadingStudios, error } = useAppSelector((state) => state.admin);
+  const {
+    accessibleStudios,
+    isLoadingMembership,
+    error,
+    loadAccessibleStudios,
+  } = useSchedule();
   
-  // Фильтруем студии - показываем только ту, к которой привязан преподаватель
-  const teacherStudios = studios.filter(studio => studio.id === user?.studio_id);
+  // На бэке уже отдаётся только студия преподавателя - дополнительный
+  // фильтр не нужен. Оставлен для совместимости с auth-stale state.
+  const teacherStudios = accessibleStudios;
   
   useEffect(() => {
-    dispatch(fetchAllStudios());
-  }, [dispatch]);
+    loadAccessibleStudios();
+  }, [loadAccessibleStudios]);
   
   const handleOpenStudio = (studioId: number) => {
-    navigate(getStudioDetailRoute(studioId));
+    navigate(getTeacherStudioDetailRoute(studioId));
   };
   
-  if (isLoadingStudios) {
+  if (isLoadingMembership && teacherStudios.length === 0) {
     return (
       <div className="teacher-studios-page">
         <div className="loading-container">
@@ -45,7 +49,7 @@ const TeacherStudiosPage = () => {
         <div className="error-container">
           <h2>Ошибка загрузки</h2>
           <p>{error}</p>
-          <button onClick={() => dispatch(fetchAllStudios())} className="btn-primary">
+          <button onClick={() => loadAccessibleStudios()} className="btn-primary">
             Попробовать снова
           </button>
         </div>

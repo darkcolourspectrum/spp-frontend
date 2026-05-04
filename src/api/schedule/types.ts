@@ -191,7 +191,12 @@ export interface ScheduleStudioInfo {
   name: string;
   description: string | null;
   address: string | null;
+  phone: string | null;
+  email: string | null;
   is_active: boolean;
+  teachers_count: number;
+  students_count: number;
+  classrooms_count: number;
 }
 
 export interface ScheduleClassroomInfo {

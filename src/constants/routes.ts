@@ -25,7 +25,8 @@ export const ROUTES = {
   
   // Преподаватель маршруты
   TEACHER: {
-    STUDIOS: '/teacher/studios',  // ← НОВЫЙ МАРШРУТ
+    STUDIOS: '/teacher/studios',
+    STUDIO_DETAIL: '/teacher/studios/:studioId',
     SCHEDULE: '/teacher/schedule',
     LESSONS: '/teacher/lessons',
     STUDENTS: '/teacher/students',
@@ -66,8 +67,21 @@ export const getDefaultRouteForRole = (role: string): string => {
 };
 
 /**
- * Хелпер для генерации пути к детальной странице студии
+ * Путь к детальной странице студии для админа.
  */
-export const getStudioDetailRoute = (studioId: number): string => {
+export const getAdminStudioDetailRoute = (studioId: number): string => {
   return `/admin/studios/${studioId}`;
 };
+
+/**
+ * Путь к детальной странице студии для преподавателя.
+ */
+export const getTeacherStudioDetailRoute = (studioId: number): string => {
+  return `/teacher/studios/${studioId}`;
+};
+
+/**
+ * @deprecated Используй getAdminStudioDetailRoute или getTeacherStudioDetailRoute.
+ * Оставлено для обратной совместимости со старым кодом.
+ */
+export const getStudioDetailRoute = getAdminStudioDetailRoute;

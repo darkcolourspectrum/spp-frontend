@@ -17,6 +17,7 @@ import { AdminDashboardPage, AdminUsersPage, AdminStudiosPage, StudioDetailPage 
 
 // Teacher Pages
 import TeacherStudiosPage from './pages/teacher/TeacherStudiosPage';
+import TeacherStudioDetailPage from './pages/teacher/TeacherStudiosDetailPage';
 
 // Profile Page (универсальная для всех ролей)
 import UserProfilePage from './pages/UserProfilePage';
@@ -101,14 +102,15 @@ const AppRoutes = () => {
           <Route path={ROUTES.ADMIN.STATISTICS} element={<AdminStatistics />} />
         </Route>
         
-        {/* Просмотр студии доступен и админу, и преподавателю */}
-        <Route element={<ProtectedRoute requiredRoles={['admin', 'teacher']}><Outlet /></ProtectedRoute>}>
+        {/* Детальная страница студии для админа */}
+        <Route element={<ProtectedRoute requiredRoles={['admin']}><Outlet /></ProtectedRoute>}>
           <Route path={ROUTES.ADMIN.STUDIO_DETAIL} element={<StudioDetailPage />} />
         </Route>
 
         {/* ==================== ПРЕПОДАВАТЕЛЬ МАРШРУТЫ ==================== */}
         <Route element={<ProtectedRoute requiredRoles={['teacher', 'admin']}><Outlet /></ProtectedRoute>}>
           <Route path={ROUTES.TEACHER.STUDIOS} element={<TeacherStudiosPage />} />
+          <Route path={ROUTES.TEACHER.STUDIO_DETAIL} element={<TeacherStudioDetailPage />} />
           <Route path={ROUTES.TEACHER.SCHEDULE} element={<TeacherSchedule />} />
           <Route path={ROUTES.TEACHER.STUDENTS} element={<TeacherStudents />} />
           <Route path={ROUTES.TEACHER.PROFILE} element={<UserProfilePage />} />
