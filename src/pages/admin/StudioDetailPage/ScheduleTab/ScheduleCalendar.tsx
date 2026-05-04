@@ -172,24 +172,6 @@ const ScheduleCalendar = ({
     return () => clearInterval(id);
   }, []);
 
-  // Однократно при монтировании выравниваем фильтры на текущую неделю
-  // (Пн-Сб) ТОЛЬКО если они ещё в дефолтном состоянии legacy initialState
-  // (today + 7 дней). После пользовательской навигации трогать filters
-  // нельзя - иначе затрём только что выбранную неделю.
-  useEffect(() => {
-    const today = formatLocalDate(new Date());
-    const sevenDaysAhead = formatLocalDate(addDays(new Date(), 7));
-    const isLegacyDefault =
-      filters.fromDate === today && filters.toDate === sevenDaysAhead;
-
-    if (isLegacyDefault) {
-      const monday = getMonday(new Date());
-      const saturday = addDays(monday, 5);
-      updateDateRange(formatLocalDate(monday), formatLocalDate(saturday));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   // Парсим текущий "Пн" из фильтров (от него считаем 6 дней вперед).
   const currentMonday = useMemo(() => {
     const [y, m, d] = filters.fromDate.split('-').map(Number);

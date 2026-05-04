@@ -184,6 +184,45 @@ export interface ConflictCheckResponse {
   }>;
 }
 
+// ==================== STUDIOS / CLASSROOMS / MEMBERS (read-only кеши) ====================
+
+export interface ScheduleStudioInfo {
+  id: number;
+  name: string;
+  description: string | null;
+  address: string | null;
+  is_active: boolean;
+}
+
+export interface ScheduleClassroomInfo {
+  id: number;
+  studio_id: number;
+  name: string;
+  capacity: number;
+  description: string | null;
+  floor: number | null;
+  room_number: string | null;
+  is_active: boolean;
+}
+
+export interface ScheduleStudioMember {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  phone: string | null;
+  role: 'teacher' | 'student';
+  studio_id: number | null;
+  is_active: boolean;
+}
+
+export interface ScheduleStudioMembersResponse {
+  studio_id: number;
+  teachers: ScheduleStudioMember[];
+  students: ScheduleStudioMember[];
+}
+
 // ==================== FILTERS ====================
 
 export interface ScheduleFilters {

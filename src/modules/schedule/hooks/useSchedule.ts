@@ -22,6 +22,9 @@ import {
   clearError,
   clearSuccessMessage,
   setDateRange,
+  fetchAccessibleStudios,
+  fetchStudioClassroomsForSchedule,
+  fetchStudioMembers,
 } from '../store';
 import type {
   RecurringPatternCreate,
@@ -48,6 +51,10 @@ export const useSchedule = () => {
     error,
     successMessage,
     lastUpdated,
+    accessibleStudios,
+    studioClassrooms,
+    studioMembers,
+    isLoadingMembership,
   } = useAppSelector((state) => state.schedule);
   
   // ==================== RECURRING PATTERNS ====================
@@ -163,6 +170,26 @@ export const useSchedule = () => {
     [dispatch]
   );
   
+  // ==================== MEMBERSHIP (студии, кабинеты, члены) ====================
+  
+  const loadAccessibleStudios = useCallback(() => {
+    return dispatch(fetchAccessibleStudios());
+  }, [dispatch]);
+  
+  const loadStudioClassroomsForSchedule = useCallback(
+    (studioId: number) => {
+      return dispatch(fetchStudioClassroomsForSchedule(studioId));
+    },
+    [dispatch],
+  );
+  
+  const loadStudioMembers = useCallback(
+    (studioId: number) => {
+      return dispatch(fetchStudioMembers(studioId));
+    },
+    [dispatch],
+  );
+
   // ==================== MESSAGES ====================
   
   const handleClearError = useCallback(() => {
@@ -234,6 +261,12 @@ export const useSchedule = () => {
     lessonsByDate,
     activePatterns,
     lessonStats,
+
+    // Membership state
+    accessibleStudios,
+    studioClassrooms,
+    studioMembers,
+    isLoadingMembership,
     
     // Actions - Patterns
     loadRecurringPatterns,
@@ -259,5 +292,11 @@ export const useSchedule = () => {
     updateDateRange,
     handleClearError,
     handleClearSuccess,
+
+    // Membership actions
+    loadAccessibleStudios,
+    loadStudioClassroomsForSchedule,
+    loadStudioMembers,
+
   };
 };

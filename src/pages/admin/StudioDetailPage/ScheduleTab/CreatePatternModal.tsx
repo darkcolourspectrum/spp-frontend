@@ -3,10 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useAppSelector } from '@/store/hooks';
 import { useSchedule } from '@/modules/schedule/hooks/useSchedule';
-import { fetchAllUsers } from '@/modules/admin/store';
-import { useAppDispatch } from '@/store/hooks';
 import { DAY_OF_WEEK_LABELS } from '@/api/schedule/types';
 import type { RecurringPatternCreate } from '@/api/schedule/types';
 import './createPatternModal.css';
@@ -18,10 +15,14 @@ interface CreatePatternModalProps {
 }
 
 const CreatePatternModal = ({ studioId, teacherId, onClose }: CreatePatternModalProps) => {
-  const dispatch = useAppDispatch();
-  const { addRecurringPattern, isSubmitting } = useSchedule();
-  const { classrooms } = useAppSelector((state) => state.admin);
-  const { users } = useAppSelector((state) => state.admin);
+  const {
+    addRecurringPattern,
+    isSubmitting,
+    studioMembers,
+    studioClassrooms: scheduleStudioClassrooms,
+    loadStudioMembers,
+    loadStudioClassroomsForSchedule,
+  } = useSchedule();
   
   const [formData, setFormData] = useState<Partial<RecurringPatternCreate>>({
     studio_id: studioId,
@@ -35,25 +36,15 @@ const CreatePatternModal = ({ studioId, teacherId, onClose }: CreatePatternModal
   
   const [error, setError] = useState<string | null>(null);
   
-  // Загружаем пользователей если их нет
   useEffect(() => {
-    if (users.length === 0) {
-      dispatch(fetchAllUsers());
-    }
-  }, [dispatch, users.length]);
+    loadStudioMembers(studioId);
+    loadStudioClassroomsForSchedule(studioId);
+  }, [studioId, loadStudioMembers, loadStudioClassroomsForSchedule]);
   
-  // Фильтруем учеников студии
-  const students = users.filter(
-    (u) => u.role === 'student' && u.studio_id === studioId
-  );
-  
-  // Фильтруем преподавателей студии (если выбор доступен)
-  const teachers = users.filter(
-    (u) => u.role === 'teacher' && u.studio_id === studioId
-  );
-  
-  // Фильтруем кабинеты студии
-  const studioClassrooms = classrooms.filter((c) => c.studio_id === studioId);
+  const students = studioMembers?.students ?? [];
+  const teachers = studioMembers?.teachers ?? [];
+  // Бэк уже фильтрует по studio_id и активности - дополнительный filter не нужен.
+  const studioClassrooms = scheduleStudioClassrooms;
   
   const handleInputChange = (field: keyof RecurringPatternCreate, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));

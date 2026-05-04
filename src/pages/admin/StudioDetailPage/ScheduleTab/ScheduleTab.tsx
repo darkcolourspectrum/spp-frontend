@@ -5,8 +5,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/modules/auth/hooks/useAuth';
 import { useSchedule } from '@/modules/schedule/hooks/useSchedule';
-import { useAppDispatch } from '@/store/hooks';
-import { fetchStudioClassrooms } from '@/modules/admin/store';
 import type { Studio } from '@/api/admin/types';
 import PatternsList from './PatternsList';
 import ScheduleCalendar from './ScheduleCalendar';
@@ -20,7 +18,6 @@ interface ScheduleTabProps {
 }
 
 const ScheduleTab = ({ studio, isReadOnly = false }: ScheduleTabProps) => {
-  const dispatch = useAppDispatch();
   const { user } = useAuth();
   const {
     patterns,
@@ -31,6 +28,7 @@ const ScheduleTab = ({ studio, isReadOnly = false }: ScheduleTabProps) => {
     successMessage,
     loadRecurringPatterns,
     loadStudioSchedule,
+    loadStudioClassroomsForSchedule,
     handleClearError,
     handleClearSuccess,
     filters,
@@ -41,15 +39,13 @@ const ScheduleTab = ({ studio, isReadOnly = false }: ScheduleTabProps) => {
   const [activeView, setActiveView] = useState<'patterns' | 'calendar'>('patterns');
   
   useEffect(() => {
-    // Загружаем шаблоны студии
+    // Шаблоны студии
     loadRecurringPatterns(studio.id);
-    
-    // Загружаем расписание на текущую неделю
+    // Расписание на текущую неделю
     loadStudioSchedule(studio.id, filters.fromDate, filters.toDate);
-    
-    // Загружаем кабинеты студии для модального окна создания шаблона
-    dispatch(fetchStudioClassrooms(studio.id));
-  }, [studio.id, filters.fromDate, filters.toDate, dispatch]);
+    // Кабинеты студии (из локального кеша Schedule Service - доступно и преподу)
+    loadStudioClassroomsForSchedule(studio.id);
+  }, [studio.id, filters.fromDate, filters.toDate]);
   
   const handleCreatePattern = () => {
     setShowCreateModal(true);

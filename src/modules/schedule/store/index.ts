@@ -51,5 +51,11 @@ export {
   generateLessons,
 } from './scheduleSlice/actionCreators';
 
+export {
+  fetchAccessibleStudios,
+  fetchStudioClassroomsForSchedule,
+  fetchStudioMembers,
+} from './scheduleSlice/membershipActions';
+
 // Types
 export type { ScheduleState } from './scheduleSlice/scheduleReducer';

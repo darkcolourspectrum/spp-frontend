@@ -7,6 +7,9 @@ import type {
   RecurringPatternResponse,
   LessonResponse,
   ScheduleLessonItem,
+  ScheduleStudioInfo,
+  ScheduleClassroomInfo,
+  ScheduleStudioMembersResponse,
 } from '@/api/schedule/types';
 
 // ==================== STATE TYPE ====================
@@ -37,6 +40,14 @@ export interface ScheduleState {
   isLoadingSchedule: boolean;
   isSubmitting: boolean;
   
+  // Студии/кабинеты/члены студии из локального кеша Schedule Service.
+  // Используются в модалках создания занятий и шаблонов.
+  // accessibleStudios - все студии, доступные текущему пользователю.
+  accessibleStudios: ScheduleStudioInfo[];
+  studioClassrooms: ScheduleClassroomInfo[];
+  studioMembers: ScheduleStudioMembersResponse | null;
+  isLoadingMembership: boolean;
+
   // Ошибки
   error: string | null;
   
@@ -49,8 +60,32 @@ export interface ScheduleState {
 
 // ==================== INITIAL STATE ====================
 
-const today = new Date().toISOString().split('T')[0];
-const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+// Локальная дата без UTC-сдвига. toISOString() даёт UTC, что в часовых
+// поясах с положительным offset (например, Asia/Tomsk +07) около полуночи
+// возвращает вчерашнюю дату — это ломает выравнивание недели в календаре.
+const formatLocal = (d: Date): string => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
+// Понедельник текущей недели (для дефолтного диапазона календаря Пн-Сб).
+const getCurrentWeekMonday = (): Date => {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  const day = d.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d;
+};
+
+const _monday = getCurrentWeekMonday();
+const _saturday = new Date(_monday);
+_saturday.setDate(_saturday.getDate() + 5);
+
+const today = formatLocal(_monday);
+const nextWeek = formatLocal(_saturday);
 
 const initialState: ScheduleState = {
   patterns: [],
@@ -71,6 +106,10 @@ const initialState: ScheduleState = {
   error: null,
   successMessage: null,
   lastUpdated: null,
+  accessibleStudios: [],
+  studioClassrooms: [],
+  studioMembers: null,
+  isLoadingMembership: false,
 };
 
 // ==================== SLICE ====================
@@ -213,6 +252,27 @@ const scheduleSlice = createSlice({
       state.successMessage = null;
     },
     
+    // ========== STUDIOS AND CLASSROOMS FROM CACHE ==========
+
+    setAccessibleStudios: (state, action: PayloadAction<ScheduleStudioInfo[]>) => {
+      state.accessibleStudios = action.payload;
+    },
+    setStudioClassrooms: (state, action: PayloadAction<ScheduleClassroomInfo[]>) => {
+      state.studioClassrooms = action.payload;
+    },
+    setStudioMembers: (
+      state,
+      action: PayloadAction<ScheduleStudioMembersResponse | null>,
+    ) => {
+      state.studioMembers = action.payload;
+    },
+    setLoadingMembership: (state, action: PayloadAction<boolean>) => {
+      state.isLoadingMembership = action.payload;
+      if (action.payload) {
+        state.error = null;
+      }
+    },
+
     // ========== CLEAR ==========
     
     clearScheduleData: (state) => {
@@ -254,6 +314,10 @@ export const {
   setSuccessMessage,
   clearSuccessMessage,
   clearScheduleData,
+  setAccessibleStudios,
+  setStudioClassrooms,
+  setStudioMembers,
+  setLoadingMembership,
 } = scheduleSlice.actions;
 
 export default scheduleSlice.reducer;

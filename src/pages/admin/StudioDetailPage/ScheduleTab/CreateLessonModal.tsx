@@ -3,10 +3,8 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { useSchedule } from '@/modules/schedule/hooks/useSchedule';
 import { useAuth } from '@/modules/auth/hooks/useAuth';
-import { fetchAllUsers } from '@/modules/admin/store';
 import type { LessonCreate } from '@/api/schedule/types';
 import './createPatternModal.css';
 
@@ -17,10 +15,15 @@ interface CreateLessonModalProps {
 }
 
 const CreateLessonModal = ({ studioId, teacherId, onClose }: CreateLessonModalProps) => {
-  const dispatch = useAppDispatch();
-  const { addLesson, isSubmitting } = useSchedule();
+  const {
+    addLesson,
+    isSubmitting,
+    studioMembers,
+    studioClassrooms: scheduleStudioClassrooms,
+    loadStudioMembers,
+    loadStudioClassroomsForSchedule,
+  } = useSchedule();
   const { isAdmin } = useAuth();
-  const { classrooms, users } = useAppSelector((state) => state.admin);
   
   const [formData, setFormData] = useState({
     studio_id: studioId,
@@ -36,14 +39,14 @@ const CreateLessonModal = ({ studioId, teacherId, onClose }: CreateLessonModalPr
   const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
-    if (users.length === 0) {
-      dispatch(fetchAllUsers());
-    }
-  }, [dispatch, users.length]);
+    loadStudioMembers(studioId);
+    loadStudioClassroomsForSchedule(studioId);
+  }, [studioId, loadStudioMembers, loadStudioClassroomsForSchedule]);
   
-  const students = users.filter((u) => u.role === 'student' && u.studio_id === studioId);
-  const teachers = users.filter((u) => u.role === 'teacher' && u.studio_id === studioId);
-  const studioClassrooms = classrooms.filter((c) => c.studio_id === studioId);
+  const students = studioMembers?.students ?? [];
+  const teachers = studioMembers?.teachers ?? [];
+  // Бэк уже фильтрует по studio_id и активности - дополнительный filter не нужен.
+  const studioClassrooms = scheduleStudioClassrooms;
   
   const handleStudentToggle = (studentId: number) => {
     setFormData((prev) => {

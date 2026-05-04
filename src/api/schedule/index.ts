@@ -18,6 +18,10 @@ import type {
   GenerateLessonsResponse,
   ConflictCheckRequest,
   ConflictCheckResponse,
+  ScheduleStudioInfo,
+  ScheduleClassroomInfo,
+  ScheduleStudioMember,
+  ScheduleStudioMembersResponse,
 } from './types';
 
 // ==================== RECURRING PATTERNS ====================
@@ -205,6 +209,38 @@ export const checkClassroomConflict = async (
   return response.data;
 };
 
+// ==================== STUDIOS / CLASSROOMS / MEMBERS (read-only) ====================
+
+/**
+ * Список студий, доступных текущему пользователю.
+ * Источник - локальный кеш Schedule Service (synced from Admin via events).
+ */
+export const getScheduleStudios = async (): Promise<ScheduleStudioInfo[]> => {
+  const response = await apiClient.get('/api/schedule/studios');
+  return response.data;
+};
+
+/**
+ * Активные кабинеты конкретной студии.
+ */
+export const getScheduleStudioClassrooms = async (
+  studioId: number
+): Promise<ScheduleClassroomInfo[]> => {
+  const response = await apiClient.get(`/api/schedule/studios/${studioId}/classrooms`);
+  return response.data;
+};
+
+/**
+ * Активные преподаватели и ученики конкретной студии.
+ * Используется в модалках создания занятия и шаблона.
+ */
+export const getScheduleStudioMembers = async (
+  studioId: number
+): Promise<ScheduleStudioMembersResponse> => {
+  const response = await apiClient.get(`/api/schedule/studios/${studioId}/members`);
+  return response.data;
+};
+
 // ==================== EXPORT ====================
 
 export default {
@@ -228,6 +264,11 @@ export default {
   getStudioSchedule,
   getTeacherSchedule,
   getStudentSchedule,
+
+  // Studios / Members (read-only)
+  getScheduleStudios,
+  getScheduleStudioClassrooms,
+  getScheduleStudioMembers,
   
   // Generation
   generateLessons,
