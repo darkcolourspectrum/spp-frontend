@@ -21,6 +21,7 @@ export const ROUTES = {
     STUDIOS: '/admin/studios',
     STUDIO_DETAIL: '/admin/studios/:studioId',
     STATISTICS: '/admin/statistics',
+    CRM: '/admin/crm',
   },
   
   // Преподаватель маршруты

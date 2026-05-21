@@ -1,0 +1,60 @@
+.admin-crm-page {
+  width: 100%;
+  max-width: 100%;
+}
+
+.admin-crm-page .page-header {
+  margin-bottom: 24px;
+}
+
+.admin-crm-page .page-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.admin-crm-page .page-subtitle {
+  font-size: 15px;
+  color: #888;
+  margin: 0;
+}
+
+.admin-crm-page .error-message,
+.admin-crm-page .success-message {
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-crm-page .error-message {
+  background: #fee;
+  color: #c33;
+  border-left: 4px solid #c33;
+}
+
+.admin-crm-page .success-message {
+  background: #d4edda;
+  color: #155724;
+  border-left: 4px solid #28a745;
+}
+
+.admin-crm-page .error-icon,
+.admin-crm-page .success-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.admin-crm-page .close-button {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: inherit;
+  padding: 0 8px;
+}

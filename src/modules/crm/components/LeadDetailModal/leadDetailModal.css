@@ -1,0 +1,356 @@
+.lead-detail-modal__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.lead-detail-modal__content {
+  background: white;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 960px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.lead-detail-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.lead-detail-modal__header h2 {
+  margin: 0 0 6px 0;
+  font-size: 20px;
+  color: #1f2937;
+}
+
+.lead-detail-modal__status-pill {
+  display: inline-block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.lead-detail-modal__status-pill--new { background: #3b82f6; }
+.lead-detail-modal__status-pill--contacted { background: #6366f1; }
+.lead-detail-modal__status-pill--trial_scheduled { background: #f59e0b; }
+.lead-detail-modal__status-pill--trial_attended { background: #14b8a6; }
+.lead-detail-modal__status-pill--converted { background: #10b981; }
+.lead-detail-modal__status-pill--lost { background: #9ca3af; }
+
+.lead-detail-modal__close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0;
+  line-height: 1;
+}
+
+.lead-detail-modal__body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.lead-detail-modal__details,
+.lead-detail-modal__journal {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.lead-detail-modal__journal > h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 -8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.lead-detail-modal__section {
+  background: #f9fafb;
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+
+.lead-detail-modal__section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.lead-detail-modal__section-header h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.lead-detail-modal__edit-btn {
+  background: none;
+  border: none;
+  color: #6366f1;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.lead-detail-modal__edit-btn:hover {
+  text-decoration: underline;
+}
+
+.lead-detail-modal__field-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.lead-detail-modal__field-list > div {
+  display: flex;
+  gap: 8px;
+}
+
+.lead-detail-modal__field-label {
+  color: #6b7280;
+  min-width: 70px;
+}
+
+.lead-detail-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lead-detail-modal__form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.lead-detail-modal__form input,
+.lead-detail-modal__form textarea,
+.lead-detail-modal__status-select,
+.lead-detail-modal__activity-form select,
+.lead-detail-modal__activity-form textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.lead-detail-modal__form input:focus,
+.lead-detail-modal__form textarea:focus,
+.lead-detail-modal__status-select:focus,
+.lead-detail-modal__activity-form select:focus,
+.lead-detail-modal__activity-form textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.lead-detail-modal__form textarea {
+  resize: vertical;
+}
+
+.lead-detail-modal__form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.lead-detail-modal__btn {
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s;
+}
+
+.lead-detail-modal__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lead-detail-modal__btn--secondary {
+  background: white;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.lead-detail-modal__btn--secondary:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+.lead-detail-modal__btn--primary {
+  background: #6366f1;
+  color: white;
+}
+
+.lead-detail-modal__btn--primary:hover:not(:disabled) {
+  background: #4f46e5;
+}
+
+.lead-detail-modal__btn--convert {
+  background: #10b981;
+  color: white;
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 14px;
+}
+
+.lead-detail-modal__btn--convert:hover:not(:disabled) {
+  background: #059669;
+}
+
+.lead-detail-modal__convert-hint {
+  margin: 8px 0 0 0;
+  font-size: 12px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.lead-detail-modal__notes-view {
+  font-size: 14px;
+  color: #374151;
+  white-space: pre-wrap;
+  min-height: 20px;
+}
+
+.lead-detail-modal__notes-view em {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.lead-detail-modal__lost-reason {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #374151;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 4px;
+  border-left: 3px solid #9ca3af;
+}
+
+.lead-detail-modal__converted-info {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #374151;
+  padding: 8px 12px;
+  background: #ecfdf5;
+  border-radius: 4px;
+  border-left: 3px solid #10b981;
+}
+
+/* Журнал активностей */
+
+.lead-detail-modal__activity-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 6px;
+}
+
+.lead-detail-modal__activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.lead-detail-modal__activity {
+  padding: 10px 12px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-left-width: 3px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.lead-detail-modal__activity--note {
+  border-left-color: #6366f1;
+}
+
+.lead-detail-modal__activity--call {
+  border-left-color: #f59e0b;
+}
+
+.lead-detail-modal__activity--status_changed {
+  border-left-color: #14b8a6;
+  background: #fafbff;
+}
+
+.lead-detail-modal__activity-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.lead-detail-modal__activity-type {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.lead-detail-modal__activity-date {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.lead-detail-modal__activity-content {
+  color: #1f2937;
+  white-space: pre-wrap;
+}
+
+.lead-detail-modal__empty {
+  text-align: center;
+  color: #9ca3af;
+  font-style: italic;
+  padding: 24px;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .lead-detail-modal__body {
+    grid-template-columns: 1fr;
+  }
+}

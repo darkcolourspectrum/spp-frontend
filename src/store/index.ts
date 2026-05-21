@@ -8,6 +8,7 @@ import { profileReducer } from '@/modules/profile/store';
 import { adminReducer } from '@/modules/admin/store';
 import { scheduleReducer } from '@/modules/schedule/store';
 import { notificationsReducer } from '@/modules/notifications/store';
+import { crmReducer } from '@/modules/crm/store';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     admin: adminReducer,
     schedule: scheduleReducer,
     notifications: notificationsReducer,
+    crm: crmReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

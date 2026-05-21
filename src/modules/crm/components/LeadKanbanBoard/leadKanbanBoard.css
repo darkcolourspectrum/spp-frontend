@@ -1,0 +1,21 @@
+.lead-board {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  overflow-x: auto;
+  height: calc(100vh - 200px);
+  align-items: stretch;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+.lead-board__loading {
+  text-align: center;
+  padding: 80px 16px;
+  color: #6b7280;
+  font-size: 14px;
+}

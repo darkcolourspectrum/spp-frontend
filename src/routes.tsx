@@ -13,8 +13,7 @@ import Register from './modules/auth/components/Register';
 import ProtectedRoute from './modules/auth/components/ProtectedRoute';
 
 // Admin Pages
-import { AdminDashboardPage, AdminUsersPage, AdminStudiosPage, StudioDetailPage } from './pages/admin';
-
+import { AdminDashboardPage, AdminUsersPage, AdminStudiosPage, StudioDetailPage, AdminCrmPage } from './pages/admin';
 // Teacher Pages
 import TeacherStudiosPage from './pages/teacher/TeacherStudiosPage';
 import TeacherStudioDetailPage from './pages/teacher/TeacherStudiosDetailPage';
@@ -100,6 +99,7 @@ const AppRoutes = () => {
           <Route path={ROUTES.ADMIN.USERS} element={<AdminUsersPage />} />
           <Route path={ROUTES.ADMIN.STUDIOS} element={<AdminStudiosPage />} />
           <Route path={ROUTES.ADMIN.STATISTICS} element={<AdminStatistics />} />
+          <Route path={ROUTES.ADMIN.CRM} element={<AdminCrmPage />} />
         </Route>
         
         {/* Детальная страница студии для админа */}

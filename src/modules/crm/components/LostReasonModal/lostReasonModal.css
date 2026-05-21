@@ -1,0 +1,138 @@
+.lost-reason-modal__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.lost-reason-modal__content {
+  background: white;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.lost-reason-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.lost-reason-modal__header h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #1f2937;
+}
+
+.lost-reason-modal__close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+}
+
+.lost-reason-modal__body {
+  padding: 20px 24px;
+}
+
+.lost-reason-modal__lead-info {
+  background: #f9fafb;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lost-reason-modal__lead-info strong {
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.lost-reason-modal__lead-info span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.lost-reason-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lost-reason-modal__field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.lost-reason-modal__field textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.lost-reason-modal__field textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.lost-reason-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.lost-reason-modal__button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s;
+}
+
+.lost-reason-modal__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lost-reason-modal__button--secondary {
+  background: white;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.lost-reason-modal__button--secondary:hover {
+  background: #f3f4f6;
+}
+
+.lost-reason-modal__button--primary {
+  background: #ef4444;
+  color: white;
+}
+
+.lost-reason-modal__button--primary:hover:not(:disabled) {
+  background: #dc2626;
+}

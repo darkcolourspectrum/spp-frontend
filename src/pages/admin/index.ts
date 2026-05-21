@@ -6,3 +6,4 @@ export { default as AdminDashboardPage } from './AdminDashboardPage/AdminDashboa
 export { default as AdminUsersPage } from './AdminUsersPage/AdminUsersPage';
 export { default as AdminStudiosPage } from './AdminStudiosPage/AdminStudiosPage';
 export { default as StudioDetailPage } from './StudioDetailPage/StudioDetailPage';
+export { default as AdminCrmPage } from './AdminCrmPage/AdminCrmPage';
