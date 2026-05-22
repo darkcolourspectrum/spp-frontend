@@ -15,3 +15,4 @@ export { LeadColumn } from './LeadColumn/LeadColumn';
 export { LeadKanbanBoard } from './LeadKanbanBoard/LeadKanbanBoard';
 export { LostReasonModal } from './LostReasonModal/LostReasonModal';
 export { LeadDetailModal } from './LeadDetailModal/LeadDetailModal';
+export { ConvertLeadModal } from './ConvertLeadModal/ConvertLeadModal';

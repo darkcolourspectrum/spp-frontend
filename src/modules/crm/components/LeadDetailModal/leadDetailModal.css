@@ -354,3 +354,16 @@
     grid-template-columns: 1fr;
   }
 }
+
+.lead-detail-modal__schedule-link {
+  display: inline-block;
+  margin-top: 8px;
+  color: #6366f1;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.lead-detail-modal__schedule-link:hover {
+  text-decoration: underline;
+}

@@ -5,7 +5,6 @@ import {
   updateLeadFields,
   addActivity,
   changeLeadStatus,
-  convertLead,
 } from '@/modules/crm/store';
 import type {
   LeadStatus,
@@ -13,6 +12,7 @@ import type {
   Lead,
 } from '@/api/crm/types';
 import { LostReasonModal } from '../LostReasonModal/LostReasonModal';
+import { ConvertLeadModal } from '../ConvertLeadModal/ConvertLeadModal';
 import './leadDetailModal.css';
 
 /** Все статусы воронки - для выпадающего списка смены статуса. */
@@ -68,6 +68,8 @@ export const LeadDetailModal = () => {
 
   // Лид, для которого открыта модалка ввода причины проигрыша.
   const [pendingLostLead, setPendingLostLead] = useState<Lead | null>(null);
+  // Открыта ли модалка конвертации (поверх детальной).
+  const [isConvertModalOpen, setIsConvertModalOpen] = useState(false);
 
   // При смене selectedLead - сбрасываем все режимы редактирования
   // и наполняем драфты актуальными значениями.
@@ -179,7 +181,7 @@ export const LeadDetailModal = () => {
   };
 
   const handleConvert = () => {
-    dispatch(convertLead(lead.id));
+    setIsConvertModalOpen(true);
   };
 
   // ===== Рендер =====
@@ -295,8 +297,20 @@ export const LeadDetailModal = () => {
                 )}
                 {isConverted && (
                   <div className="lead-detail-modal__converted-info">
-                    Лид конвертирован в клиента (ID пользователя:{' '}
-                    <strong>{lead.converted_user_id}</strong>)
+                    <div>
+                      Лид конвертирован в клиента (ID пользователя:{' '}
+                      <strong>{lead.converted_user_id}</strong>)
+                    </div>
+                    {lead.studio_id && (
+                      <a
+                        href={`/admin/studios/${lead.studio_id}?tab=schedule`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="lead-detail-modal__schedule-link"
+                      >
+                        Перейти к расписанию студии →
+                      </a>
+                    )}
                   </div>
                 )}
               </section>
@@ -424,6 +438,12 @@ export const LeadDetailModal = () => {
           lead={pendingLostLead}
           onConfirm={handleLostConfirm}
           onCancel={() => setPendingLostLead(null)}
+        />
+      )}
+      {isConvertModalOpen && (
+        <ConvertLeadModal
+          lead={lead}
+          onClose={() => setIsConvertModalOpen(false)}
         />
       )}
     </>

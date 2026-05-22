@@ -18,6 +18,8 @@ import type {
   LeadUpdateRequest,
   LeadActivity,
   LeadActivityCreateRequest,
+  LeadConvertRequest,
+  StudioOption,
 } from './types';
 
 // Endpoints
@@ -27,6 +29,7 @@ const CRM_ENDPOINTS = {
   LEAD_STATUS: (id: number) => `/api/crm/leads/${id}/status`,
   LEAD_ACTIVITIES: (id: number) => `/api/crm/leads/${id}/activities`,
   LEAD_CONVERT: (id: number) => `/api/crm/leads/${id}/convert-to-user`,
+  STUDIOS: '/api/crm/studios',
 };
 
 // ==================== ЛИДЫ ====================
@@ -89,9 +92,21 @@ export const addLeadActivity = async (
 /** Конвертировать лид в клиента (создать пользователя в Auth Service). */
 export const convertLeadToUser = async (
   id: number,
+  data?: LeadConvertRequest,
 ): Promise<LeadConversionResponse> => {
   const response = await apiClient.post<LeadConversionResponse>(
     CRM_ENDPOINTS.LEAD_CONVERT(id),
+    data,
+  );
+  return response.data;
+};
+
+// ==================== СПРАВОЧНИКИ ====================
+
+/** Получить список активных студий из локального кеша CRM. */
+export const getStudios = async (): Promise<StudioOption[]> => {
+  const response = await apiClient.get<StudioOption[]>(
+    CRM_ENDPOINTS.STUDIOS,
   );
   return response.data;
 };

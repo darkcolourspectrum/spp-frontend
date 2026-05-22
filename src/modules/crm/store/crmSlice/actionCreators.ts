@@ -14,6 +14,7 @@ import type {
   LeadUpdateRequest,
   LeadActivityCreateRequest,
   LeadListParams,
+  LeadConvertRequest,
 } from '@/api/crm/types';
 import {
   setLeads,
@@ -176,10 +177,13 @@ export const addActivity = createAsyncThunk(
 /** Конвертировать лид в клиента (создать пользователя). */
 export const convertLead = createAsyncThunk(
   'crm/convertLead',
-  async (leadId: number, { dispatch, rejectWithValue }) => {
+  async (
+    args: { leadId: number; data?: LeadConvertRequest },
+    { dispatch, rejectWithValue },
+  ) => {
     try {
       dispatch(setSubmitting(true));
-      const result = await crmApi.convertLeadToUser(leadId);
+      const result = await crmApi.convertLeadToUser(args.leadId, args.data);
       // Лид сменил статус на trial_scheduled - обновляем в списке.
       dispatch(updateLeadInList(result.lead));
       dispatch(
@@ -188,7 +192,7 @@ export const convertLead = createAsyncThunk(
         ),
       );
       // Перечитываем карточку, если она открыта в модалке.
-      await dispatch(fetchLeadDetail(leadId));
+      await dispatch(fetchLeadDetail(args.leadId));
       return result;
     } catch (error) {
       const message = getErrorMessage(error);

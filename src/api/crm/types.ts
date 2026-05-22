@@ -101,3 +101,20 @@ export interface LeadActivityCreateRequest {
   type: 'note' | 'call';
   content: string;
 }
+
+// ==================== СПРАВОЧНИКИ ====================
+
+/** Студия из локального кеша CRM (для select в модалке конвертации). */
+export interface StudioOption {
+  id: number;
+  name: string;
+}
+
+/** Тело запроса конвертации лида в клиента. Все поля опциональны. */
+export interface LeadConvertRequest {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string | null;
+  studio_id?: number;
+}
