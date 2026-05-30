@@ -12,6 +12,11 @@ import type {
   MessageResponse,
   CurrentUserResponse,
   Studio,
+  VkLoginRequest,
+  VkRegisterRequest,
+  VkRegisterResponse,
+  VkRegisterCompleteRequest,
+  VkLinkRequest,
 } from './types';
 
 // ==================== AUTHENTICATION ====================
@@ -53,6 +58,56 @@ export const refreshAccessToken = async (): Promise<RefreshTokenResponse> => {
  */
 export const getCurrentUser = async (): Promise<CurrentUserResponse> => {
   const response = await apiClient.get<CurrentUserResponse>(AUTH_ENDPOINTS.ME);
+  return response.data;
+};
+
+// ==================== VK ID ====================
+
+/**
+ * Вход через VK. Бэк обменяет code на vk_id и вернёт токены
+ * (либо 404, если аккаунта с таким vk_id нет — тогда фронт ведёт на регистрацию).
+ */
+export const vkLogin = async (data: VkLoginRequest): Promise<AuthResponse> => {
+  const response = await apiClient.post<AuthResponse>(AUTH_ENDPOINTS.VK_LOGIN, data);
+  return response.data;
+};
+
+/**
+ * Регистрация через VK, шаг 1. Возвращает либо созданный аккаунт
+ * (needs_email=false), либо запрос на email (needs_email=true).
+ */
+export const vkRegister = async (data: VkRegisterRequest): Promise<VkRegisterResponse> => {
+  const response = await apiClient.post<VkRegisterResponse>(AUTH_ENDPOINTS.VK_REGISTER, data);
+  return response.data;
+};
+
+/**
+ * Регистрация через VK, шаг 2 — завершение с введённым email.
+ */
+export const vkRegisterComplete = async (
+  data: VkRegisterCompleteRequest
+): Promise<AuthResponse> => {
+  const response = await apiClient.post<AuthResponse>(
+    AUTH_ENDPOINTS.VK_REGISTER_COMPLETE,
+    data
+  );
+  return response.data;
+};
+
+/**
+ * Привязка VK к существующему аккаунту (требует авторизации).
+ * Возвращает обновлённый профиль пользователя.
+ */
+export const linkVk = async (userId: number, data: VkLinkRequest): Promise<CurrentUserResponse> => {
+  const response = await apiClient.post<CurrentUserResponse>(AUTH_ENDPOINTS.VK_LINK(userId), data);
+  return response.data;
+};
+
+/**
+ * Отвязка VK от аккаунта (требует авторизации).
+ */
+export const unlinkVk = async (userId: number): Promise<CurrentUserResponse> => {
+  const response = await apiClient.post<CurrentUserResponse>(AUTH_ENDPOINTS.VK_UNLINK(userId));
   return response.data;
 };
 

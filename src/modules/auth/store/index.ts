@@ -26,6 +26,9 @@ export {
   refreshToken,
   fetchCurrentUser,
   checkAuthStatus,
+  vkLogin,
+  vkRegister,
+  vkRegisterComplete,
 } from './authSlice/actionCreators';
 
 // Types

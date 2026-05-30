@@ -233,3 +233,29 @@
     font-size: 26px;
   }
 }
+
+.register-divider {
+  text-align: center;
+  margin: 20px 0;
+  color: #999;
+  font-size: 14px;
+  position: relative;
+}
+ 
+.register-divider::before,
+.register-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 42%;
+  height: 1px;
+  background-color: #e0e0e0;
+}
+ 
+.register-divider::before {
+  left: 0;
+}
+ 
+.register-divider::after {
+  right: 0;
+}

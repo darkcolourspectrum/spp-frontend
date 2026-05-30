@@ -31,7 +31,7 @@ const PatternsList = ({ patterns, studioId, isReadOnly = false }: PatternsListPr
   if (patterns.length === 0) {
     return (
       <div className="no-patterns">
-        <div className="no-patterns-icon">📋</div>
+        <div className="no-patterns-icon"></div>
         <h3>Нет шаблонов расписания</h3>
         <p>Создайте первый шаблон для автоматической генерации занятий</p>
       </div>
@@ -56,7 +56,7 @@ const PatternsList = ({ patterns, studioId, isReadOnly = false }: PatternsListPr
             
             <div className="pattern-body">
               <div className="pattern-time">
-                <span className="time-icon">🕐</span>
+                <span className="time-icon"></span>
                 <span className="time-text">
                   {pattern.start_time} ({pattern.duration_minutes} мин)
                 </span>
@@ -64,20 +64,20 @@ const PatternsList = ({ patterns, studioId, isReadOnly = false }: PatternsListPr
               
               {pattern.classroom_id && (
                 <div className="pattern-classroom">
-                  <span className="classroom-icon">🚪</span>
+                  <span className="classroom-icon"></span>
                   <span className="classroom-text">Кабинет #{pattern.classroom_id}</span>
                 </div>
               )}
               
               <div className="pattern-students">
-                <span className="students-icon">👥</span>
+                <span className="students-icon"></span>
                 <span className="students-text">
                   {pattern.student_ids.length} {pattern.student_ids.length === 1 ? 'ученик' : 'учеников'}
                 </span>
               </div>
               
               <div className="pattern-validity">
-                <span className="validity-icon">📅</span>
+                <span className="validity-icon"></span>
                 <span className="validity-text">
                   С {new Date(pattern.valid_from).toLocaleDateString('ru-RU')}
                   {pattern.valid_until && ` до ${new Date(pattern.valid_until).toLocaleDateString('ru-RU')}`}
@@ -85,7 +85,7 @@ const PatternsList = ({ patterns, studioId, isReadOnly = false }: PatternsListPr
               </div>
               
               <div className="pattern-generated">
-                <span className="generated-icon">✨</span>
+                <span className="generated-icon"></span>
                 <span className="generated-text">
                   Создано занятий: {pattern.generated_lessons_count}
                 </span>
@@ -93,7 +93,7 @@ const PatternsList = ({ patterns, studioId, isReadOnly = false }: PatternsListPr
               
               {pattern.notes && (
                 <div className="pattern-notes">
-                  <span className="notes-icon">📝</span>
+                  <span className="notes-icon"></span>
                   <span className="notes-text">{pattern.notes}</span>
                 </div>
               )}
@@ -106,14 +106,14 @@ const PatternsList = ({ patterns, studioId, isReadOnly = false }: PatternsListPr
                   className="action-button edit"
                   title="Редактировать"
                 >
-                  ✏️
+                  
                 </button>
                 <button
                   onClick={() => handleDelete(pattern)}
                   className="action-button delete"
                   title="Удалить"
                 >
-                  🗑️
+                  
                 </button>
               </div>
             )}

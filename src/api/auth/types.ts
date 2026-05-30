@@ -17,6 +17,7 @@ export interface UserInfo {
   studio_name: string | null;
   is_active: boolean;
   is_verified: boolean;
+  vk_linked?: boolean;
 }
 
 export interface Tokens {
@@ -66,6 +67,7 @@ export interface CurrentUserResponse extends UserInfo {
   created_at: string;
   updated_at: string;
   last_login: string | null;
+  vk_linked?: boolean;
 }
 
 // ==================== STUDIO TYPES ====================
@@ -97,3 +99,59 @@ export interface ValidationError {
     type: string;
   }>;
 }
+
+// ==================== VK ID TYPES ====================
+
+/**
+ * Данные, которые фронт получает от VK ID SDK после авторизации
+ * и шлёт на бэк. Бэк сам обменяет code на проверенный vk_id.
+ */
+export interface VkAuthPayload {
+  code: string;
+  device_id: string;
+  code_verifier: string;
+  state?: string;
+}
+
+/**
+ * Тело входа через VK (POST /api/auth/vk/login).
+ */
+export type VkLoginRequest = VkAuthPayload;
+
+/**
+ * Тело регистрации через VK, шаг 1 (POST /api/auth/vk/register).
+ * email опционален: если фронт его знает — шлёт, иначе бэк попробует
+ * взять из VK, а если нет — вернёт needs_email.
+ */
+export interface VkRegisterRequest extends VkAuthPayload {
+  email?: string;
+}
+
+/**
+ * Ответ шага 1 регистрации.
+ * - needs_email=false: аккаунт создан, данные входа в auth.
+ * - needs_email=true: нужен email, аккаунт не создан; registration_token
+ *   и имя/фамилия — для второго шага и предзаполнения формы.
+ */
+export interface VkRegisterResponse {
+  needs_email: boolean;
+  auth?: AuthResponse;
+  registration_token?: string;
+  first_name?: string;
+  last_name?: string;
+}
+
+/**
+ * Тело завершения регистрации через VK, шаг 2
+ * (POST /api/auth/vk/register/complete).
+ */
+export interface VkRegisterCompleteRequest {
+  registration_token: string;
+  email: string;
+}
+
+/**
+ * Тело привязки VK к существующему аккаунту
+ * (POST /api/auth/users/{id}/link-vk).
+ */
+export type VkLinkRequest = VkAuthPayload;

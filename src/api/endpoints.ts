@@ -12,6 +12,13 @@ export const AUTH_ENDPOINTS = {
   REFRESH: '/api/auth/refresh',
   ME: '/api/auth/me',
   
+  // VK ID авторизация
+  VK_LOGIN: '/api/auth/vk/login',
+  VK_REGISTER: '/api/auth/vk/register',
+  VK_REGISTER_COMPLETE: '/api/auth/vk/register/complete',
+  VK_LINK: (userId: number) => `/api/auth/users/${userId}/link-vk`,
+  VK_UNLINK: (userId: number) => `/api/auth/users/${userId}/unlink-vk`,
+
   // Управление пользователями
   USERS: '/api/auth/users',
   USER_BY_ID: (id: number) => `/api/auth/users/${id}`,
@@ -53,6 +60,8 @@ export const PROFILE_ENDPOINTS = {
   // Активность
   ACTIVITIES: (userId: number) => `/api/profile/${userId}/activities`,
 } as const;
+
+
 
 // ==================== SCHEDULE SERVICE ====================
 export const SCHEDULE_ENDPOINTS = {

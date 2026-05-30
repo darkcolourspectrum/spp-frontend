@@ -21,6 +21,8 @@ import TeacherStudioDetailPage from './pages/teacher/TeacherStudiosDetailPage';
 // Profile Page (универсальная для всех ролей)
 import UserProfilePage from './pages/UserProfilePage';
 
+import VkCallbackPage from './pages/VkCallbackPage/VkCallbackPage';
+
 // Временные placeholder компоненты
 const Dashboard = () => (
   <div style={{ padding: '40px', textAlign: 'center' }}>
@@ -78,6 +80,10 @@ const AppRoutes = () => {
         <Route 
           path={ROUTES.REGISTER} 
           element={isAuthenticated ? <Navigate to={getDefaultRedirect()} replace /> : <Register />} 
+        />
+        <Route 
+          path={ROUTES.VK_CALLBACK} 
+          element={<VkCallbackPage />} 
         />
       </Route>
       

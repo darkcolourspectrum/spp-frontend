@@ -1,0 +1,39 @@
+/* Стиль кнопки авторизации через VK. Класс общий для всех экранов,
+   где встречается кнопка (вход, регистрация, профиль), поэтому стиль
+   вынесен в отдельный файл, а не лежит в CSS одной из форм. */
+
+.vk-auth-button {
+  width: 100%;
+  padding: 14px 18px;
+  background-color: #0077ff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.vk-auth-button:hover:not(:disabled) {
+  background-color: #0066dd;
+  transform: translateY(-1px);
+}
+
+.vk-auth-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Вторичный вид — кнопка "Отвязать" в профиле (рамка вместо заливки,
+   ширина по содержимому). */
+.vk-auth-button--secondary {
+  width: auto;
+  background-color: transparent;
+  color: #0077ff;
+  border: 2px solid #0077ff;
+}
+
+.vk-auth-button--secondary:hover:not(:disabled) {
+  background-color: rgba(0, 119, 255, 0.08);
+}

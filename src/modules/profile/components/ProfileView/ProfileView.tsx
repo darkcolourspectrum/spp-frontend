@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchMyProfile } from '@/modules/profile/store';
 import { getUserInitials, formatDate, getRoleDisplayName } from '@/utils/helpers';
+import VkLinkSection from '@/modules/profile/components/VkLinkSection/VkLinkSection';
 import './profileView.css';
 
 interface ProfileViewProps {
@@ -118,7 +119,7 @@ const ProfileView = ({ onEdit }: ProfileViewProps) => {
                 {isActive ? 'Активен' : 'Неактивен'}
               </span>
             </div>
-            
+          
             <div className="info-item">
               <span className="info-label">Верификация</span>
               <span className={`info-value status-badge ${isVerified ? 'verified' : 'not-verified'}`}>
@@ -139,6 +140,7 @@ const ProfileView = ({ onEdit }: ProfileViewProps) => {
             )}
           </div>
         </div>
+        <VkLinkSection />
       </div>
     </div>
   );

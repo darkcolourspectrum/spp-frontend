@@ -5,7 +5,13 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import * as authApi from '@/api/auth';
-import type { RegisterRequest, LoginRequest, ApiError } from '@/api/auth/types';
+import type {
+  RegisterRequest,
+  LoginRequest,
+  VkLoginRequest,
+  VkRegisterRequest,
+  VkRegisterCompleteRequest,
+} from '@/api/auth/types';
 import {
   setAuth,
   setLoading,
@@ -116,6 +122,114 @@ export const login = createAsyncThunk(
 );
 
 /**
+ * Вход через VK.
+ *
+ * Принимает данные, собранные на callback-странице из VK SDK
+ * (code/device_id/code_verifier). Бэк обменяет code на vk_id и вернёт
+ * токены либо 404 (нет аккаунта). Кладёт токен+юзера через setAuth -
+ * тем же путём, что обычный вход. Зеркалит login (с очисткой профиля
+ * предыдущего пользователя).
+ */
+export const vkLogin = createAsyncThunk(
+  'auth/vkLogin',
+  async (data: VkLoginRequest, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setLoading(true));
+
+      // Очищаем профиль предыдущего пользователя если был
+      const { clearProfile } = await import('@/modules/profile/store');
+      dispatch(clearProfile());
+
+      const response = await authApi.vkLogin(data);
+
+      dispatch(setAuth({
+        accessToken: response.tokens.access_token,
+        user: response.user,
+      }));
+
+      return response;
+
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      dispatch(setError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setLoading(false));
+    }
+  }
+);
+
+/**
+ * Регистрация через VK, шаг 1.
+ *
+ * Бэк обменивает код и возвращает один из двух исходов:
+ *  - needs_email=false: аккаунт создан -> кладём токены через setAuth
+ *    (пользователь сразу залогинен), возвращаем результат компоненту.
+ *  - needs_email=true: нужен email -> НЕ трогаем авторизацию, просто
+ *    возвращаем результат, чтобы компонент показал форму ввода email.
+ *
+ * Возвращает весь VkRegisterResponse, чтобы компонент сам разветвил логику.
+ */
+export const vkRegister = createAsyncThunk(
+  'auth/vkRegister',
+  async (data: VkRegisterRequest, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setLoading(true));
+
+      const response = await authApi.vkRegister(data);
+
+      // Аккаунт создан сразу — логиним.
+      if (!response.needs_email && response.auth) {
+        dispatch(setAuth({
+          accessToken: response.auth.tokens.access_token,
+          user: response.auth.user,
+        }));
+      }
+
+      // В обоих случаях возвращаем результат — компонент решит, что дальше.
+      return response;
+
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      dispatch(setError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setLoading(false));
+    }
+  }
+);
+
+/**
+ * Регистрация через VK, шаг 2 — завершение с введённым email.
+ * Всегда возвращает токены (как обычная регистрация) -> логиним через setAuth.
+ */
+export const vkRegisterComplete = createAsyncThunk(
+  'auth/vkRegisterComplete',
+  async (data: VkRegisterCompleteRequest, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setLoading(true));
+
+      const response = await authApi.vkRegisterComplete(data);
+
+      dispatch(setAuth({
+        accessToken: response.tokens.access_token,
+        user: response.user,
+      }));
+
+      return response;
+
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      dispatch(setError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setLoading(false));
+    }
+  }
+);
+
+
+/**
  * Выход из системы
  */
 export const logoutUser = createAsyncThunk(
@@ -204,6 +318,7 @@ export const fetchCurrentUser = createAsyncThunk(
           studio_name: user.studio_name,
           is_active: user.is_active,
           is_verified: user.is_verified,
+          vk_linked: user.vk_linked,
         },
       }));
       
@@ -246,6 +361,7 @@ export const checkAuthStatus = createAsyncThunk(
           studio_name: user.studio_name,
           is_active: user.is_active,
           is_verified: user.is_verified,
+          vk_linked: user.vk_linked,
         },
       }));
       

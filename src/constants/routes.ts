@@ -8,6 +8,7 @@ export const ROUTES = {
   LOGIN: '/login',
   REGISTER: '/register',
   HOME: '/',
+  VK_CALLBACK: '/auth/vk/callback',
   
   // Общие защищенные маршруты
   DASHBOARD: '/dashboard',

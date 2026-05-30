@@ -6,7 +6,9 @@ import { useState, FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { login } from '@/modules/auth/store';
+import { startVkAuth, isVkConfigured } from '@/lib/vkid/vkidClient';
 import './login.css';
+import '../vkAuth.css';
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -26,7 +28,7 @@ const Login = () => {
       alert('Слишком много неудачных попыток. Попробуйте позже.');
       return;
     }
-    
+  
     try {
       const result = await dispatch(login({ email, password })).unwrap();
       
@@ -40,6 +42,16 @@ const Login = () => {
     }
   };
   
+  const handleVkLogin = async () => {
+    try {
+      // intent='login' — callback после возврата вызовет vkLogin.
+      await startVkAuth('login');
+      // startVkAuth редиректит на VK; код ниже не выполнится.
+    } catch (err) {
+      console.error('VK auth start error:', err);
+    }
+  };
+
   return (
     <div className="login-container">
       <div className="login-card">
@@ -103,8 +115,22 @@ const Login = () => {
           >
             {isLoading ? 'Вход...' : 'Войти'}
           </button>
-        </form>
+        </form> 
         
+        {isVkConfigured() && (
+          <>
+            <div className="login-divider">или</div>
+            <button
+              type="button"
+              className="vk-auth-button"
+              onClick={handleVkLogin}
+              disabled={isLoading}
+            >
+              Войти через VK
+            </button>
+          </>
+        )}
+
         <div className="login-footer">
           <p>
             Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
