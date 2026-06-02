@@ -17,6 +17,9 @@ import { AdminDashboardPage, AdminUsersPage, AdminStudiosPage, StudioDetailPage,
 // Teacher Pages
 import TeacherStudiosPage from './pages/teacher/TeacherStudiosPage';
 import TeacherStudioDetailPage from './pages/teacher/TeacherStudiosDetailPage';
+import TeacherSchedulePage from './pages/teacher/TeacherSchedulePage';
+// Student Pages
+import StudentSchedulePage from './pages/student/StudentSchedulePage';
 
 // Profile Page (универсальная для всех ролей)
 import UserProfilePage from './pages/UserProfilePage';
@@ -38,24 +41,10 @@ const AdminStatistics = () => (
   </div>
 );
 
-const TeacherSchedule = () => (
-  <div style={{ padding: '40px', textAlign: 'center' }}>
-    <h1>Расписание преподавателя</h1>
-    <p>Управление уроками</p>
-  </div>
-);
-
 const TeacherStudents = () => (
   <div style={{ padding: '40px', textAlign: 'center' }}>
     <h1>Мои студенты</h1>
     <p>Список студентов</p>
-  </div>
-);
-
-const StudentSchedule = () => (
-  <div style={{ padding: '40px', textAlign: 'center' }}>
-    <h1>Расписание студента</h1>
-    <p>Запись на уроки</p>
   </div>
 );
 
@@ -117,14 +106,14 @@ const AppRoutes = () => {
         <Route element={<ProtectedRoute requiredRoles={['teacher', 'admin']}><Outlet /></ProtectedRoute>}>
           <Route path={ROUTES.TEACHER.STUDIOS} element={<TeacherStudiosPage />} />
           <Route path={ROUTES.TEACHER.STUDIO_DETAIL} element={<TeacherStudioDetailPage />} />
-          <Route path={ROUTES.TEACHER.SCHEDULE} element={<TeacherSchedule />} />
+          <Route path={ROUTES.TEACHER.SCHEDULE} element={<TeacherSchedulePage />} />
           <Route path={ROUTES.TEACHER.STUDENTS} element={<TeacherStudents />} />
           <Route path={ROUTES.TEACHER.PROFILE} element={<UserProfilePage />} />
         </Route>
         
         {/* ==================== СТУДЕНТ МАРШРУТЫ ==================== */}
         <Route element={<ProtectedRoute requiredRoles={['student', 'admin']}><Outlet /></ProtectedRoute>}>
-          <Route path={ROUTES.STUDENT.SCHEDULE} element={<StudentSchedule />} />
+          <Route path={ROUTES.STUDENT.SCHEDULE} element={<StudentSchedulePage />} />
           <Route path={ROUTES.STUDENT.PROFILE} element={<UserProfilePage />} />
         </Route>
       </Route>
