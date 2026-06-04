@@ -162,6 +162,15 @@ export const getAdminDashboard = async (): Promise<any> => {
   return response.data;
 };
 
+// Analytics
+export { getAnalytics } from './analytics';
+export type {
+  AnalyticsDashboardResponse,
+  LeadsAnalytics,
+  LessonsAnalytics,
+  AnalyticsPreset,
+} from './analytics';
+
 // Экспортируем типы
 export type {
   AdminUser,

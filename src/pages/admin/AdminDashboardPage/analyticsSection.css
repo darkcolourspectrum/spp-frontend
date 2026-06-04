@@ -1,0 +1,472 @@
+/* ============================================================
+   Аналитический блок дашборда
+   Стиль согласован с adminDashboardPage.css:
+   карточки на белом, тень 0 2px 8px, скругление 12px,
+   фирменные цвета #667eea / #764ba2.
+   ============================================================ */
+
+.analytics-section {
+  margin-bottom: 40px;
+}
+
+/* ---------- Шапка с переключателем периода ---------- */
+
+.analytics-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.analytics-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 4px 0;
+}
+
+.analytics-subtitle {
+  font-size: 14px;
+  color: #888;
+  margin: 0;
+}
+
+.period-switcher {
+  display: inline-flex;
+  background: #f0f1f5;
+  border-radius: 10px;
+  padding: 4px;
+  gap: 2px;
+}
+
+.period-button {
+  border: none;
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.period-button:hover {
+  color: #333;
+}
+
+.period-button.active {
+  background: white;
+  color: #667eea;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ---------- Уведомление о неполноте данных ---------- */
+
+.analytics-notice {
+  background: #fff8e1;
+  border-left: 4px solid #ffc107;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #7a5c00;
+  margin-bottom: 20px;
+}
+
+/* ---------- Состояния загрузки / пустоты ---------- */
+
+.analytics-loading,
+.analytics-empty {
+  padding: 48px 20px;
+  text-align: center;
+  color: #999;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.analytics-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Полупрозрачность при фоновой перезагрузке (смена периода) */
+.analytics-dimmed {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+/* ---------- KPI-метрики конверсии ---------- */
+
+.analytics-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.kpi-card.highlight {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.kpi-card.highlight .kpi-value,
+.kpi-card.highlight .kpi-label {
+  color: white;
+}
+
+.kpi-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.kpi-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ---------- Сетка карточек аналитики ---------- */
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.analytics-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+}
+
+.analytics-grid .analytics-card {
+  margin-bottom: 0;
+}
+
+.analytics-card h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 20px 0;
+}
+
+.analytics-card h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #555;
+  margin: 24px 0 12px 0;
+}
+
+/* ---------- Воронка лидов ---------- */
+
+.funnel-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.funnel-row {
+  display: grid;
+  grid-template-columns: 140px 1fr 40px;
+  align-items: center;
+  gap: 12px;
+}
+
+.funnel-label {
+  font-size: 13px;
+  color: #666;
+  text-align: right;
+}
+
+.funnel-bar-track {
+  background: #f4f5f8;
+  border-radius: 6px;
+  height: 28px;
+  overflow: hidden;
+}
+
+.funnel-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 10px;
+  min-width: 28px;
+  transition: width 0.3s ease;
+}
+
+.funnel-bar-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+}
+
+.funnel-share {
+  font-size: 12px;
+  font-weight: 600;
+  color: #999;
+  text-align: right;
+}
+
+.funnel-empty,
+.source-empty,
+.lessons-empty,
+.trend-empty {
+  padding: 32px 20px;
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+}
+
+/* ---------- Таблица источников ---------- */
+
+.source-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.source-table-head,
+.source-table-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 8px;
+}
+
+.source-table-head {
+  border-bottom: 2px solid #f0f1f5;
+}
+
+.source-table-head span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.source-table-row {
+  border-bottom: 1px solid #f4f5f8;
+}
+
+.source-table-row:last-child {
+  border-bottom: none;
+}
+
+.source-col-name {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.source-col-num {
+  font-size: 14px;
+  color: #555;
+  text-align: center;
+}
+
+.source-rate {
+  font-weight: 700;
+}
+
+.source-rate.rate-high {
+  color: #28a745;
+}
+
+.source-rate.rate-mid {
+  color: #f0a020;
+}
+
+.source-rate.rate-zero {
+  color: #adb5bd;
+}
+
+/* ---------- Операционка занятий ---------- */
+
+.lessons-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.lessons-stat {
+  text-align: center;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.lessons-stat-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.lessons-stat-label {
+  font-size: 12px;
+  color: #888;
+  font-weight: 500;
+}
+
+/* Нагрузка преподавателей */
+
+.teacher-load-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.teacher-load-row {
+  display: grid;
+  grid-template-columns: 160px 1fr 70px;
+  align-items: center;
+  gap: 12px;
+}
+
+.teacher-load-name {
+  font-size: 13px;
+  color: #444;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.teacher-load-bar-track {
+  background: #f4f5f8;
+  border-radius: 5px;
+  height: 18px;
+  overflow: hidden;
+}
+
+.teacher-load-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+.teacher-load-numbers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.teacher-conducted {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.teacher-cancelled {
+  font-size: 12px;
+  font-weight: 600;
+  color: #dc3545;
+}
+
+/* ---------- График динамики ---------- */
+
+.trend-chart {
+  width: 100%;
+}
+
+.trend-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.trend-legend {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.trend-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trend-legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.trend-legend-label {
+  font-size: 13px;
+  color: #666;
+}
+
+/* ---------- Разделитель операционной секции ---------- */
+
+.operational-divider {
+  margin: 8px 0 20px 0;
+  padding-top: 24px;
+  border-top: 1px solid #eef0f4;
+}
+
+.operational-divider h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+/* ---------- Адаптивность ---------- */
+
+@media (max-width: 768px) {
+  .analytics-header {
+    flex-direction: column;
+  }
+
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .funnel-row {
+    grid-template-columns: 100px 1fr 36px;
+  }
+
+  .funnel-label {
+    font-size: 12px;
+  }
+
+  .teacher-load-row {
+    grid-template-columns: 110px 1fr 60px;
+  }
+
+  .source-table-head,
+  .source-table-row {
+    grid-template-columns: 1.3fr 0.8fr 0.8fr 0.9fr;
+  }
+}

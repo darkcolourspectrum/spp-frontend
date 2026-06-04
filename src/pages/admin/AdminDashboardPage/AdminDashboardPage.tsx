@@ -2,17 +2,19 @@ import { useEffect } from 'react';
 import { useAuth } from '@/modules/auth/hooks/useAuth';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchDashboardStats, fetchAllUsers, fetchAllStudios } from '@/modules/admin/store';
+import AnalyticsSection from './components/AnalyticsSection';
 import StatsCards from './components/StatsCards';
 import RoleDistributionChart from './components/RoleDistributionChart';
 import StudiosChart from './components/StudiosChart';
 import RecentActivity from './components/RecentActivity';
 import SystemAlerts from './components/SystemAlerts';
 import './adminDashboardPage.css';
+import './analyticsSection.css';
 
 const AdminDashboardPage = () => {
   const dispatch = useAppDispatch();
   const { user } = useAuth();
-  
+
   const { dashboardStats, users, studios, isLoadingDashboard, error } = useAppSelector(
     (state) => state.admin
   );
@@ -40,8 +42,8 @@ const AdminDashboardPage = () => {
         <div className="error-state">
           <h2>Ошибка загрузки</h2>
           <p>{error}</p>
-          <button 
-            onClick={() => dispatch(fetchDashboardStats())} 
+          <button
+            onClick={() => dispatch(fetchDashboardStats())}
             className="retry-button"
           >
             Попробовать снова
@@ -63,6 +65,14 @@ const AdminDashboardPage = () => {
         </div>
       </div>
 
+      {/* Аналитика - главный блок для управленческих решений */}
+      <AnalyticsSection />
+
+      {/* Операционная статистика системы */}
+      <div className="operational-divider">
+        <h2>Состояние системы</h2>
+      </div>
+
       {/* Stats Cards */}
       <StatsCards stats={dashboardStats} />
 
@@ -70,13 +80,13 @@ const AdminDashboardPage = () => {
       <div className="charts-section">
         <div className="chart-card">
           <h3>Распределение по ролям</h3>
-          <RoleDistributionChart 
+          <RoleDistributionChart
             students={dashboardStats?.activeStudents || 0}
             teachers={dashboardStats?.activeTeachers || 0}
             total={dashboardStats?.totalUsers || 0}
           />
         </div>
-        
+
         <div className="chart-card">
           <h3>Студии и кабинеты</h3>
           <StudiosChart studios={studios} />
@@ -89,11 +99,11 @@ const AdminDashboardPage = () => {
           <h3>Последние действия</h3>
           <RecentActivity users={users} studios={studios} />
         </div>
-        
+
         <div className="alerts-section">
           <h3>Системные предупреждения</h3>
-          <SystemAlerts 
-            users={users} 
+          <SystemAlerts
+            users={users}
             studios={studios}
             stats={dashboardStats}
           />

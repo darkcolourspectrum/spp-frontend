@@ -29,6 +29,9 @@ export {
   clearError,
   setSuccessMessage,
   clearSuccessMessage,
+  setAnalytics,
+  setLoadingAnalytics,
+  setAnalyticsPeriod,
 } from './adminSlice/adminReducer';
 
 // Action Creators (Thunks)
@@ -47,6 +50,7 @@ export {
   updateExistingClassroom,
   deleteExistingClassroom,
   fetchDashboardStats,
+  fetchAnalytics,
 } from './adminSlice/actionCreators';
 
 // Types

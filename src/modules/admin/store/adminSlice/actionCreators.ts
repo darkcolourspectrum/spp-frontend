@@ -27,7 +27,12 @@ import {
   setSubmitting,
   setError,
   setSuccessMessage,
+  setAnalytics,
+  setLoadingAnalytics,
 } from './adminReducer';
+
+import { getAnalytics } from '@/api/admin/analytics';
+import type { AnalyticsPreset } from '@/api/admin/analytics';
 
 // Хелпер для обработки ошибок
 const getErrorMessage = (error: any): string => {
@@ -346,4 +351,22 @@ export const fetchDashboardStats = createAsyncThunk(
       dispatch(setLoadingDashboard(false));
     }
   }
+);
+
+export const fetchAnalytics = createAsyncThunk(
+  'admin/fetchAnalytics',
+  async (period: AnalyticsPreset = 30, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setLoadingAnalytics(true));
+      const analytics = await getAnalytics({ days: period });
+      dispatch(setAnalytics(analytics));
+      return analytics;
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      dispatch(setError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setLoadingAnalytics(false));
+    }
+  },
 );
