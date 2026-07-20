@@ -47,7 +47,6 @@ const Header = () => {
         { label: 'Dashboard', path: ROUTES.ADMIN.DASHBOARD },
         { label: 'Пользователи', path: ROUTES.ADMIN.USERS },
         { label: 'Студии', path: ROUTES.ADMIN.STUDIOS },
-        { label: 'Статистика', path: ROUTES.ADMIN.STATISTICS },
         { label: 'CRM', path: ROUTES.ADMIN.CRM },
       ];
     }
@@ -56,7 +55,6 @@ const Header = () => {
       return [
         { label: 'Моя студия', path: ROUTES.TEACHER.STUDIOS },
         { label: 'Расписание', path: ROUTES.TEACHER.SCHEDULE },
-        { label: 'Студенты', path: ROUTES.TEACHER.STUDENTS },
       ];
     }
     

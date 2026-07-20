@@ -1,4 +1,4 @@
-/**
+ /**
  * Роутинг приложения с Layout системой
  */
 
@@ -26,27 +26,6 @@ import UserProfilePage from './pages/UserProfilePage';
 
 import VkCallbackPage from './pages/VkCallbackPage/VkCallbackPage';
 
-// Временные placeholder компоненты
-const Dashboard = () => (
-  <div style={{ padding: '40px', textAlign: 'center' }}>
-    <h1>Dashboard</h1>
-    <p>Добро пожаловать в систему!</p>
-  </div>
-);
-
-const AdminStatistics = () => (
-  <div style={{ padding: '40px', textAlign: 'center' }}>
-    <h1>Статистика</h1>
-    <p>Аналитика и отчеты</p>
-  </div>
-);
-
-const TeacherStudents = () => (
-  <div style={{ padding: '40px', textAlign: 'center' }}>
-    <h1>Мои студенты</h1>
-    <p>Список студентов</p>
-  </div>
-);
 
 const AppRoutes = () => {
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
@@ -85,7 +64,6 @@ const AppRoutes = () => {
         </PrivateLayout>
       }>
         {/* Общие защищенные маршруты */}
-        <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
         <Route path={ROUTES.PROFILE} element={<UserProfilePage />} />
         
         {/* ==================== АДМИН МАРШРУТЫ ==================== */}
@@ -93,7 +71,6 @@ const AppRoutes = () => {
           <Route path={ROUTES.ADMIN.DASHBOARD} element={<AdminDashboardPage />} />
           <Route path={ROUTES.ADMIN.USERS} element={<AdminUsersPage />} />
           <Route path={ROUTES.ADMIN.STUDIOS} element={<AdminStudiosPage />} />
-          <Route path={ROUTES.ADMIN.STATISTICS} element={<AdminStatistics />} />
           <Route path={ROUTES.ADMIN.CRM} element={<AdminCrmPage />} />
         </Route>
         
@@ -107,7 +84,6 @@ const AppRoutes = () => {
           <Route path={ROUTES.TEACHER.STUDIOS} element={<TeacherStudiosPage />} />
           <Route path={ROUTES.TEACHER.STUDIO_DETAIL} element={<TeacherStudioDetailPage />} />
           <Route path={ROUTES.TEACHER.SCHEDULE} element={<TeacherSchedulePage />} />
-          <Route path={ROUTES.TEACHER.STUDENTS} element={<TeacherStudents />} />
           <Route path={ROUTES.TEACHER.PROFILE} element={<UserProfilePage />} />
         </Route>
         

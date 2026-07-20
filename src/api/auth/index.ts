@@ -11,7 +11,6 @@ import type {
   RefreshTokenResponse,
   MessageResponse,
   CurrentUserResponse,
-  Studio,
   VkLoginRequest,
   VkRegisterRequest,
   VkRegisterResponse,
@@ -108,50 +107,6 @@ export const linkVk = async (userId: number, data: VkLinkRequest): Promise<Curre
  */
 export const unlinkVk = async (userId: number): Promise<CurrentUserResponse> => {
   const response = await apiClient.post<CurrentUserResponse>(AUTH_ENDPOINTS.VK_UNLINK(userId));
-  return response.data;
-};
-
-// ==================== USERS ====================
-
-/**
- * Получение списка пользователей (только для admin)
- */
-export const getUsers = async (params?: {
-  role?: string;
-  studio_id?: number;
-  is_active?: boolean;
-  skip?: number;
-  limit?: number;
-}): Promise<CurrentUserResponse[]> => {
-  const response = await apiClient.get<CurrentUserResponse[]>(AUTH_ENDPOINTS.USERS, { params });
-  return response.data;
-};
-
-/**
- * Получение пользователя по ID
- */
-export const getUserById = async (id: number): Promise<CurrentUserResponse> => {
-  const response = await apiClient.get<CurrentUserResponse>(AUTH_ENDPOINTS.USER_BY_ID(id));
-  return response.data;
-};
-
-// ==================== STUDIOS ====================
-
-/**
- * Получение списка студий
- */
-export const getStudios = async (params?: {
-  is_active?: boolean;
-}): Promise<Studio[]> => {
-  const response = await apiClient.get<Studio[]>(AUTH_ENDPOINTS.STUDIOS, { params });
-  return response.data;
-};
-
-/**
- * Получение студии по ID
- */
-export const getStudioById = async (id: number): Promise<Studio> => {
-  const response = await apiClient.get<Studio>(AUTH_ENDPOINTS.STUDIO_BY_ID(id));
   return response.data;
 };
 

@@ -6,6 +6,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAppSelector } from '@/store/hooks';
 import type { UserRole } from '@/api/auth/types';
+import { getDefaultRouteForRole } from '@/constants/routes';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -42,7 +43,6 @@ const ProtectedRoute = ({ children, requiredRoles }: ProtectedRouteProps) => {
     if (!requiredRoles.includes(user.role)) {
       // Пользователь не имеет нужной роли
       // Редирект на дефолтную страницу для его роли
-      const { getDefaultRouteForRole } = require('@/constants/routes');
       return <Navigate to={getDefaultRouteForRole(user.role)} replace />;
     }
   }

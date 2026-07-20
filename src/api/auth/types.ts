@@ -70,20 +70,6 @@ export interface CurrentUserResponse extends UserInfo {
   vk_linked?: boolean;
 }
 
-// ==================== STUDIO TYPES ====================
-
-export interface Studio {
-  id: number;
-  name: string;
-  description: string | null;
-  address: string | null;
-  phone: string | null;
-  email: string | null;
-  is_active: boolean;
-  teachers_count: number;
-  students_count: number;
-  created_at: string;
-}
 
 // ==================== ERROR TYPES ====================
 

@@ -9,13 +9,6 @@ import type {
   ProfileUpdateRequest,
   AvatarUploadResponse,
   AvatarDeleteResponse,
-  DashboardData,
-  Comment,
-  CommentCreateRequest,
-  CommentUpdateRequest,
-  RecentActivity,
-  ActivityFilter,
-  ActivityListResponse,
 } from './types';
 
 // ==================== PROFILE OPERATIONS ====================
@@ -72,75 +65,6 @@ export const uploadAvatar = async (userId: number, file: File): Promise<AvatarUp
 export const deleteAvatar = async (userId: number): Promise<AvatarDeleteResponse> => {
   const response = await apiClient.delete<AvatarDeleteResponse>(
     PROFILE_ENDPOINTS.DELETE_AVATAR(userId)
-  );
-  return response.data;
-};
-
-// ==================== DASHBOARD ====================
-
-/**
- * Получение данных для дашборда
- */
-export const getDashboard = async (): Promise<DashboardData> => {
-  const response = await apiClient.get<DashboardData>(PROFILE_ENDPOINTS.DASHBOARD);
-  return response.data;
-};
-
-// ==================== COMMENTS (для будущего) ====================
-
-/**
- * Получение комментариев профиля
- */
-export const getComments = async (userId: number): Promise<Comment[]> => {
-  const response = await apiClient.get<Comment[]>(PROFILE_ENDPOINTS.COMMENTS(userId));
-  return response.data;
-};
-
-/**
- * Добавление комментария
- */
-export const addComment = async (userId: number, data: CommentCreateRequest): Promise<Comment> => {
-  const response = await apiClient.post<Comment>(PROFILE_ENDPOINTS.ADD_COMMENT(userId), data);
-  return response.data;
-};
-
-/**
- * Обновление комментария
- */
-export const updateComment = async (
-  userId: number,
-  commentId: number,
-  data: CommentUpdateRequest
-): Promise<Comment> => {
-  const response = await apiClient.put<Comment>(
-    PROFILE_ENDPOINTS.UPDATE_COMMENT(userId, commentId),
-    data
-  );
-  return response.data;
-};
-
-/**
- * Удаление комментария
- */
-export const deleteComment = async (userId: number, commentId: number): Promise<{ message: string }> => {
-  const response = await apiClient.delete<{ message: string }>(
-    PROFILE_ENDPOINTS.DELETE_COMMENT(userId, commentId)
-  );
-  return response.data;
-};
-
-// ==================== ACTIVITIES ====================
-
-/**
- * Получение активности пользователя
- */
-export const getActivities = async (
-  userId: number,
-  filters?: ActivityFilter
-): Promise<ActivityListResponse> => {
-  const response = await apiClient.get<ActivityListResponse>(
-    PROFILE_ENDPOINTS.ACTIVITIES(userId),
-    { params: filters }
   );
   return response.data;
 };
