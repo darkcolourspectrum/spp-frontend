@@ -1,0 +1,310 @@
+/**
+ * Стили формы шаблона.
+ *
+ * Дополняют createPatternModal.css, а не заменяют его: базовые классы
+ * modal-overlay, modal-content, form-group, form-row, students-list,
+ * modal-actions и кнопки берутся оттуда. Здесь только то, чего раньше
+ * не было - слоты и панель предпросмотра.
+ */
+
+/* Форма со слотами шире обычной: в строке слота четыре поля */
+.modal-content.wide {
+  max-width: 720px;
+}
+
+/* Значение поля, которое нельзя менять (преподаватель в режиме правки) */
+.form-static-value {
+  padding: 10px 12px;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  background: #fafafa;
+  color: #666;
+  font-size: 14px;
+}
+
+/* ==================== СЛОТЫ ==================== */
+
+.slots-section {
+  padding: 4px 24px 20px 24px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 4px;
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 16px 0 12px 0;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.section-hint {
+  font-size: 13px;
+  color: #999;
+}
+
+.slots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* Пропорции колонок подобраны под содержимое: день недели длиннее
+   остальных, кнопка удаления фиксированная */
+.slot-row {
+  display: grid;
+  grid-template-columns: 1.3fr 0.9fr 0.9fr 1.2fr 36px;
+  gap: 8px;
+  align-items: center;
+}
+
+.slot-row select,
+.slot-row input {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  background: white;
+  transition: border-color 0.2s;
+}
+
+.slot-row select:focus,
+.slot-row input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.slot-remove {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: white;
+  color: #999;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.slot-remove:hover:not(:disabled) {
+  border-color: #ef9a9a;
+  color: #c62828;
+  background: #fff5f5;
+}
+
+.slot-remove:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.add-slot-button {
+  padding: 9px 14px;
+  border: 1px dashed #c5cae9;
+  border-radius: 6px;
+  background: white;
+  color: #667eea;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-slot-button:hover:not(:disabled) {
+  background: #f5f6ff;
+  border-color: #667eea;
+}
+
+.add-slot-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==================== ПРЕДПРОСМОТР ==================== */
+
+.preview-panel {
+  margin: 8px 24px 20px 24px;
+  padding: 16px;
+  background: #f8f9fc;
+  border: 1px solid #eceef5;
+  border-radius: 8px;
+}
+
+.preview-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.preview-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.preview-horizon {
+  font-size: 13px;
+  color: #888;
+  white-space: nowrap;
+}
+
+.preview-placeholder {
+  margin: 0;
+  font-size: 14px;
+  color: #999;
+}
+
+.preview-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  transition: opacity 0.2s;
+}
+
+/* Пока идёт пересчёт, старые числа приглушаются - так видно, что
+   значения ещё не окончательные, но интерфейс не прыгает */
+.preview-stats.stale {
+  opacity: 0.45;
+}
+
+.preview-stat {
+  background: white;
+  border: 1px solid #eceef5;
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.preview-stat-label {
+  font-size: 12px;
+  color: #888;
+}
+
+.preview-stat-value {
+  font-size: 22px;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.2;
+}
+
+.preview-stat-value.warning {
+  color: #ef6c00;
+}
+
+.preview-hint {
+  margin: 10px 0 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #999;
+}
+
+.preview-conflicts {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #eceef5;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.preview-conflict {
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  flex-wrap: wrap;
+}
+
+.conflict-date {
+  color: #ef6c00;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.conflict-message {
+  color: #777;
+}
+
+.preview-conflicts {
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.conflicts-toggle {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #667eea;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.conflicts-toggle:hover {
+  color: #4a55b8;
+}
+
+/* ==================== МОБИЛЬНЫЕ ==================== */
+
+@media (max-width: 768px) {
+  .modal-content.wide {
+    max-width: 100%;
+  }
+
+  /* На узком экране поля слота встают в две строки: день и время
+     сверху, длительность и кабинет снизу, крестик остаётся справа */
+  .slot-row {
+    grid-template-columns: 1fr 1fr 36px;
+    grid-template-areas:
+      "day time remove"
+      "duration room remove";
+    row-gap: 6px;
+  }
+
+  .slot-row select:nth-of-type(1) {
+    grid-area: day;
+  }
+
+  .slot-row input[type='time'] {
+    grid-area: time;
+  }
+
+  .slot-row select:nth-of-type(2) {
+    grid-area: duration;
+  }
+
+  .slot-row select:nth-of-type(3) {
+    grid-area: room;
+  }
+
+  .slot-remove {
+    grid-area: remove;
+    height: 100%;
+  }
+
+  .preview-stats {
+    grid-template-columns: 1fr;
+  }
+}

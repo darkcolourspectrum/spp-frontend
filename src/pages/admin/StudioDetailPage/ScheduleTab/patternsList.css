@@ -167,7 +167,120 @@
   background: #ffebee;
 }
 
+/* Дни недели чипами в шапке карточки */
+.pattern-days {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.day-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  padding: 3px 7px;
+  background: #eef0fb;
+  color: #4a55b8;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pattern-card.inactive .day-chip {
+  background: #f0f0f0;
+  color: #999;
+}
+
+/* Строки слотов */
+.pattern-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.pattern-slot-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items: baseline;
+  font-size: 14px;
+}
+
+.slot-day {
+  color: #333;
+}
+
+.slot-time {
+  color: #333;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.slot-room {
+  color: #888;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* Метаданные шаблона */
+.pattern-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.meta-line {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.meta-line.accent {
+  color: #4a55b8;
+  font-weight: 500;
+}
+
+.meta-line.muted {
+  color: #aaa;
+}
+
+.pattern-notes {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: #fafafa;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* Кнопки в карточке */
+.pattern-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 14px;
+  margin-top: auto;
+}
+
+.btn-small {
+  padding: 7px 12px;
+  font-size: 13px;
+}
+
 /* Mobile */
+@media (max-width: 768px) {
+  .pattern-slot-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f5f5f5;
+  }
+}
+
 @media (max-width: 768px) {
   .patterns-grid {
     grid-template-columns: 1fr;

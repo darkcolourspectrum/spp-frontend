@@ -22,18 +22,77 @@ import type {
   ScheduleClassroomInfo,
   ScheduleStudioMember,
   ScheduleStudioMembersResponse,
+  RecurringPatternPreviewRequest,
+  RecurringPatternPreviewResponse,
+  RecurringPatternWithGeneration,
+  LessonCompleteRequest,
 } from './types';
 
 // ==================== RECURRING PATTERNS ====================
 
 /**
- * Создать шаблон повторяющегося занятия
+ * Предпросмотр шаблона.
+ * Считает будущие занятия и конфликты, ничего не создавая.
+ */
+export const previewRecurringPattern = async (
+  data: RecurringPatternPreviewRequest
+): Promise<RecurringPatternPreviewResponse> => {
+  const response = await apiClient.post(
+    '/api/schedule/recurring-patterns/preview',
+    data
+  );
+  return response.data;
+};
+
+/**
+ * Создать шаблон.
+ * Возвращает шаблон вместе с итогом генерации занятий.
  */
 export const createRecurringPattern = async (
   data: RecurringPatternCreate
-): Promise<RecurringPatternResponse> => {
+): Promise<RecurringPatternWithGeneration> => {
   const response = await apiClient.post('/api/schedule/recurring-patterns', data);
   return response.data;
+};
+
+/**
+ * Обновить шаблон.
+ * Если менялись слоты или период, будущие занятия пересобираются.
+ */
+export const updateRecurringPattern = async (
+  patternId: number,
+  data: RecurringPatternUpdate
+): Promise<RecurringPatternWithGeneration> => {
+  const response = await apiClient.patch(
+    `/api/schedule/recurring-patterns/${patternId}`,
+    data
+  );
+  return response.data;
+};
+
+/**
+ * Выключить шаблон. Занятия остаются, новые не генерируются.
+ */
+export const deactivateRecurringPattern = async (
+  patternId: number
+): Promise<RecurringPatternResponse> => {
+  const response = await apiClient.post(
+    `/api/schedule/recurring-patterns/${patternId}/deactivate`
+  );
+  return response.data;
+};
+
+/**
+ * Удалить шаблон.
+ * deleteFutureLessons удаляет и будущие занятия - прошлые не трогаются никогда.
+ */
+export const deleteRecurringPattern = async (
+  patternId: number,
+  deleteFutureLessons: boolean = false
+): Promise<void> => {
+  await apiClient.delete(`/api/schedule/recurring-patterns/${patternId}`, {
+    params: { delete_future_lessons: deleteFutureLessons },
+  });
 };
 
 /**
@@ -60,24 +119,6 @@ export const getRecurringPatternById = async (
 ): Promise<RecurringPatternResponse> => {
   const response = await apiClient.get(`/api/schedule/recurring-patterns/${patternId}`);
   return response.data;
-};
-
-/**
- * Обновить шаблон
- */
-export const updateRecurringPattern = async (
-  patternId: number,
-  data: RecurringPatternUpdate
-): Promise<RecurringPatternResponse> => {
-  const response = await apiClient.patch(`/api/schedule/recurring-patterns/${patternId}`, data);
-  return response.data;
-};
-
-/**
- * Удалить шаблон
- */
-export const deleteRecurringPattern = async (patternId: number): Promise<void> => {
-  await apiClient.delete(`/api/schedule/recurring-patterns/${patternId}`);
 };
 
 // ==================== LESSONS ====================
@@ -121,10 +162,28 @@ export const cancelLesson = async (
 };
 
 /**
- * Завершить занятие
+ * Отметить занятие проведённым.
  */
-export const completeLesson = async (lessonId: number): Promise<LessonResponse> => {
-  const response = await apiClient.post(`/api/schedule/lessons/${lessonId}/complete`);
+export const completeLesson = async (
+  lessonId: number,
+  attendance?: LessonCompleteRequest['attendance']
+): Promise<LessonResponse> => {
+  const body: LessonCompleteRequest = attendance ? { attendance } : {};
+  const response = await apiClient.post(
+    `/api/schedule/lessons/${lessonId}/complete`,
+    body
+  );
+  return response.data;
+};
+
+/**
+ * Вернуть отменённое занятие в расписание.
+ * Может вернуть 409, если время успели занять.
+ */
+export const restoreLesson = async (lessonId: number): Promise<LessonResponse> => {
+  const response = await apiClient.post(
+    `/api/schedule/lessons/${lessonId}/restore`
+  );
   return response.data;
 };
 
@@ -246,6 +305,9 @@ export const getScheduleStudioMembers = async (
 export default {
   // Recurring Patterns
   createRecurringPattern,
+  previewRecurringPattern,
+  deactivateRecurringPattern,
+  restoreLesson,
   getRecurringPatterns,
   getRecurringPatternById,
   updateRecurringPattern,

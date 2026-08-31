@@ -12,9 +12,12 @@ import { useSchedule } from '@/modules/schedule/hooks/useSchedule';
 import type { ScheduleLessonItem } from '@/api/schedule/types';
 import './createPatternModal.css';
 
-interface CancelLessonModalProps {
-  lesson: ScheduleLessonItem;
+interface CreateLessonModalProps {
   studioId: number;
+  teacherId?: number;
+  /** Предзаполнение при клике по слоту в календаре */
+  initialDate?: string;
+  initialTime?: string;
   onClose: () => void;
 }
 

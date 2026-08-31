@@ -2,7 +2,7 @@
  * Schedule Action Creators - async операции (thunks)
  */
 
-import { AppDispatch } from '@/store';
+import { AppDispatch, RootState } from '@/store';
 import * as scheduleApi from '@/api/schedule';
 import type {
   RecurringPatternCreate,
@@ -10,6 +10,8 @@ import type {
   LessonCreate,
   LessonUpdate,
   GenerateLessonsRequest,
+  RecurringPatternPreviewRequest,
+  AttendanceStatus,
 } from '@/api/schedule/types';
 import {
   setPatterns,
@@ -23,6 +25,50 @@ import {
   setError,
   setSuccessMessage,
 } from './scheduleReducer';
+
+/**
+ * Перечитать текущее расписание после мутации.
+ *
+ * Раньше каждая мутация решала это по-своему: отмена и перенос вручную
+ * диспатчили fetchStudioSchedule, а создание занятия не делало ничего -
+ * занятие появлялось в базе, но не на экране до нажатия "Обновить".
+ *
+ * Контекст берётся из filters, поэтому один и тот же вызов работает
+ * на экране студии, преподавателя и ученика.
+ */
+export const refreshCurrentSchedule = () => {
+  return async (dispatch: AppDispatch, getState: () => RootState) => {
+    const { studioId, teacherId, studentId, fromDate, toDate } =
+      getState().schedule.filters;
+
+    if (studioId) {
+      return dispatch(fetchStudioSchedule(studioId, fromDate, toDate));
+    }
+    if (teacherId) {
+      return dispatch(fetchTeacherSchedule(teacherId, fromDate, toDate));
+    }
+    if (studentId) {
+      return dispatch(fetchStudentSchedule(studentId, fromDate, toDate));
+    }
+  };
+};
+
+/**
+ * Предпросмотр шаблона. В стор ничего не пишет - результат возвращается
+ * вызывающей форме, она держит его в локальном состоянии.
+ */
+export const previewRecurringPattern = (data: RecurringPatternPreviewRequest) => {
+  return async (dispatch: AppDispatch) => {
+    try {
+      return await scheduleApi.previewRecurringPattern(data);
+    } catch (error: any) {
+      const message =
+        error.response?.data?.detail || 'Не удалось рассчитать предпросмотр';
+      dispatch(setError(message));
+      throw error;
+    }
+  };
+};
 
 // ==================== RECURRING PATTERNS ====================
 
@@ -51,24 +97,27 @@ export const fetchRecurringPatterns = (
   };
 };
 
-/**
- * Создать новый шаблон
- */
+//create pattern
 export const createRecurringPattern = (data: RecurringPatternCreate) => {
   return async (dispatch: AppDispatch) => {
     try {
       dispatch(setSubmitting(true));
-      
-      const newPattern = await scheduleApi.createRecurringPattern(data);
-      
-      dispatch(addPattern(newPattern));
-      dispatch(setSuccessMessage('Шаблон успешно создан'));
-      
-      return newPattern;
+
+      const result = await scheduleApi.createRecurringPattern(data);
+
+      dispatch(addPattern(result.pattern));
+      dispatch(
+        setSuccessMessage(
+          `Шаблон создан, занятий добавлено: ${result.generation.created_count}`
+        )
+      );
+      await dispatch(refreshCurrentSchedule());
+
+      return result;
     } catch (error: any) {
-      console.error('Failed to create recurring pattern:', error);
-      const errorMessage = error.response?.data?.detail || 'Не удалось создать шаблон';
-      dispatch(setError(errorMessage));
+      const message =
+        error.response?.data?.detail || 'Не удалось создать шаблон';
+      dispatch(setError(message));
       throw error;
     } finally {
       dispatch(setSubmitting(false));
@@ -76,24 +125,26 @@ export const createRecurringPattern = (data: RecurringPatternCreate) => {
   };
 };
 
-/**
- * Обновить шаблон
- */
-export const updateRecurringPattern = (patternId: number, data: RecurringPatternUpdate) => {
+//update pattern
+export const updateRecurringPattern = (
+  patternId: number,
+  data: RecurringPatternUpdate
+) => {
   return async (dispatch: AppDispatch) => {
     try {
       dispatch(setSubmitting(true));
-      
-      const updatedPattern = await scheduleApi.updateRecurringPattern(patternId, data);
-      
-      dispatch(updatePatternAction(updatedPattern));
-      dispatch(setSuccessMessage('Шаблон успешно обновлен'));
-      
-      return updatedPattern;
+
+      const result = await scheduleApi.updateRecurringPattern(patternId, data);
+
+      dispatch(updatePatternAction(result.pattern));
+      dispatch(setSuccessMessage('Шаблон обновлён'));
+      await dispatch(refreshCurrentSchedule());
+
+      return result;
     } catch (error: any) {
-      console.error('Failed to update recurring pattern:', error);
-      const errorMessage = error.response?.data?.detail || 'Не удалось обновить шаблон';
-      dispatch(setError(errorMessage));
+      const message =
+        error.response?.data?.detail || 'Не удалось обновить шаблон';
+      dispatch(setError(message));
       throw error;
     } finally {
       dispatch(setSubmitting(false));
@@ -101,22 +152,24 @@ export const updateRecurringPattern = (patternId: number, data: RecurringPattern
   };
 };
 
-/**
- * Удалить шаблон
- */
-export const deleteRecurringPattern = (patternId: number) => {
+//delete pattern
+export const deleteRecurringPattern = (
+  patternId: number,
+  deleteFutureLessons: boolean = false
+) => {
   return async (dispatch: AppDispatch) => {
     try {
       dispatch(setSubmitting(true));
-      
-      await scheduleApi.deleteRecurringPattern(patternId);
-      
+
+      await scheduleApi.deleteRecurringPattern(patternId, deleteFutureLessons);
+
       dispatch(removePattern(patternId));
-      dispatch(setSuccessMessage('Шаблон успешно удален'));
+      dispatch(setSuccessMessage('Шаблон удалён'));
+      await dispatch(refreshCurrentSchedule());
     } catch (error: any) {
-      console.error('Failed to delete recurring pattern:', error);
-      const errorMessage = error.response?.data?.detail || 'Не удалось удалить шаблон';
-      dispatch(setError(errorMessage));
+      const message =
+        error.response?.data?.detail || 'Не удалось удалить шаблон';
+      dispatch(setError(message));
       throw error;
     } finally {
       dispatch(setSubmitting(false));
@@ -141,6 +194,8 @@ export const createLesson = (data: LessonCreate) => {
       
       dispatch(setSuccessMessage('Занятие успешно создано'));
       
+      await dispatch(refreshCurrentSchedule());
+
       return newLesson;
     } catch (error: any) {
       console.error('Failed to create lesson:', error);
@@ -165,6 +220,8 @@ export const updateLesson = (lessonId: number, data: LessonUpdate) => {
       
       dispatch(setSuccessMessage('Занятие успешно обновлено'));
       
+      await dispatch(refreshCurrentSchedule());
+
       return updatedLesson;
     } catch (error: any) {
       console.error('Failed to update lesson:', error);
@@ -188,6 +245,7 @@ export const cancelLesson = (lessonId: number, reason?: string) => {
       await scheduleApi.cancelLesson(lessonId, reason);
       
       dispatch(setSuccessMessage('Занятие отменено'));
+      await dispatch(refreshCurrentSchedule());
     } catch (error: any) {
       console.error('Failed to cancel lesson:', error);
       const errorMessage = error.response?.data?.detail || 'Не удалось отменить занятие';
@@ -202,13 +260,14 @@ export const cancelLesson = (lessonId: number, reason?: string) => {
 /**
  * Завершить занятие
  */
-export const completeLesson = (lessonId: number) => {
+export const completeLesson = (lessonId: number, attendance?: Record<number, AttendanceStatus>) => {
   return async (dispatch: AppDispatch) => {
     try {
       dispatch(setSubmitting(true));
       
-      await scheduleApi.completeLesson(lessonId);
-      
+      await scheduleApi.completeLesson(lessonId, attendance);
+      await dispatch(refreshCurrentSchedule());
+
       dispatch(setSuccessMessage('Занятие завершено'));
     } catch (error: any) {
       console.error('Failed to complete lesson:', error);
@@ -236,6 +295,32 @@ export const markLessonAsMissed = (lessonId: number) => {
       console.error('Failed to mark lesson as missed:', error);
       const errorMessage = error.response?.data?.detail || 'Не удалось отметить занятие';
       dispatch(setError(errorMessage));
+      throw error;
+    } finally {
+      dispatch(setSubmitting(false));
+    }
+  };
+};
+
+/**
+ * Вернуть отменённое занятие в расписание.
+ * Бекенд проверит конфликты заново и вернёт 409, если слот занят.
+ */
+export const restoreLesson = (lessonId: number) => {
+  return async (dispatch: AppDispatch) => {
+    try {
+      dispatch(setSubmitting(true));
+
+      const lesson = await scheduleApi.restoreLesson(lessonId);
+
+      dispatch(setSuccessMessage('Занятие возвращено в расписание'));
+      await dispatch(refreshCurrentSchedule());
+
+      return lesson;
+    } catch (error: any) {
+      const message =
+        error.response?.data?.detail || 'Не удалось вернуть занятие';
+      dispatch(setError(message));
       throw error;
     } finally {
       dispatch(setSubmitting(false));

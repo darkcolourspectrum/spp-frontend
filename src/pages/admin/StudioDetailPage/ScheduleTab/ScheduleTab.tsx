@@ -3,12 +3,14 @@
  */
 
 import { useEffect, useState } from 'react';
+import { useAppDispatch } from '@/store/hooks';
+import { setStudioFilter } from '@/modules/schedule/store/scheduleSlice/scheduleReducer';
 import { useAuth } from '@/modules/auth/hooks/useAuth';
 import { useSchedule } from '@/modules/schedule/hooks/useSchedule';
 import type { Studio } from '@/api/admin/types';
 import PatternsList from './PatternsList';
 import ScheduleCalendar from './ScheduleCalendar';
-import CreatePatternModal from './CreatePatternModal';
+import PatternFormModal from './PatternFormModal';
 import CreateLessonModal from './CreateLessonModal';
 import './scheduleTab.css';
 
@@ -19,6 +21,7 @@ interface ScheduleTabProps {
 
 const ScheduleTab = ({ studio, isReadOnly = false }: ScheduleTabProps) => {
   const { user } = useAuth();
+  const dispatch = useAppDispatch();
   const {
     patterns,
     lessons,
@@ -39,12 +42,23 @@ const ScheduleTab = ({ studio, isReadOnly = false }: ScheduleTabProps) => {
   const [activeView, setActiveView] = useState<'patterns' | 'calendar'>('patterns');
   
   useEffect(() => {
+    // Контекст для refreshCurrentSchedule: без него обновление после
+    // создания или отмены занятия не будет знать, что перечитывать.
+    dispatch(setStudioFilter(studio.id));
+
     // Шаблоны студии
     loadRecurringPatterns(studio.id);
     // Расписание на текущую неделю
     loadStudioSchedule(studio.id, filters.fromDate, filters.toDate);
     // Кабинеты студии (из локального кеша Schedule Service - доступно и преподу)
     loadStudioClassroomsForSchedule(studio.id);
+
+    // Уходим со страницы студии - контекст надо снять, иначе на экране
+    // расписания преподавателя обновление после мутации перечитает
+    // расписание студии вместо нужного.
+    return () => {
+      dispatch(setStudioFilter(null));
+    };
   }, [studio.id, filters.fromDate, filters.toDate]);
   
   const handleCreatePattern = () => {
@@ -147,9 +161,9 @@ const ScheduleTab = ({ studio, isReadOnly = false }: ScheduleTabProps) => {
       
       {/* Modals */}
       {showCreateModal && (
-        <CreatePatternModal
+        <PatternFormModal
           studioId={studio.id}
-          teacherId={user?.id}
+          teacherId={isReadOnly ? user?.id : undefined}
           onClose={() => setShowCreateModal(false)}
         />
       )} {showCreateLessonModal && (

@@ -11,10 +11,28 @@ import './createPatternModal.css';
 interface CreateLessonModalProps {
   studioId: number;
   teacherId?: number;
+  /** Предзаполнение при клике по слоту в календаре */
+  initialDate?: string;
+  initialTime?: string;
   onClose: () => void;
 }
 
-const CreateLessonModal = ({ studioId, teacherId, onClose }: CreateLessonModalProps) => {
+// toISOString() возвращает дату по UTC: в Томске (+07) до семи утра это
+// вчерашний день. Форма подставляла бы вчера как дату занятия.
+const formatLocalDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const CreateLessonModal = ({
+  studioId,
+  teacherId,
+  initialDate,
+  initialTime,
+  onClose,
+}: CreateLessonModalProps) => {
   const {
     addLesson,
     isSubmitting,
@@ -29,8 +47,8 @@ const CreateLessonModal = ({ studioId, teacherId, onClose }: CreateLessonModalPr
     studio_id: studioId,
     teacher_id: teacherId,
     classroom_id: null as number | null,
-    lesson_date: new Date().toISOString().split('T')[0],
-    start_time: '10:00',
+    lesson_date: initialDate ?? formatLocalDate(new Date()),
+    start_time: initialTime ?? '10:00',
     duration_minutes: 60,
     student_ids: [] as number[],
     notes: '',

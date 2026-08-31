@@ -1,7 +1,7 @@
 /**
  * ScheduleCalendar - time-grid представление расписания студии.
  *
- * Layout: 6 колонок (Пн-Сб), слева шкала времени 09:00-21:00 шагом 30 мин.
+ * Layout: 7 колонок (Пн-Вс), слева шкала времени 09:00-21:00 шагом 30 мин.
  * Час = 60px по вертикали. Занятия рендерятся как абсолютно
  * позиционированные блоки внутри колонки своего дня:
  *   top    = (start - 09:00) в минутах * (60 / 60) px
@@ -9,14 +9,30 @@
  *
  * Наложения занятий в одном дне разруливаются упрощенно: каждое
  * занятие в группе пересекающихся получает width = 100/N% и left = i*100/N%.
+ *
+ * Что изменилось в этой версии:
+ *
+ *   1. Появилось воскресенье. Раньше сетка рисовала шесть колонок, Пн-Сб.
+ *      Шаблон при этом мог иметь слот на воскресенье, занятия создавались
+ *      и жили в базе, но в календаре их не было видно вообще.
+ *
+ *   2. Клик по пустому месту создаёт занятие на этом слоте. Раньше
+ *      единственным входом была кнопка в шапке, открывавшая форму
+ *      с датой "сегодня" и временем 10:00 - нужный слот приходилось
+ *      вбивать руками, глядя на сетку.
+ *
+ *   3. Отменённое занятие можно вернуть в расписание кнопкой на блоке.
  */
 
 import { useMemo, useState, useEffect } from 'react';
 import { useSchedule } from '@/modules/schedule/hooks/useSchedule';
 import { useAuth } from '@/modules/auth/hooks/useAuth';
+import { useAppDispatch } from '@/store/hooks';
+import { restoreLesson } from '@/modules/schedule/store/scheduleSlice/actionCreators';
 import type { ScheduleLessonItem } from '@/api/schedule/types';
 import CancelLessonModal from './CancelLessonModal';
 import RescheduleLessonModal from './RescheduleLessonModal';
+import CreateLessonModal from './CreateLessonModal';
 import './scheduleCalendar.css';
 
 interface ScheduleCalendarProps {
@@ -34,6 +50,7 @@ const MINUTE_HEIGHT_PX = HOUR_HEIGHT_PX / 60;
 const SLOT_MINUTES = 30;        // шаг линий сетки
 
 const WEEKDAY_LABELS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+const DAYS_IN_WEEK = 6;
 
 // ====== Date helpers ======
 
@@ -63,13 +80,13 @@ const addDays = (date: Date, days: number): Date => {
 };
 
 const formatRangeLabel = (monday: Date): string => {
-  const saturday = addDays(monday, 5);
+  const lastDay = addDays(monday, DAYS_IN_WEEK - 1);
   const monthsFmt = new Intl.DateTimeFormat('ru-RU', { month: 'short' });
-  const sameMonth = monday.getMonth() === saturday.getMonth();
+  const sameMonth = monday.getMonth() === lastDay.getMonth();
   if (sameMonth) {
-    return `${monday.getDate()}-${saturday.getDate()} ${monthsFmt.format(monday)} ${monday.getFullYear()}`;
+    return `${monday.getDate()}-${lastDay.getDate()} ${monthsFmt.format(monday)} ${monday.getFullYear()}`;
   }
-  return `${monday.getDate()} ${monthsFmt.format(monday)} - ${saturday.getDate()} ${monthsFmt.format(saturday)} ${saturday.getFullYear()}`;
+  return `${monday.getDate()} ${monthsFmt.format(monday)} - ${lastDay.getDate()} ${monthsFmt.format(lastDay)} ${lastDay.getFullYear()}`;
 };
 
 // ====== Time helpers ======
@@ -159,27 +176,35 @@ const ScheduleCalendar = ({
 }: ScheduleCalendarProps) => {
   const { user, isAdmin } = useAuth();
   const { filters, updateDateRange } = useSchedule();
+  const dispatch = useAppDispatch();
 
   const [lessonToCancel, setLessonToCancel] =
     useState<ScheduleLessonItem | null>(null);
   const [lessonToReschedule, setLessonToReschedule] =
     useState<ScheduleLessonItem | null>(null);
-    // Текущее время (для линии "сейчас"). Обновляется раз в минуту.
+
+  // Слот, по которому кликнули для создания занятия
+  const [newLessonSlot, setNewLessonSlot] = useState<{
+    date: string;
+    time: string;
+  } | null>(null);
+
+  // Текущее время (для линии "сейчас"). Обновляется раз в минуту.
   const [now, setNow] = useState(new Date());
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 60_000);
-    
+
     return () => clearInterval(id);
   }, []);
 
-  // Парсим текущий "Пн" из фильтров (от него считаем 6 дней вперед).
+  // Парсим текущий "Пн" из фильтров (от него считаем 7 дней вперед).
   const currentMonday = useMemo(() => {
     const [y, m, d] = filters.fromDate.split('-').map(Number);
     return new Date(y, m - 1, d);
   }, [filters.fromDate]);
 
   const weekDays = useMemo(() => {
-    return Array.from({ length: 6 }, (_, i) => addDays(currentMonday, i));
+    return Array.from({ length: DAYS_IN_WEEK }, (_, i) => addDays(currentMonday, i));
   }, [currentMonday]);
 
   // Группируем занятия по дате
@@ -202,6 +227,7 @@ const ScheduleCalendar = ({
   // Проверка прав на управление занятием
   const todayStr = formatLocalDate(new Date());
   const currentUserId = user?.id;
+
   const canManageLesson = (lesson: ScheduleLessonItem): boolean => {
     if (isReadOnly) return false;
     if (lesson.status !== 'scheduled') return false;
@@ -210,33 +236,79 @@ const ScheduleCalendar = ({
     return lesson.teacher_id === currentUserId;
   };
 
+  /**
+   * Отменённое занятие можно вернуть в расписание.
+   * canManageLesson для него false - у отменённого другие действия.
+   */
+  const canRestoreLesson = (lesson: ScheduleLessonItem): boolean => {
+    if (isReadOnly) return false;
+    if (lesson.status !== 'cancelled') return false;
+    if (lesson.lesson_date < todayStr) return false;
+    if (isAdmin()) return true;
+    return lesson.teacher_id === currentUserId;
+  };
+
+  const handleRestore = (lesson: ScheduleLessonItem) => {
+    // Сервер проверит конфликты заново: пока занятие было отменено,
+    // его время считалось свободным и могло быть занято.
+    dispatch(restoreLesson(lesson.lesson_id));
+  };
+
+  /**
+   * Клик по пустому месту в колонке дня создаёт занятие.
+   *
+   * Время берётся из координаты клика и округляется вниз до получаса,
+   * чтобы занятия ложились на линии сетки.
+   */
+  const handleGridClick = (
+    event: React.MouseEvent<HTMLDivElement>,
+    dayStr: string
+  ) => {
+    if (isReadOnly) return;
+    if (dayStr < todayStr) return;
+
+    // Клик пришёлся на существующее занятие - это не создание нового.
+    if ((event.target as HTMLElement).closest('.lesson-block')) return;
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const minutesFromOpen = (event.clientY - rect.top) / MINUTE_HEIGHT_PX;
+    const snapped = Math.floor(minutesFromOpen / SLOT_MINUTES) * SLOT_MINUTES;
+
+    const maxStart = (STUDIO_CLOSE_HOUR - STUDIO_OPEN_HOUR) * 60 - SLOT_MINUTES;
+    const clamped = Math.min(Math.max(snapped, 0), maxStart);
+    const totalMinutes = STUDIO_OPEN_HOUR * 60 + clamped;
+
+    const hh = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
+    const mm = String(totalMinutes % 60).padStart(2, '0');
+
+    setNewLessonSlot({ date: dayStr, time: `${hh}:${mm}` });
+  };
+
   // Навигация недель
   const shiftWeek = (offsetDays: number) => {
     const newMonday = addDays(currentMonday, offsetDays);
-    const newSaturday = addDays(newMonday, 5);
-    updateDateRange(formatLocalDate(newMonday), formatLocalDate(newSaturday));
+    const newLastDay = addDays(newMonday, DAYS_IN_WEEK - 1);
+    updateDateRange(formatLocalDate(newMonday), formatLocalDate(newLastDay));
   };
 
   const goToToday = () => {
     const monday = getMonday(new Date());
-    const saturday = addDays(monday, 5);
-    updateDateRange(formatLocalDate(monday), formatLocalDate(saturday));
+    const lastDay = addDays(monday, DAYS_IN_WEEK - 1);
+    updateDateRange(formatLocalDate(monday), formatLocalDate(lastDay));
   };
 
   const totalGridHeight =
     (STUDIO_CLOSE_HOUR - STUDIO_OPEN_HOUR) * HOUR_HEIGHT_PX;
 
   // Позиция "линии сейчас" в пикселях от начала сетки и индекс
-  // колонки текущего дня (0-5 для Пн-Сб, или -1 если сегодня воскресенье).
+  // колонки текущего дня.
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
   const dayStartMin = STUDIO_OPEN_HOUR * 60;
   const dayEndMin = STUDIO_CLOSE_HOUR * 60;
   const showNowLine = nowMinutes >= dayStartMin && nowMinutes <= dayEndMin;
   const nowLineTop = (nowMinutes - dayStartMin) * MINUTE_HEIGHT_PX;
 
-  const todayDayIdx = weekDays.findIndex(
-    (d) => formatLocalDate(d) === todayStr
-  );
+  const todayDayIdx = weekDays.findIndex((d) => formatLocalDate(d) === todayStr);
 
   return (
     <div className="schedule-calendar">
@@ -308,13 +380,14 @@ const ScheduleCalendar = ({
               className="now-line"
               style={{
                 top: nowLineTop,
-                left: `calc(${(todayDayIdx * 100) / 6}%)`,
-                width: `calc(${100 / 6}%)`,
+                left: `calc(${(todayDayIdx * 100) / DAYS_IN_WEEK}%)`,
+                width: `calc(${100 / DAYS_IN_WEEK}%)`,
               }}
             >
               <div className="now-line-dot" />
             </div>
           )}
+
           {/* Горизонтальные линии сетки */}
           <div className="grid-lines">
             {Array.from(
@@ -336,55 +409,86 @@ const ScheduleCalendar = ({
             )}
           </div>
 
-          {/* 6 колонок дней */}
+          {/* Колонки дней */}
           {weekDays.map((day) => {
             const dayStr = formatLocalDate(day);
             const dayLessons = lessonsByDate[dayStr] || [];
             const positioned = layoutDay(dayLessons);
             const isToday = dayStr === todayStr;
+            const isClickable = !isReadOnly && dayStr >= todayStr;
 
             return (
-              <div key={dayStr} className={`day-column ${isToday ? 'is-today' : ''}`}>
-                {positioned.map(({ lesson, top, height, leftPercent, widthPercent }) => (
-                  <div
-                    key={lesson.lesson_id}
-                    className={`lesson-block status-${lesson.status}`}
-                    style={{
-                      top,
-                      height,
-                      left: `calc(${leftPercent}% + 2px)`,
-                      width: `calc(${widthPercent}% - 4px)`,
-                    }}
-                  >
-                    {canManageLesson(lesson) && (
-                      <div className="lesson-block-actions">
-                        <button
-                          type="button"
-                          className="lesson-action-btn reschedule"
-                          title="Перенести"
-                          onClick={() => setLessonToReschedule(lesson)}
-                        >
-                          ↻
-                        </button>
-                        <button
-                          type="button"
-                          className="lesson-action-btn cancel"
-                          title="Отменить"
-                          onClick={() => setLessonToCancel(lesson)}
-                        >
-                          ×
-                        </button>
+              <div
+                key={dayStr}
+                className={`day-column ${isToday ? 'is-today' : ''} ${
+                  isClickable ? 'clickable' : ''
+                }`}
+                onClick={(event) => handleGridClick(event, dayStr)}
+                title={
+                  isClickable ? 'Нажмите, чтобы создать занятие' : undefined
+                }
+              >
+                {positioned.map(
+                  ({ lesson, top, height, leftPercent, widthPercent }) => (
+                    <div
+                      key={lesson.lesson_id}
+                      className={`lesson-block status-${lesson.status}`}
+                      style={{
+                        top,
+                        height,
+                        left: `calc(${leftPercent}% + 2px)`,
+                        width: `calc(${widthPercent}% - 4px)`,
+                      }}
+                    >
+                      {canManageLesson(lesson) && (
+                        <div className="lesson-block-actions">
+                          <button
+                            type="button"
+                            className="lesson-action-btn reschedule"
+                            title="Перенести"
+                            onClick={() => setLessonToReschedule(lesson)}
+                          >
+                            ↻
+                          </button>
+                          <button
+                            type="button"
+                            className="lesson-action-btn cancel"
+                            title="Отменить"
+                            onClick={() => setLessonToCancel(lesson)}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      )}
+
+                      {canRestoreLesson(lesson) && (
+                        <div className="lesson-block-actions">
+                          <button
+                            type="button"
+                            className="lesson-action-btn restore"
+                            title="Вернуть в расписание"
+                            onClick={() => handleRestore(lesson)}
+                          >
+                            ↺
+                          </button>
+                        </div>
+                      )}
+
+                      <div className="lesson-block-time">
+                        {trimSeconds(lesson.start_time)}-
+                        {trimSeconds(lesson.end_time)}
                       </div>
-                    )}
-                    <div className="lesson-block-time">
-                      {trimSeconds(lesson.start_time)}-{trimSeconds(lesson.end_time)}
+                      <div className="lesson-block-title">
+                        {lesson.teacher_name}
+                      </div>
+                      {lesson.classroom_name && (
+                        <div className="lesson-block-meta">
+                          {lesson.classroom_name}
+                        </div>
+                      )}
                     </div>
-                    <div className="lesson-block-title">{lesson.teacher_name}</div>
-                    {lesson.classroom_name && (
-                      <div className="lesson-block-meta">{lesson.classroom_name}</div>
-                    )}
-                  </div>
-                ))}
+                  )
+                )}
               </div>
             );
           })}
@@ -392,6 +496,16 @@ const ScheduleCalendar = ({
       </div>
 
       {isLoading && <div className="calendar-loading-overlay">Загрузка...</div>}
+
+      {newLessonSlot && (
+        <CreateLessonModal
+          studioId={studioId}
+          teacherId={isAdmin() ? undefined : currentUserId}
+          initialDate={newLessonSlot.date}
+          initialTime={newLessonSlot.time}
+          onClose={() => setNewLessonSlot(null)}
+        />
+      )}
 
       {lessonToCancel && (
         <CancelLessonModal
