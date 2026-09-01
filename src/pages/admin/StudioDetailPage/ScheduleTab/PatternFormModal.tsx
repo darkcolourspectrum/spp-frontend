@@ -145,12 +145,19 @@ const PatternFormModal = ({
     (pattern?.week_interval as 1 | 2) ?? 1
   );
   const [slots, setSlots] = useState<RecurringPatternSlotCreate[]>(
-    pattern?.slots.map((slot) => ({
-      day_of_week: slot.day_of_week,
-      start_time: slot.start_time.slice(0, 5),
-      duration_minutes: slot.duration_minutes,
-      classroom_id: slot.classroom_id,
-    })) ?? [makeEmptySlot()]
+    // Проверяем длину, а не только наличие: ?? срабатывает лишь на
+    // null и undefined, а пустой массив - валидное значение, и форма
+    // молча оставалась бы без единой строки. В режиме правки это
+    // особенно опасно: сохранение заменяет набор слотов целиком,
+    // то есть пустая форма стирает всё расписание шаблона.
+    pattern?.slots?.length
+      ? pattern.slots.map((slot) => ({
+          day_of_week: slot.day_of_week,
+          start_time: slot.start_time.slice(0, 5),
+          duration_minutes: slot.duration_minutes,
+          classroom_id: slot.classroom_id,
+        }))
+      : [makeEmptySlot()]
   );
   const [studentIds, setStudentIds] = useState<number[]>(
     pattern?.student_ids ?? []
