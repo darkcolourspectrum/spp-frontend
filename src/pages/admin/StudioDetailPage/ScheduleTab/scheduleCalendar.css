@@ -187,12 +187,27 @@
   z-index: 5;
 }
 
-.lesson-block.status-cancelled {
-  background: #ffebee;
-  border-left-color: #f44336;
+/* Отменённое занятие - не блок, а след. Узкая штриховая полоска
+   в жёлобе слева, не отнимающая места у реальных занятий. */
+.lesson-block.is-marker {
+  padding: 0;
+  border: none;
+  border-radius: 3px;
   z-index: 0;
-  opacity: 0.55;
-  text-decoration: line-through;
+  opacity: 0.8;
+  cursor: pointer;
+  background: repeating-linear-gradient(
+    45deg,
+    #f2b8b8,
+    #f2b8b8 3px,
+    #fadede 3px,
+    #fadede 6px
+  );
+  text-decoration: none;
+}
+
+.lesson-block.is-marker:hover {
+  opacity: 1;
 }
 
 .lesson-block.status-completed {
@@ -330,4 +345,145 @@
   .lesson-block-actions {
     opacity: 1;
   }
+}
+
+/* ==================== Легенда ==================== */
+
+.schedule-legend {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.legend-toggle {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid #e2e5ea;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 13px;
+  line-height: 1;
+  color: #a0a6b1;
+  cursor: pointer;
+}
+
+.legend-toggle:hover {
+  border-color: #c9cfd8;
+  color: #2b313e;
+}
+
+.legend-toggle:hover {
+  border-color: #c9cfd8;
+  color: #2b313e;
+}
+
+.legend-caret.open {
+  transform: rotate(180deg);
+}
+
+.legend-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  width: 420px;
+  padding: 14px 16px;
+  background: #fff;
+  border: 1px solid #e2e5ea;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(20, 25, 40, 0.12);
+}
+
+.legend-group + .legend-group {
+  margin-top: 14px;
+}
+
+.legend-group-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #a0a6b1;
+  margin-bottom: 7px;
+}
+
+.legend-row {
+  display: grid;
+  grid-template-columns: 14px 150px 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 13px;
+}
+
+.legend-row.plain {
+  display: block;
+  color: #6b7280;
+  padding-left: 22px;
+  text-indent: -22px;
+}
+
+.legend-row.plain::before {
+  content: '- ';
+  color: #c9cfd8;
+}
+
+.legend-label {
+  color: #2b313e;
+}
+
+.legend-hint {
+  color: #8a909e;
+  font-size: 12px;
+}
+
+/* Образцы повторяют вид блоков в сетке. Цвета продублированы, а не
+   унаследованы от .lesson-block: у того есть позиционирование
+   и размеры, которые образцу не нужны. */
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border-left: 3px solid transparent;
+}
+
+.legend-swatch.status-scheduled {
+  background: #e3f2fd;
+  border-left-color: #1976d2;
+}
+
+.legend-swatch.status-completed {
+  background: #e8f5e9;
+  border-left-color: #2e7d32;
+}
+
+.legend-swatch.status-missed {
+  background: #fff3e0;
+  border-left-color: #e65100;
+}
+
+.legend-swatch.status-teacher_missed {
+  background: #f3e5f5;
+  border-left-color: #9c27b0;
+}
+
+.legend-swatch.needs-review {
+  background: #fff8e1;
+  border: 1px dashed #ffb300;
+  border-left: 3px solid #ffb300;
+}
+
+.legend-swatch.is-marker {
+  width: 8px;
+  border-left: none;
+  background: repeating-linear-gradient(
+    45deg,
+    #f2b8b8,
+    #f2b8b8 3px,
+    #fadede 3px,
+    #fadede 6px
+  );
 }
