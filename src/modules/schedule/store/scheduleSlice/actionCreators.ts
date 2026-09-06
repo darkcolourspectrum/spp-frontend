@@ -289,12 +289,36 @@ export const markLessonAsMissed = (lessonId: number) => {
       dispatch(setSubmitting(true));
       
       await scheduleApi.markLessonAsMissed(lessonId);
-      
+      await dispatch(refreshCurrentSchedule());
+
       dispatch(setSuccessMessage('Занятие отмечено как пропущенное'));
     } catch (error: any) {
       console.error('Failed to mark lesson as missed:', error);
       const errorMessage = error.response?.data?.detail || 'Не удалось отметить занятие';
       dispatch(setError(errorMessage));
+      throw error;
+    } finally {
+      dispatch(setSubmitting(false));
+    }
+  };
+};
+
+/**
+ * Отметить, что занятие сорвалось по вине преподавателя.
+ */
+export const markLessonAsTeacherMissed = (lessonId: number) => {
+  return async (dispatch: AppDispatch) => {
+    try {
+      dispatch(setSubmitting(true));
+
+      await scheduleApi.markLessonAsTeacherMissed(lessonId);
+
+      dispatch(setSuccessMessage('Занятие отмечено как сорванное'));
+      await dispatch(refreshCurrentSchedule());
+    } catch (error: any) {
+      const message =
+        error.response?.data?.detail || 'Не удалось отметить занятие';
+      dispatch(setError(message));
       throw error;
     } finally {
       dispatch(setSubmitting(false));
@@ -337,7 +361,8 @@ export const deleteLesson = (lessonId: number) => {
       dispatch(setSubmitting(true));
       
       await scheduleApi.deleteLesson(lessonId);
-      
+      await dispatch(refreshCurrentSchedule());
+
       dispatch(setSuccessMessage('Занятие удалено'));
     } catch (error: any) {
       console.error('Failed to delete lesson:', error);

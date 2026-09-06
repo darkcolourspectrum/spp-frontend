@@ -7,23 +7,18 @@
 
 import { useState } from 'react';
 import { useAppDispatch } from '@/store/hooks';
-import { cancelLesson, fetchStudioSchedule } from '@/modules/schedule/store';
+import { cancelLesson } from '@/modules/schedule/store';
 import { useSchedule } from '@/modules/schedule/hooks/useSchedule';
 import type { ScheduleLessonItem } from '@/api/schedule/types';
 import './createPatternModal.css';
 
-interface CreateLessonModalProps {
-  studioId: number;
-  teacherId?: number;
-  /** Предзаполнение при клике по слоту в календаре */
-  initialDate?: string;
-  initialTime?: string;
+interface CancelLessonModalProps {
+  lesson: ScheduleLessonItem;
   onClose: () => void;
 }
-
-const CancelLessonModal = ({ lesson, studioId, onClose }: CancelLessonModalProps) => {
+const CancelLessonModal = ({ lesson, onClose }: CancelLessonModalProps) => {
   const dispatch = useAppDispatch();
-  const { isSubmitting, filters } = useSchedule();
+  const { isSubmitting } = useSchedule();
   const [reason, setReason] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -31,8 +26,6 @@ const CancelLessonModal = ({ lesson, studioId, onClose }: CancelLessonModalProps
     setError(null);
     try {
       await dispatch(cancelLesson(lesson.lesson_id, reason.trim() || undefined));
-      // Перезагружаем расписание студии за тот же диапазон, чтобы UI обновился
-      await dispatch(fetchStudioSchedule(studioId, filters.fromDate, filters.toDate));
       onClose();
     } catch (e: any) {
       setError(e?.response?.data?.detail || 'Не удалось отменить занятие');

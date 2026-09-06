@@ -17,6 +17,7 @@ import {
   cancelLesson,
   completeLesson,
   markLessonAsMissed,
+  markLessonAsTeacherMissed,
   deleteLesson,
   generateLessons,
   clearError,
@@ -32,6 +33,7 @@ import type {
   LessonCreate,
   LessonUpdate,
   GenerateLessonsRequest,
+  LessonStatus,
 } from '@/api/schedule/types';
 
 export const useSchedule = () => {
@@ -124,6 +126,13 @@ export const useSchedule = () => {
     [dispatch]
   );
   
+  const handleMarkTeacherMissed = useCallback(
+    (lessonId: number) => {
+      return dispatch(markLessonAsTeacherMissed(lessonId));
+    },
+    [dispatch]
+  );
+
   const removeLesson = useCallback(
     (lessonId: number) => {
       return dispatch(deleteLesson(lessonId));
@@ -228,11 +237,12 @@ export const useSchedule = () => {
   
   // Количество занятий по статусам
   const lessonStats = useMemo(() => {
-    const stats = {
+    const stats: Record<LessonStatus, number> = {
       scheduled: 0,
       completed: 0,
       cancelled: 0,
       missed: 0,
+      teacher_missed: 0,
     };
     
     lessons.forEach((lesson) => {
@@ -280,6 +290,7 @@ export const useSchedule = () => {
     handleCancelLesson,
     handleCompleteLesson,
     handleMarkLessonAsMissed,
+    handleMarkTeacherMissed,
     removeLesson,
     
     // Actions - Schedule

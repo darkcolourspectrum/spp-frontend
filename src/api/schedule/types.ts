@@ -125,8 +125,17 @@ export const CONFLICT_KIND_LABELS: Record<ConflictKind, string> = {
 
 export interface LessonStudentInfo {
   student_id: number;
+  student_name: string | null;
   attendance_status: 'scheduled' | 'attended' | 'missed' | 'cancelled';
 }
+
+/** Статус занятия. Один источник для всех мест, где статусы перечисляются. */
+export type LessonStatus =
+  | 'scheduled'
+  | 'completed'
+  | 'cancelled'
+  | 'missed'
+  | 'teacher_missed';
 
 export interface Lesson {
   id: number;
@@ -137,7 +146,7 @@ export interface Lesson {
   lesson_date: string; // "YYYY-MM-DD"
   start_time: string; // "HH:MM"
   end_time: string; // "HH:MM"
-  status: 'scheduled' | 'completed' | 'cancelled' | 'missed';
+    status: LessonStatus;
   notes: string | null;
   cancellation_reason: string | null;
   created_at: string;
@@ -147,6 +156,14 @@ export interface Lesson {
 export interface LessonResponse extends Lesson {
   students: LessonStudentInfo[];
   is_recurring: boolean;
+  has_ended: boolean;
+}
+
+/** Ответ GET /lessons/{id}: то же самое плюс имена для карточки. */
+export interface LessonWithDetails extends LessonResponse {
+  teacher_name: string | null;
+  classroom_name: string | null;
+  studio_name: string | null;
 }
 
 export interface LessonCreate {
@@ -179,6 +196,12 @@ export interface LessonCompleteRequest {
   attendance?: Record<number, AttendanceStatus>;
 }
 
+export interface LessonWithDetails extends LessonResponse {
+  teacher_name: string | null;
+  classroom_name: string | null;
+  studio_name: string | null;
+}
+
 // ==================== SCHEDULE ====================
 
 export interface ScheduleLessonItem {
@@ -186,7 +209,7 @@ export interface ScheduleLessonItem {
   lesson_date: string;
   start_time: string;
   end_time: string;
-  status: 'scheduled' | 'completed' | 'cancelled' | 'missed';
+  status: LessonStatus;
   teacher_id: number;
   teacher_name: string;
   classroom_id: number | null;
@@ -194,6 +217,7 @@ export interface ScheduleLessonItem {
   student_ids: number[];
   student_names: string[];
   is_recurring: boolean;
+  has_ended: boolean;
   notes: string | null;
 }
 
@@ -223,6 +247,7 @@ export interface StudentScheduleResponse {
   lessons: ScheduleLessonItem[];
   total: number;
 }
+
 
 // ==================== GENERATION ====================
 
@@ -346,6 +371,7 @@ export const LESSON_STATUS_LABELS: Record<string, string> = {
   completed: 'Завершено',
   cancelled: 'Отменено',
   missed: 'Пропущено',
+  teacher_missed: 'Сорвано преподавателем',
 };
 
 export const ATTENDANCE_STATUS_LABELS: Record<string, string> = {

@@ -9,6 +9,7 @@ import type {
   RecurringPatternUpdate,
   RecurringPatternListResponse,
   LessonResponse,
+  LessonWithDetails,
   LessonCreate,
   LessonUpdate,
   StudioScheduleResponse,
@@ -134,7 +135,7 @@ export const createLesson = async (data: LessonCreate): Promise<LessonResponse> 
 /**
  * Получить занятие по ID
  */
-export const getLessonById = async (lessonId: number): Promise<LessonResponse> => {
+export const getLessonById = async (lessonId: number): Promise<LessonWithDetails> => {
   const response = await apiClient.get(`/api/schedule/lessons/${lessonId}`);
   return response.data;
 };
@@ -192,6 +193,19 @@ export const restoreLesson = async (lessonId: number): Promise<LessonResponse> =
  */
 export const markLessonAsMissed = async (lessonId: number): Promise<LessonResponse> => {
   const response = await apiClient.post(`/api/schedule/lessons/${lessonId}/mark-missed`);
+  return response.data;
+};
+
+/**
+ * Отметить, что занятие сорвалось по вине преподавателя.
+ * Ученикам при этом ставится 'cancelled', а не пропуск.
+ */
+export const markLessonAsTeacherMissed = async (
+  lessonId: number
+): Promise<LessonResponse> => {
+  const response = await apiClient.post(
+    `/api/schedule/lessons/${lessonId}/mark-teacher-missed`
+  );
   return response.data;
 };
 

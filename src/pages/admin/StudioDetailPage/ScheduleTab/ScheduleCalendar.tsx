@@ -1,7 +1,7 @@
 /**
  * ScheduleCalendar - time-grid представление расписания студии.
  *
- * Layout: 7 колонок (Пн-Вс), слева шкала времени 09:00-21:00 шагом 30 мин.
+ * Layout: 6 колонок (Пн-Сб), слева шкала времени 09:00-21:00 шагом 30 мин.
  * Час = 60px по вертикали. Занятия рендерятся как абсолютно
  * позиционированные блоки внутри колонки своего дня:
  *   top    = (start - 09:00) в минутах * (60 / 60) px
@@ -33,6 +33,7 @@ import type { ScheduleLessonItem } from '@/api/schedule/types';
 import CancelLessonModal from './CancelLessonModal';
 import RescheduleLessonModal from './RescheduleLessonModal';
 import CreateLessonModal from './CreateLessonModal';
+import LessonCard from './LessonCard';
 import './scheduleCalendar.css';
 
 interface ScheduleCalendarProps {
@@ -115,55 +116,116 @@ interface PositionedLesson {
  * где оно не пересекается с уже размещенным; ширина дня делится на
  * максимальное число параллельных колонок.
  */
+/**
+ * Распределяет занятия одного дня по горизонтали с учётом пересечений.
+ *
+ * Работает в два прохода. Сначала день режется на группы: занятия
+ * попадают в одну группу, если их интервалы соприкасаются хотя бы
+ * через цепочку соседей. Затем внутри каждой группы отдельно считаются
+ * колонки, и ширина делится только на них.
+ *
+ * Раньше колонки считались на весь день сразу, и ширина по максимуму
+ * применялась ко всем занятиям подряд. Одной пары пересечений в девять
+ * утра хватало, чтобы одинокое занятие в шесть вечера тоже ужалось
+ * вдвое.
+ *
+ * Отменённые занятия в раскладке не участвуют: отмена освобождает слот,
+ * и такое занятие ни с чем не конкурирует за место. Оно рисуется на всю
+ * ширину и уезжает назад по z-index, а активные раскладываются так,
+ * будто его нет.
+ */
 const layoutDay = (dayLessons: ScheduleLessonItem[]): PositionedLesson[] => {
-  const sorted = [...dayLessons].sort((a, b) =>
-    a.start_time.localeCompare(b.start_time)
-  );
+  const dayStartMin = STUDIO_OPEN_HOUR * 60;
 
-  // columns[i] = массив занятий в i-й колонке
-  const columns: ScheduleLessonItem[][] = [];
-  const columnIndex = new Map<number, number>(); // lesson_id -> col idx
-
-  for (const lesson of sorted) {
+  const geometry = (lesson: ScheduleLessonItem) => {
     const startMin = timeToMinutes(lesson.start_time);
     const endMin = timeToMinutes(lesson.end_time);
-
-    let placed = false;
-    for (let i = 0; i < columns.length; i++) {
-      const last = columns[i][columns[i].length - 1];
-      const lastEnd = timeToMinutes(last.end_time);
-      if (lastEnd <= startMin) {
-        columns[i].push(lesson);
-        columnIndex.set(lesson.lesson_id, i);
-        placed = true;
-        break;
-      }
-    }
-    if (!placed) {
-      columns.push([lesson]);
-      columnIndex.set(lesson.lesson_id, columns.length - 1);
-    }
-    // Переменная endMin зарезервирована для возможного расширения
-    void endMin;
-  }
-
-  const totalCols = columns.length || 1;
-  const colWidthPercent = 100 / totalCols;
-
-  return sorted.map((lesson) => {
-    const startMin = timeToMinutes(lesson.start_time);
-    const endMin = timeToMinutes(lesson.end_time);
-    const dayStartMin = STUDIO_OPEN_HOUR * 60;
-    const col = columnIndex.get(lesson.lesson_id) ?? 0;
-
     return {
-      lesson,
       top: (startMin - dayStartMin) * MINUTE_HEIGHT_PX,
       height: (endMin - startMin) * MINUTE_HEIGHT_PX,
-      leftPercent: col * colWidthPercent,
-      widthPercent: colWidthPercent,
     };
-  });
+  };
+
+  const cancelled = dayLessons.filter((l) => l.status === 'cancelled');
+  const active = [...dayLessons]
+    .filter((l) => l.status !== 'cancelled')
+    .sort((a, b) => a.start_time.localeCompare(b.start_time));
+
+  const positioned: PositionedLesson[] = [];
+
+  // Проход первый: режем день на группы пересекающихся занятий.
+  // Занятия отсортированы по началу, поэтому группа заканчивается там,
+  // где очередное занятие стартует не раньше конца всей текущей группы.
+  let group: ScheduleLessonItem[] = [];
+  let groupEndMin = -1;
+
+  const flushGroup = () => {
+    if (group.length === 0) return;
+
+    // Проход второй: колонки внутри группы. Занятие садится в первую
+    // колонку, где не пересекается с последним её жильцом.
+    const columns: ScheduleLessonItem[][] = [];
+    const columnIndex = new Map<number, number>();
+
+    for (const lesson of group) {
+      const startMin = timeToMinutes(lesson.start_time);
+      let placed = false;
+
+      for (let i = 0; i < columns.length; i++) {
+        const last = columns[i][columns[i].length - 1];
+        if (timeToMinutes(last.end_time) <= startMin) {
+          columns[i].push(lesson);
+          columnIndex.set(lesson.lesson_id, i);
+          placed = true;
+          break;
+        }
+      }
+
+      if (!placed) {
+        columns.push([lesson]);
+        columnIndex.set(lesson.lesson_id, columns.length - 1);
+      }
+    }
+
+    const colWidthPercent = 100 / (columns.length || 1);
+
+    for (const lesson of group) {
+      const col = columnIndex.get(lesson.lesson_id) ?? 0;
+      positioned.push({
+        lesson,
+        ...geometry(lesson),
+        leftPercent: col * colWidthPercent,
+        widthPercent: colWidthPercent,
+      });
+    }
+
+    group = [];
+    groupEndMin = -1;
+  };
+
+  for (const lesson of active) {
+    const startMin = timeToMinutes(lesson.start_time);
+    const endMin = timeToMinutes(lesson.end_time);
+
+    if (group.length > 0 && startMin >= groupEndMin) {
+      flushGroup();
+    }
+
+    group.push(lesson);
+    groupEndMin = Math.max(groupEndMin, endMin);
+  }
+  flushGroup();
+
+  for (const lesson of cancelled) {
+    positioned.push({
+      lesson,
+      ...geometry(lesson),
+      leftPercent: 0,
+      widthPercent: 100,
+    });
+  }
+
+  return positioned;
 };
 
 // ====== Component ======
@@ -188,6 +250,10 @@ const ScheduleCalendar = ({
     date: string;
     time: string;
   } | null>(null);
+
+  // Занятие, открытое в карточке. Храним id, а не объект: карточка
+  // грузит данные сама, и ей достаточно одного числа.
+  const [openLessonId, setOpenLessonId] = useState<number | null>(null);
 
   // Текущее время (для линии "сейчас"). Обновляется раз в минуту.
   const [now, setNow] = useState(new Date());
@@ -231,7 +297,9 @@ const ScheduleCalendar = ({
   const canManageLesson = (lesson: ScheduleLessonItem): boolean => {
     if (isReadOnly) return false;
     if (lesson.status !== 'scheduled') return false;
-    if (lesson.lesson_date < todayStr) return false;
+    // Перенос и отмена - планирование. Прошедшее занятие планировать
+    // поздно, сервер такой запрос отклонит.
+    if (lesson.has_ended) return false;
     if (isAdmin()) return true;
     return lesson.teacher_id === currentUserId;
   };
@@ -243,7 +311,9 @@ const ScheduleCalendar = ({
   const canRestoreLesson = (lesson: ScheduleLessonItem): boolean => {
     if (isReadOnly) return false;
     if (lesson.status !== 'cancelled') return false;
-    if (lesson.lesson_date < todayStr) return false;
+    // По времени не ограничиваем: возврат - это исправление ошибки.
+    // Занятие, отменённое по ошибке, надо уметь вернуть и отметить
+    // проведённым, а прямой переход cancelled -> completed запрещён.
     if (isAdmin()) return true;
     return lesson.teacher_id === currentUserId;
   };
@@ -439,9 +509,13 @@ const ScheduleCalendar = ({
                         left: `calc(${leftPercent}% + 2px)`,
                         width: `calc(${widthPercent}% - 4px)`,
                       }}
+                      onClick={() => setOpenLessonId(lesson.lesson_id)}
                     >
                       {canManageLesson(lesson) && (
-                        <div className="lesson-block-actions">
+                        <div
+                          className="lesson-block-actions"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <button
                             type="button"
                             className="lesson-action-btn reschedule"
@@ -462,7 +536,10 @@ const ScheduleCalendar = ({
                       )}
 
                       {canRestoreLesson(lesson) && (
-                        <div className="lesson-block-actions">
+                        <div
+                          className="lesson-block-actions"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <button
                             type="button"
                             className="lesson-action-btn restore"
@@ -507,10 +584,16 @@ const ScheduleCalendar = ({
         />
       )}
 
+      {openLessonId !== null && (
+        <LessonCard
+          lessonId={openLessonId}
+          onClose={() => setOpenLessonId(null)}
+        />
+      )}
+
       {lessonToCancel && (
         <CancelLessonModal
           lesson={lessonToCancel}
-          studioId={studioId}
           onClose={() => setLessonToCancel(null)}
         />
       )}

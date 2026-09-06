@@ -8,10 +8,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { useSchedule } from '@/modules/schedule/hooks/useSchedule';
-import {
-  updateLessonThunk,
-  fetchStudioSchedule,
-} from '@/modules/schedule/store';
+import { updateLessonThunk } from '@/modules/schedule/store';
 import { fetchStudioClassrooms } from '@/modules/admin/store';
 import type { ScheduleLessonItem, LessonUpdate } from '@/api/schedule/types';
 import './createPatternModal.css';
@@ -35,7 +32,7 @@ const trimSeconds = (t: string): string => {
 
 const RescheduleLessonModal = ({ lesson, studioId, onClose }: RescheduleLessonModalProps) => {
   const dispatch = useAppDispatch();
-  const { isSubmitting, filters } = useSchedule();
+  const { isSubmitting } = useSchedule();
   const { classrooms } = useAppSelector((state) => state.admin);
 
   const initialStart = trimSeconds(lesson.start_time);
@@ -98,7 +95,6 @@ const RescheduleLessonModal = ({ lesson, studioId, onClose }: RescheduleLessonMo
 
     try {
       await dispatch(updateLessonThunk(lesson.lesson_id, payload));
-      await dispatch(fetchStudioSchedule(studioId, filters.fromDate, filters.toDate));
       onClose();
     } catch (e: any) {
       setError(e?.response?.data?.detail || 'Не удалось перенести занятие');

@@ -44,6 +44,7 @@ export {
   cancelLesson,
   completeLesson,
   markLessonAsMissed,
+  markLessonAsTeacherMissed,
   deleteLesson,
   fetchStudioSchedule,
   fetchTeacherSchedule,
