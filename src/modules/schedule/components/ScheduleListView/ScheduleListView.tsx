@@ -2,18 +2,22 @@
  * ScheduleListView - просмотр расписания списком по дням.
  *
  * Общий презентационный компонент для страниц расписания студента и
- * преподавателя. Только просмотр: ни отмены, ни переноса (управление
- * занятиями живёт внутри студии). Получает уже загруженные занятия и
- * флаги состояния, сам данные не грузит - это делает страница-обёртка
+ * преподавателя. Занятия приходят готовыми - грузит их страница-обёртка
  * через useSchedule.
+ *
+ * Клик по занятию открывает карточку. Она самодостаточна: принимает
+ * только lessonId и грузит детали сама, поэтому одинаково работает
+ * и здесь, и в сетке студии. Действия внутри неё сами разбираются
+ * с правами, ученику кнопок не покажут.
  *
  * Занятия группируются по датам и сортируются по времени. Для
  * преподавателя в строке показываем учеников, для студента -
  * преподавателя. Чем именно подписывать строку, решает проп subtitleMode.
  */
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { ScheduleLessonItem } from '@/api/schedule/types';
+import LessonCard from '@/modules/schedule/components/LessonCard/LessonCard';
 import { LESSON_STATUS_LABELS } from '@/api/schedule/types';
 import './scheduleListView.css';
 
@@ -73,6 +77,9 @@ const ScheduleListView = ({
   onNextWeek,
   onToday,
 }: ScheduleListViewProps) => {
+
+  const [openLessonId, setOpenLessonId] = useState<number | null>(null);
+
   // Группировка по дате + сортировка занятий внутри дня по времени.
   const groupedByDate = useMemo(() => {
     const grouped: Record<string, ScheduleLessonItem[]> = {};
@@ -141,8 +148,13 @@ const ScheduleListView = ({
               <ul className="slv-lessons">
                 {groupedByDate[date].map((lesson) => (
                   <li
-                    className={`slv-lesson slv-status-${lesson.status}`}
+                    className={`slv-lesson slv-status-${lesson.status}${
+                      lesson.has_ended && lesson.status === 'scheduled'
+                        ? ' slv-needs-review'
+                        : ''
+                    }`}
                     key={lesson.lesson_id}
+                    onClick={() => setOpenLessonId(lesson.lesson_id)}
                   >
                     <div className="slv-time">
                       {trimSeconds(lesson.start_time)}
@@ -165,6 +177,13 @@ const ScheduleListView = ({
             </div>
           ))}
         </div>
+      )}
+
+      {openLessonId !== null && (
+        <LessonCard
+          lessonId={openLessonId}
+          onClose={() => setOpenLessonId(null)}
+        />
       )}
     </div>
   );

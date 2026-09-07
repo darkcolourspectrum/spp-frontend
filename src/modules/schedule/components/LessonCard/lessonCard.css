@@ -1,6 +1,65 @@
 /* Карточка занятия. Оверлей и рамка берутся из createPatternModal.css,
    здесь только внутренности. */
 
+/* Оболочка модалки своя, а не из соседнего файла со стилями шаблонов:
+   карточка открывается и с личных страниц преподавателя и ученика,
+   где тот файл не подключён, и без этих правил окно оставалось
+   без затемнения и рамки. */
+
+.lesson-card-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(20, 25, 40, 0.45);
+}
+
+.lesson-card {
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(20, 25, 40, 0.25);
+}
+
+.lesson-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eef0f3;
+}
+
+.lesson-card-head h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #1f2430;
+}
+
+.lesson-card-close {
+  border: none;
+  background: none;
+  font-size: 24px;
+  line-height: 1;
+  color: #a0a6b1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.lesson-card-close:hover {
+  color: #2b313e;
+}
+
+.lesson-card-body {
+  padding: 20px;
+}
+
 .lesson-card {
   max-width: 520px;
 }

@@ -375,15 +375,6 @@
   color: #2b313e;
 }
 
-.legend-toggle:hover {
-  border-color: #c9cfd8;
-  color: #2b313e;
-}
-
-.legend-caret.open {
-  transform: rotate(180deg);
-}
-
 .legend-panel {
   position: absolute;
   top: calc(100% + 6px);

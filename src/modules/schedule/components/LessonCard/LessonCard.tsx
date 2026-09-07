@@ -201,19 +201,20 @@ const [showAttendance, setShowAttendance] = useState(false);
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div
-        className="modal-content lesson-card"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="modal-header">
+    <div className="lesson-card-overlay" onClick={onClose}>
+      <div className="lesson-card" onClick={(e) => e.stopPropagation()}>
+        <div className="lesson-card-head">
           <h2>Занятие</h2>
-          <button onClick={onClose} className="close-button" type="button">
+          <button
+            onClick={onClose}
+            className="lesson-card-close"
+            type="button"
+          >
             &times;
           </button>
         </div>
 
-        <div className="modal-body">
+        <div className="lesson-card-body">
           {isLoading && <div className="lesson-card-loading">Загрузка...</div>}
 
           {error && <div className="error-message">{error}</div>}

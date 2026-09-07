@@ -1,39 +1,36 @@
 /**
- * ScheduleCalendar - time-grid представление расписания студии.
+ * ScheduleCalendar - недельная сетка расписания студии.
  *
- * Layout: 6 колонок (Пн-Сб), слева шкала времени 09:00-21:00 шагом 30 мин.
- * Час = 60px по вертикали. Занятия рендерятся как абсолютно
- * позиционированные блоки внутри колонки своего дня:
- *   top    = (start - 09:00) в минутах * (60 / 60) px
- *   height = duration в минутах * (60 / 60) px
+ * Шесть колонок, Пн-Сб: воскресенье в SCHEDULE_WORKING_DAYS не входит.
+ * Слева шкала часов, час равен HOUR_HEIGHT_PX по вертикали, занятия -
+ * абсолютно позиционированные блоки внутри колонки своего дня.
  *
- * Наложения занятий в одном дне разруливаются упрощенно: каждое
- * занятие в группе пересекающихся получает width = 100/N% и left = i*100/N%.
+ * Границы шкалы подвижны. По умолчанию это рабочее окно студии, но если
+ * в загруженной неделе есть занятие за его пределами, сетка растягивается:
+ * занятие, которого нет на экране, но есть в базе, найти нечем.
  *
- * Что изменилось в этой версии:
+ * Наложения разруливаются группами. День режется на связные пачки
+ * пересекающихся занятий, и ширина делится внутри каждой пачки отдельно -
+ * иначе одна пара пересечений утром ужимала бы вдвое одинокое занятие
+ * вечером.
  *
- *   1. Появилось воскресенье. Раньше сетка рисовала шесть колонок, Пн-Сб.
- *      Шаблон при этом мог иметь слот на воскресенье, занятия создавались
- *      и жили в базе, но в календаре их не было видно вообще.
+ * Отменённые занятия в раскладке не участвуют вовсе. Отмена освобождает
+ * слот, и конкурировать за место такому занятию не за что: оно рисуется
+ * тонкой полоской в жёлобе у левого края, а вернуть его в расписание
+ * можно из карточки.
  *
- *   2. Клик по пустому месту создаёт занятие на этом слоте. Раньше
- *      единственным входом была кнопка в шапке, открывавшая форму
- *      с датой "сегодня" и временем 10:00 - нужный слот приходилось
- *      вбивать руками, глядя на сетку.
- *
- *   3. Отменённое занятие можно вернуть в расписание кнопкой на блоке.
+ * Клик по пустому месту создаёт занятие на этом времени, клик по
+ * занятию открывает карточку.
  */
 
 import { useMemo, useState, useEffect } from 'react';
 import { useSchedule } from '@/modules/schedule/hooks/useSchedule';
 import { useAuth } from '@/modules/auth/hooks/useAuth';
-import { useAppDispatch } from '@/store/hooks';
-import { restoreLesson } from '@/modules/schedule/store/scheduleSlice/actionCreators';
 import type { ScheduleLessonItem } from '@/api/schedule/types';
 import CancelLessonModal from './CancelLessonModal';
 import RescheduleLessonModal from './RescheduleLessonModal';
 import CreateLessonModal from './CreateLessonModal';
-import LessonCard from './LessonCard';
+import LessonCard from '@/modules/schedule/components/LessonCard/LessonCard';
 import ScheduleLegend from './ScheduleLegend';
 import './scheduleCalendar.css';
 
@@ -65,6 +62,10 @@ const CANCELLED_INSET_PX = 2;
 
 const WEEKDAY_LABELS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 const DAYS_IN_WEEK = 6;
+
+// Сетка показывает шесть дней, но соседняя неделя всё равно в семи днях:
+// сдвиг на шесть сломал бы выравнивание по понедельнику.
+const WEEK_STRIDE_DAYS = 7;
 
 // ====== Date helpers ======
 
@@ -134,10 +135,11 @@ interface PositionedLesson {
  * колонки, и ширина делится только на них.
  *
  *
- * Отменённые занятия в раскладке не участвуют: отмена освобождает слот,
- * и такое занятие ни с чем не конкурирует за место. Оно рисуется на всю
- * ширину и уезжает назад по z-index, а активные раскладываются так,
- * будто его нет.
+ * Отменённые и активные раскладываются независимо. Отменённые уходят
+ * в узкий жёлоб слева отдельными полосками. Жёлоб местный, а не на весь
+ * день: место под полоски резервируется только у тех групп занятий,
+ * под которыми полоски действительно есть - иначе четыре отмены
+ * в шесть вечера сдвигали бы вправо занятие в час дня.
  */
 interface LayoutGroup {
   lessons: ScheduleLessonItem[];
@@ -316,7 +318,6 @@ const ScheduleCalendar = ({
 }: ScheduleCalendarProps) => {
   const { user, isAdmin } = useAuth();
   const { filters, updateDateRange } = useSchedule();
-  const dispatch = useAppDispatch();
 
   const [lessonToCancel, setLessonToCancel] =
     useState<ScheduleLessonItem | null>(null);
@@ -473,7 +474,7 @@ const ScheduleCalendar = ({
           <button
             type="button"
             className="nav-btn"
-            onClick={() => shiftWeek(-7)}
+            onClick={() => shiftWeek(-WEEK_STRIDE_DAYS)}
             title="Предыдущая неделя"
           >
             ←
@@ -484,7 +485,7 @@ const ScheduleCalendar = ({
           <button
             type="button"
             className="nav-btn"
-            onClick={() => shiftWeek(7)}
+            onClick={() => shiftWeek(WEEK_STRIDE_DAYS)}
             title="Следующая неделя"
           >
             →

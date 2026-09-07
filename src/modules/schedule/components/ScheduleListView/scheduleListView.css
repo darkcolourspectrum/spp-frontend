@@ -155,6 +155,7 @@
   border-radius: 10px;
   padding: 14px 18px;
   transition: box-shadow 0.15s;
+  cursor: pointer;
 }
 
 .slv-lesson:hover {
@@ -240,6 +241,24 @@
 .slv-status-missed .slv-status {
   color: #e0a020;
 }
+
+.slv-status-teacher_missed {
+  border-left-color: #9c27b0;
+}
+.slv-status-teacher_missed .slv-status {
+  color: #9c27b0;
+}
+
+/* Прошло, но результат никто не отметил. */
+.slv-needs-review {
+  border-left-color: #ffb300;
+  background: #fffdf5;
+}
+.slv-needs-review .slv-status::after {
+  content: ' · не отмечено';
+  color: #b26a00;
+}
+
 
 /* ---- Адаптив ---- */
 @media (max-width: 560px) {
