@@ -361,12 +361,42 @@ const ScheduleCalendar = ({
     return map;
   }, [lessons]);
 
-  // Часы для шкалы слева (09, 10, ..., 21)
+  /**
+   * Границы сетки по вертикали.
+   *
+   * Рабочие часы студии - лишь значение по умолчанию. Если занятие
+   * оказалось за их пределами, сетка растягивается, чтобы его было
+   * видно: занятие, которого нет на экране, но есть в базе, найти
+   * нечем, и это хуже некрасивой сетки.
+   *
+   * Объявлено выше hours не случайно: у const нет подъёма, и обращение
+   * к этим значениям из хука, стоящего раньше в файле, роняет весь
+   * компонент при первом же рендере.
+   */
+  const { gridStartHour, gridEndHour } = useMemo(() => {
+    let start = STUDIO_OPEN_HOUR;
+    let end = STUDIO_CLOSE_HOUR;
+
+    for (const lesson of lessons) {
+      start = Math.min(
+        start,
+        Math.floor(timeToMinutes(lesson.start_time) / 60)
+      );
+      end = Math.max(end, Math.ceil(timeToMinutes(lesson.end_time) / 60));
+    }
+
+    return { gridStartHour: start, gridEndHour: end };
+  }, [lessons]);
+
+  const totalGridHeight =
+    (gridEndHour - gridStartHour) * HOUR_HEIGHT_PX + GRID_TAIL_PX;
+
+  // Часы для шкалы слева (по фактическим границам сетки)
   const hours = useMemo(() => {
     const arr: number[] = [];
     for (let h = gridStartHour; h <= gridEndHour; h++) arr.push(h);
     return arr;
-  }, []);
+  }, [gridStartHour, gridEndHour]);
 
   // Проверка прав на управление занятием
   const todayStr = formatLocalDate(new Date());
@@ -424,32 +454,6 @@ const ScheduleCalendar = ({
     const lastDay = addDays(monday, DAYS_IN_WEEK - 1);
     updateDateRange(formatLocalDate(monday), formatLocalDate(lastDay));
   };
-
-    /**
-   * Границы сетки по вертикали.
-   *
-   * Рабочие часы студии - лишь значение по умолчанию. Если занятие
-   * оказалось за их пределами, сетка растягивается, чтобы его было
-   * видно: занятие, которого нет на экране, но есть в базе, найти
-   * нечем, и это хуже некрасивой сетки.
-   */
-  const { gridStartHour, gridEndHour } = useMemo(() => {
-    let start = STUDIO_OPEN_HOUR;
-    let end = STUDIO_CLOSE_HOUR;
-
-    for (const lesson of lessons) {
-      start = Math.min(
-        start,
-        Math.floor(timeToMinutes(lesson.start_time) / 60)
-      );
-      end = Math.max(end, Math.ceil(timeToMinutes(lesson.end_time) / 60));
-    }
-
-    return { gridStartHour: start, gridEndHour: end };
-  }, [lessons]);
-
-  const totalGridHeight =
-    (gridEndHour - gridStartHour) * HOUR_HEIGHT_PX + GRID_TAIL_PX;
 
   // Позиция "линии сейчас" в пикселях от начала сетки и индекс
   // колонки текущего дня.
