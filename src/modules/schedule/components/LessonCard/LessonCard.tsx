@@ -26,7 +26,7 @@ import {
   restoreLesson,
 } from '@/modules/schedule/store/scheduleSlice/actionCreators';
 import {
-  LESSON_STATUS_LABELS,
+  lessonStatusLabel,
   ATTENDANCE_STATUS_LABELS,
 } from '@/api/schedule/types';
 import type {
@@ -40,6 +40,9 @@ interface LessonCardProps {
   lessonId: number;
   onClose: () => void;
 }
+
+/** Посещаемость поимённо: id ученика -> был или не был. */
+type AttendanceMap = Record<number, AttendanceStatus>;
 
 const WEEKDAYS = [
   'Воскресенье',
@@ -96,29 +99,34 @@ const attendanceLabel = (
   if (attendanceStatus === 'cancelled' && lessonStatus === 'teacher_missed') {
     return 'Не состоялось';
   }
+  // 'scheduled' у ученика означает "решения ещё нет". До окончания
+  // занятия это буквально план, после - незаполненные данные, и
+  // подпись должна отличаться.
+  if (attendanceStatus === 'scheduled' && lessonStatus === 'scheduled') {
+    return 'Не отмечено';
+  }
   return ATTENDANCE_STATUS_LABELS[attendanceStatus] || attendanceStatus;
 };
 
 const LessonCard = ({ lessonId, onClose }: LessonCardProps) => {
+  const { user, isAdmin } = useAuth();
+  const dispatch = useAppDispatch();
+
   const [lesson, setLesson] = useState<LessonWithDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-const { user, isAdmin } = useAuth();
-const dispatch = useAppDispatch();
+  const [isActing, setIsActing] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
-const [isActing, setIsActing] = useState(false);
-const [actionError, setActionError] = useState<string | null>(null);
-// Счётчик перезагрузок: после действия карточка перечитывает себя,
-// не переоткрываясь. Проще, чем выносить загрузку в отдельный колбэк.
-const [reloadToken, setReloadToken] = useState(0);
+  // Счётчик перезагрузок: после действия карточка перечитывает себя,
+  // не переоткрываясь. Проще, чем выносить загрузку в отдельный колбэк.
+  const [reloadToken, setReloadToken] = useState(0);
 
-// Режим поимённой отметки. Нужен только групповым занятиям и только
-// когда пришли не все - в остальных случаях посещаемость выводится
-// из статуса занятия автоматически.
-const [showAttendance, setShowAttendance] = useState(false);
-  /** Посещаемость поимённо: id ученика -> был или не был. */
-  type AttendanceMap = Record<number, AttendanceStatus>;
+  // Режим поимённой отметки. Нужен только групповым занятиям и только
+  // когда пришли не все - в остальных случаях посещаемость выводится
+  // из статуса занятия автоматически.
+  const [showAttendance, setShowAttendance] = useState(false);
   const [attendance, setAttendance] = useState<AttendanceMap>({});
 
   useEffect(() => {
@@ -160,6 +168,14 @@ const [showAttendance, setShowAttendance] = useState(false);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [onClose]);
 
+    // Пока данных нет, карточки не существует. Иначе окно появляется
+    // пустой коробкой и на глазах вырастает под содержимое - именно это
+    // читается как рывок. Модалка лида в CRM устроена так же.
+    //
+    // Ошибку показываем, даже если занятие не загрузилось: иначе клик
+    // выглядел бы как ничего не произошло.
+    if (!lesson && !error) return null;
+
     const canManage = !!lesson && (isAdmin() || lesson.teacher_id === user?.id);
 
   const runAction = async (action: () => Promise<unknown>) => {
@@ -180,7 +196,7 @@ const [showAttendance, setShowAttendance] = useState(false);
     if (!lesson) return;
     // По умолчанию все присутствовали - преподаватель снимает тех, кого
     // не было, а не отмечает каждого пришедшего.
-    const initial: Record<number, AttendanceStatus> = {};
+    const initial: AttendanceMap = {};
     lesson.students.forEach((item) => {
       // На неотмеченном занятии по умолчанию все были - преподаватель
       // снимает отсутствовавших. На уже отмеченном показываем то, что
@@ -202,7 +218,10 @@ const [showAttendance, setShowAttendance] = useState(false);
 
   return (
     <div className="lesson-card-overlay" onClick={onClose}>
-      <div className="lesson-card" onClick={(e) => e.stopPropagation()}>
+        <div
+        className={`lesson-card${isLoading ? ' is-reloading' : ''}`}
+        onClick={(e) => e.stopPropagation()}
+        >
         <div className="lesson-card-head">
           <h2>Занятие</h2>
           <button
@@ -215,11 +234,14 @@ const [showAttendance, setShowAttendance] = useState(false);
         </div>
 
         <div className="lesson-card-body">
-          {isLoading && <div className="lesson-card-loading">Загрузка...</div>}
+          {/* Спиннер только на первой загрузке. При перечитывании после
+              действия старое содержимое остаётся на месте: подменять его
+              на строку "Загрузка" значит схлопнуть окно и раскрыть
+              обратно, а выглядит это как вторая открывающаяся модалка. */}
 
           {error && <div className="error-message">{error}</div>}
 
-          {lesson && !isLoading && (
+          {lesson && (
             <>
               <div className="lesson-card-headline">
                 <div className="lesson-card-date">
@@ -232,14 +254,19 @@ const [showAttendance, setShowAttendance] = useState(false);
               </div>
 
               <div className="lesson-card-badges">
-                <span className={`lesson-card-status status-${lesson.status}`}>
-                  {LESSON_STATUS_LABELS[lesson.status] || lesson.status}
+                {/* Значка "не отмечено" рядом больше нет: он говорил
+                    то же самое, что и подпись статуса. */}
+                <span
+                  className={`lesson-card-status status-${lesson.status}${
+                    lesson.has_ended && lesson.status === 'scheduled'
+                      ? ' needs-review'
+                      : ''
+                  }`}
+                >
+                  {lessonStatusLabel(lesson.status, lesson.has_ended)}
                 </span>
                 {lesson.is_recurring && (
                   <span className="lesson-card-badge">Из шаблона</span>
-                )}
-                {lesson.has_ended && lesson.status === 'scheduled' && (
-                  <span className="lesson-card-badge warning">Не отмечено</span>
                 )}
               </div>
 
@@ -293,7 +320,7 @@ const [showAttendance, setShowAttendance] = useState(false);
                   </ul>
                 )}
               </div>
-                            {canManage && (
+                {canManage && (
                 <div className="lesson-card-actions">
                   {actionError && (
                     <div className="error-message">{actionError}</div>
@@ -305,6 +332,14 @@ const [showAttendance, setShowAttendance] = useState(false);
                       после времени окончания.
                     </div>
                   )}
+
+                  {lesson.has_ended &&
+                    lesson.status === 'scheduled' &&
+                    !showAttendance && (
+                      <div className="lesson-card-call">
+                        Отметьте, как прошло занятие
+                      </div>
+                    )}
 
                   {lesson.status === 'cancelled' && (
                     <button
@@ -326,7 +361,11 @@ const [showAttendance, setShowAttendance] = useState(false);
                         {lesson.status !== 'completed' && (
                           <button
                             type="button"
-                            className="btn-primary"
+                            className={
+                              lesson.status === 'scheduled'
+                                ? 'lesson-card-btn pending'
+                                : 'lesson-card-btn done'
+                            }
                             disabled={isActing}
                             onClick={() =>
                               runAction(() =>
@@ -341,7 +380,7 @@ const [showAttendance, setShowAttendance] = useState(false);
                         {lesson.students.length > 1 && (
                           <button
                             type="button"
-                            className="btn-secondary"
+                            className="lesson-card-btn partial"
                             disabled={isActing}
                             onClick={openAttendance}
                           >
@@ -352,7 +391,7 @@ const [showAttendance, setShowAttendance] = useState(false);
                         {lesson.status !== 'missed' && (
                           <button
                             type="button"
-                            className="btn-secondary"
+                            className="lesson-card-btn missed"
                             disabled={isActing}
                             onClick={() =>
                               runAction(() =>
@@ -369,7 +408,7 @@ const [showAttendance, setShowAttendance] = useState(false);
                         {lesson.status !== 'teacher_missed' && (
                           <button
                             type="button"
-                            className="btn-secondary"
+                            className="lesson-card-btn teacher-missed"
                             disabled={isActing}
                             onClick={() =>
                               runAction(() =>

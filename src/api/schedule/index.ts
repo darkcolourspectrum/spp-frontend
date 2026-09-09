@@ -27,6 +27,8 @@ import type {
   RecurringPatternPreviewResponse,
   RecurringPatternWithGeneration,
   LessonCompleteRequest,
+  UnmarkedLessonsResponse,
+  UnmarkedLessonsParams,
 } from './types';
 
 // ==================== RECURRING PATTERNS ====================
@@ -256,6 +258,21 @@ export const getStudentSchedule = async (
 ): Promise<StudentScheduleResponse> => {
   const response = await apiClient.get(`/api/schedule/schedule/students/${studentId}`, {
     params: { from_date: fromDate, to_date: toDate },
+  });
+  return response.data;
+};
+
+/**
+ * Занятия, у которых время вышло, а результат не проставлен.
+ *
+ * Преподавателю сервер отдаёт только его собственные, независимо
+ * от переданных параметров.
+ */
+export const getUnmarkedLessons = async (
+  params: UnmarkedLessonsParams = {}
+): Promise<UnmarkedLessonsResponse> => {
+  const response = await apiClient.get('/api/schedule/schedule/unmarked', {
+    params,
   });
   return response.data;
 };

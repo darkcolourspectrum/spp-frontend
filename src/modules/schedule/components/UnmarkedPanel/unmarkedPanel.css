@@ -1,0 +1,114 @@
+/* Панель хвоста неотмеченных.
+
+   Оранжевый тот же, что у точки на блоке в сетке и у призыва к действию
+   в карточке: один цвет означает одно - результата ещё нет, от человека
+   ждут решения. */
+
+.unmarked-panel {
+  margin-bottom: 16px;
+  border: 1px solid #ffcc80;
+  border-radius: 8px;
+  background: #fff8e1;
+  overflow: hidden;
+}
+
+.unmarked-panel__toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.unmarked-panel__toggle:hover {
+  background: rgba(255, 152, 0, 0.07);
+}
+
+.unmarked-panel__dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff9800;
+}
+
+.unmarked-panel__title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #a15c00;
+}
+
+.unmarked-panel__caret {
+  font-size: 11px;
+  color: #a15c00;
+  transition: transform 0.15s;
+}
+
+.unmarked-panel__caret.open {
+  transform: rotate(180deg);
+}
+
+/* ==================== Список ==================== */
+
+.unmarked-panel__list {
+  list-style: none;
+  margin: 0;
+  padding: 0 6px 6px;
+}
+
+.unmarked-panel__item {
+  display: grid;
+  grid-template-columns: 110px 95px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #ffe0b2;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.unmarked-panel__item + .unmarked-panel__item {
+  margin-top: 5px;
+}
+
+.unmarked-panel__item:hover {
+  border-color: #ffb74d;
+  background: #fffdf7;
+}
+
+.unmarked-panel__date {
+  color: #a15c00;
+  font-weight: 600;
+}
+
+.unmarked-panel__time {
+  color: #2b313e;
+  font-variant-numeric: tabular-nums;
+}
+
+.unmarked-panel__who {
+  color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unmarked-panel__more {
+  padding: 8px 10px 4px;
+  font-size: 12px;
+  color: #a15c00;
+}
+
+@media (max-width: 640px) {
+  .unmarked-panel__item {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+}

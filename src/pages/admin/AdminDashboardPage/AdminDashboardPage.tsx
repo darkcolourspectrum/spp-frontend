@@ -8,6 +8,7 @@ import RoleDistributionChart from './components/RoleDistributionChart';
 import StudiosChart from './components/StudiosChart';
 import RecentActivity from './components/RecentActivity';
 import SystemAlerts from './components/SystemAlerts';
+import UnmarkedWidget from './components/UnmarkedWidget';
 import './adminDashboardPage.css';
 import './analyticsSection.css';
 
@@ -67,6 +68,8 @@ const AdminDashboardPage = () => {
 
       {/* Аналитика - главный блок для управленческих решений */}
       <AnalyticsSection />
+      {/* Unmarked Lessons Widget */}
+      <UnmarkedWidget />
 
       {/* Операционная статистика системы */}
       <div className="operational-divider">
@@ -75,6 +78,7 @@ const AdminDashboardPage = () => {
 
       {/* Stats Cards */}
       <StatsCards stats={dashboardStats} />
+
 
       {/* Charts Section */}
       <div className="charts-section">

@@ -216,13 +216,73 @@
 }
 
 .lesson-block.status-missed {
-  background: #fff3e0;
-  border-left-color: #ff9800;
+  background: #f3e5f5;
+  border-left-color: #9c27b0;
 }
 
 .lesson-block.status-teacher_missed {
-  background: #f3e5f5;
-  border-left-color: #9c27b0;
+  background: #eceff1;
+  border-left-color: #263238;
+}
+
+
+/* Прошло, но результат никто не отметил.
+
+   Кольцо - отдельный псевдоэлемент, растущий через transform. Раньше
+   оно рисовалось расходящейся box-shadow, а её браузер пересчитывает
+   на каждом кадре в основном потоке, отсюда и рывки. transform
+   и opacity считает видеокарта, поэтому идёт гладко. */
+
+.lesson-block.needs-review {
+  border-left-color: #ff9800;
+}
+
+@keyframes needs-review-edge {
+  0%, 100% {
+    border-left-color: #2196f3;
+  }
+  50% {
+    border-left-color: #ff9800;
+  }
+}
+
+.lesson-block.needs-review::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff9800;
+}
+
+.lesson-block.needs-review::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff9800;
+  animation: needs-review-pulse 2.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes needs-review-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  70% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
 }
 
 .lesson-block-time {
@@ -452,19 +512,32 @@
 }
 
 .legend-swatch.status-missed {
-  background: #fff3e0;
-  border-left-color: #e65100;
-}
-
-.legend-swatch.status-teacher_missed {
   background: #f3e5f5;
   border-left-color: #9c27b0;
 }
 
+.legend-swatch.status-teacher_missed {
+  background: #eceff1;
+  border-left-color: #263238;
+}
+
+/* Образец ожидания отметки повторяет блок в сетке: синий фон,
+   оранжевая полоса, точка-уведомление в углу. */
 .legend-swatch.needs-review {
-  background: #fff8e1;
-  border: 1px dashed #ffb300;
-  border-left: 3px solid #ffb300;
+  position: relative;
+  background: #e3f2fd;
+  border-left: 3px solid #ff9800;
+}
+
+.legend-swatch.needs-review::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #ff9800;
 }
 
 .legend-swatch.is-marker {

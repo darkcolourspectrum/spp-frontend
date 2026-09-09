@@ -137,6 +137,22 @@ export type LessonStatus =
   | 'missed'
   | 'teacher_missed';
 
+/**
+ * Подпись статуса с оглядкой на время.
+ *
+ * Прошедшее занятие в статусе scheduled - это не "запланировано",
+ * планировать его поздно. Статус в базе при этом остаётся scheduled
+ * намеренно: система не выдумывает результат за человека, она лишь
+ * показывает, что решения ещё нет.
+ */
+export const lessonStatusLabel = (
+  status: LessonStatus,
+  hasEnded: boolean
+): string => {
+  if (status === 'scheduled' && hasEnded) return 'Ожидает отметки';
+  return LESSON_STATUS_LABELS[status] || status;
+};
+
 export interface Lesson {
   id: number;
   studio_id: number;
@@ -248,6 +264,19 @@ export interface StudentScheduleResponse {
   total: number;
 }
 
+/** Ответ GET /schedule/unmarked: хвост занятий без отметки. */
+export interface UnmarkedLessonsResponse {
+  total: number;
+  lessons: ScheduleLessonItem[];
+}
+
+/** Параметры запроса хвоста. Все необязательные. */
+export interface UnmarkedLessonsParams {
+  studio_id?: number;
+  teacher_id?: number;
+  from_date?: string;
+  limit?: number;
+}
 
 // ==================== GENERATION ====================
 

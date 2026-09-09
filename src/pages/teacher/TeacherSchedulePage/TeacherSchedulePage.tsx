@@ -15,6 +15,7 @@ import { useAuth } from '@/modules/auth/hooks/useAuth';
 import { useSchedule } from '@/modules/schedule/hooks/useSchedule';
 import ScheduleListView from '../../../modules/schedule/components/ScheduleListView/ScheduleListView';
 import { useWeekRange } from '../../../modules/schedule/hooks/useWeekRange';
+import UnmarkedPanel from '@/modules/schedule/components/UnmarkedPanel/UnmarkedPanel';
 
 const TeacherSchedulePage = () => {
   const { user } = useAuth();
@@ -29,16 +30,19 @@ const TeacherSchedulePage = () => {
   }, [user?.id, fromDate, toDate]);
 
   return (
-    <ScheduleListView
-      lessons={lessons}
-      isLoading={isLoadingSchedule}
-      fromDate={fromDate}
-      toDate={toDate}
-      subtitleMode="teacher"
-      onPrevWeek={goPrevWeek}
-      onNextWeek={goNextWeek}
-      onToday={goToday}
-    />
+    <>
+      <UnmarkedPanel />
+      <ScheduleListView
+        lessons={lessons}
+        isLoading={isLoadingSchedule}
+        fromDate={fromDate}
+        toDate={toDate}
+        subtitleMode="teacher"
+        onPrevWeek={goPrevWeek}
+        onNextWeek={goNextWeek}
+        onToday={goToday}
+      />
+    </>
   );
 };
 

@@ -43,8 +43,8 @@ const STATUS_ITEMS: LegendItem[] = [
 const MARK_ITEMS: LegendItem[] = [
   {
     className: 'needs-review',
-    label: 'Не отмечено',
-    hint: 'Время занятия истекло, а результат никто не проставил',
+    label: 'Ожидает отметки',
+    hint: 'Занятие закончилось, а результат никто не проставил',
   },
   {
     className: 'is-marker',

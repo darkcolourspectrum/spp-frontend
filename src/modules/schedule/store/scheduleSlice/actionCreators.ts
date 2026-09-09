@@ -12,6 +12,7 @@ import type {
   GenerateLessonsRequest,
   RecurringPatternPreviewRequest,
   AttendanceStatus,
+  UnmarkedLessonsParams,
 } from '@/api/schedule/types';
 import {
   setPatterns,
@@ -24,6 +25,8 @@ import {
   setSubmitting,
   setError,
   setSuccessMessage,
+  setLoadingUnmarked,
+  setUnmarked,
 } from './scheduleReducer';
 
 /**
@@ -50,6 +53,16 @@ export const refreshCurrentSchedule = () => {
     if (studentId) {
       return dispatch(fetchStudentSchedule(studentId, fromDate, toDate));
     }
+
+    // Хвост обновляется вместе с расписанием: отмеченное занятие должно
+    // исчезнуть из него сразу, а не после перезагрузки страницы.
+    // Параметры берём те же, с какими его грузили в прошлый раз - иначе
+    // хвост преподавателя подменился бы хвостом студии.
+    const { unmarkedParams } = getState().schedule;
+    if (unmarkedParams) {
+      await dispatch(fetchUnmarkedLessons(unmarkedParams));
+    }
+
   };
 };
 
@@ -448,6 +461,34 @@ export const fetchStudentSchedule = (
       dispatch(setError(errorMessage));
     } finally {
       dispatch(setLoadingSchedule(false));
+    }
+  };
+};
+
+/**
+ * Загрузить хвост неотмеченных занятий.
+ *
+ * Считается живым запросом к расписанию, а не берётся из аналитики:
+ * занятие переходит в ожидание отметки само, по ходу часов, и никакого
+ * события при этом не происходит - обновлять проекцию было бы нечем.
+ */
+export const fetchUnmarkedLessons = (
+  params: UnmarkedLessonsParams = {}
+) => {
+  return async (dispatch: AppDispatch) => {
+    try {
+      dispatch(setLoadingUnmarked(true));
+
+            const data = await scheduleApi.getUnmarkedLessons(params);
+      dispatch(
+        setUnmarked({ total: data.total, lessons: data.lessons, params })
+      );
+    } catch (error: any) {
+      const message =
+        error.response?.data?.detail || 'Не удалось загрузить список';
+      dispatch(setError(message));
+    } finally {
+      dispatch(setLoadingUnmarked(false));
     }
   };
 };

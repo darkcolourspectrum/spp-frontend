@@ -10,6 +10,7 @@ import type {
   ScheduleStudioInfo,
   ScheduleClassroomInfo,
   ScheduleStudioMembersResponse,
+  UnmarkedLessonsParams,
 } from '@/api/schedule/types';
 
 // ==================== STATE TYPE ====================
@@ -56,6 +57,14 @@ export interface ScheduleState {
   
   // Последнее обновление
   lastUpdated: string | null;
+
+  /** Хвост неотмеченных: число по всему хвосту и свежие строки. */
+  unmarked: ScheduleLessonItem[];
+  unmarkedTotal: number;
+  isLoadingUnmarked: boolean;
+
+  /** Параметры последнего запроса хвоста - чтобы обновлять его тем же. */
+  unmarkedParams: UnmarkedLessonsParams | null;
 }
 
 // ==================== INITIAL STATE ====================
@@ -110,6 +119,10 @@ const initialState: ScheduleState = {
   studioClassrooms: [],
   studioMembers: null,
   isLoadingMembership: false,
+  unmarked: [],
+  unmarkedTotal: 0,
+  unmarkedParams: null,
+  isLoadingUnmarked: false,
 };
 
 // ==================== SLICE ====================
@@ -273,6 +286,26 @@ const scheduleSlice = createSlice({
       }
     },
 
+    setLoadingUnmarked: (state, action: PayloadAction<boolean>) => {
+      state.isLoadingUnmarked = action.payload;
+    },
+    setUnmarked: (
+      state,
+      action: PayloadAction<{
+        total: number;
+        lessons: ScheduleLessonItem[];
+        params: UnmarkedLessonsParams;
+      }>
+    ) => {
+      state.unmarkedTotal = action.payload.total;
+      state.unmarked = action.payload.lessons;
+      state.unmarkedParams = action.payload.params;
+    },
+    clearUnmarked: (state) => {
+      state.unmarked = [];
+      state.unmarkedTotal = 0;
+      state.unmarkedParams = null;
+    },
     // ========== CLEAR ==========
     
     clearScheduleData: (state) => {
@@ -318,6 +351,9 @@ export const {
   setStudioClassrooms,
   setStudioMembers,
   setLoadingMembership,
+  setLoadingUnmarked,
+  setUnmarked,
+  clearUnmarked,
 } = scheduleSlice.actions;
 
 export default scheduleSlice.reducer;

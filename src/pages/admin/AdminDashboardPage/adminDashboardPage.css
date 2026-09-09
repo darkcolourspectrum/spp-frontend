@@ -534,3 +534,34 @@
     font-size: 28px;
   }
 }
+
+/* Unmarked Lessons Widget */
+
+.unmarked-widget {
+  padding: 16px 18px;
+  border: 1px solid #e2e5ea;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.unmarked-widget.has-items {
+  border-color: #ffcc80;
+  background: #fff8e1;
+}
+
+.unmarked-widget__value {
+  font-size: 30px;
+  font-weight: 700;
+  color: #2b313e;
+  line-height: 1.1;
+}
+
+.unmarked-widget.has-items .unmarked-widget__value {
+  color: #a15c00;
+}
+
+.unmarked-widget__label {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #6b7280;
+}

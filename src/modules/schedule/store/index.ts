@@ -31,6 +31,7 @@ export {
   setSuccessMessage,
   clearSuccessMessage,
   clearScheduleData,
+  clearUnmarked,
 } from './scheduleSlice/scheduleReducer';
 
 // Action Creators (Thunks)
@@ -50,6 +51,7 @@ export {
   fetchTeacherSchedule,
   fetchStudentSchedule,
   generateLessons,
+  fetchUnmarkedLessons,
 } from './scheduleSlice/actionCreators';
 
 export {

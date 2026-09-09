@@ -236,26 +236,25 @@
 }
 
 .slv-status-missed {
-  border-left-color: #e0a020;
+  border-left-color: #9c27b0;
 }
 .slv-status-missed .slv-status {
-  color: #e0a020;
+  color: #9c27b0;
 }
 
 .slv-status-teacher_missed {
-  border-left-color: #9c27b0;
+  border-left-color: #263238;
 }
 .slv-status-teacher_missed .slv-status {
-  color: #9c27b0;
+  color: #263238;
 }
 
 /* Прошло, но результат никто не отметил. */
 .slv-needs-review {
-  border-left-color: #ffb300;
+  border-left-color: #ffa000;
   background: #fffdf5;
 }
-.slv-needs-review .slv-status::after {
-  content: ' · не отмечено';
+.slv-needs-review .slv-status {
   color: #b26a00;
 }
 

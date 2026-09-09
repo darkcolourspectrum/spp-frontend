@@ -18,7 +18,7 @@
 import { useMemo, useState } from 'react';
 import type { ScheduleLessonItem } from '@/api/schedule/types';
 import LessonCard from '@/modules/schedule/components/LessonCard/LessonCard';
-import { LESSON_STATUS_LABELS } from '@/api/schedule/types';
+import { lessonStatusLabel } from '@/api/schedule/types';
 import './scheduleListView.css';
 
 interface ScheduleListViewProps {
@@ -169,7 +169,7 @@ const ScheduleListView = ({
                       {lesson.notes && <div className="slv-notes">{lesson.notes}</div>}
                     </div>
                     <div className="slv-status">
-                      {LESSON_STATUS_LABELS[lesson.status] ?? lesson.status}
+                      {lessonStatusLabel(lesson.status, lesson.has_ended)}
                     </div>
                   </li>
                 ))}
